@@ -6,157 +6,196 @@
 <title>🖤 Chat Noir-MD | Pairing</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
     font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(circle at top, #111 0%, #000 70%);
+    background: url('https://files.catbox.moe/pnl7iq.jpg') center/cover no-repeat fixed;
     color: #fff;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px;
   }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 0;
+  }
+
   .card {
-    background: #0e0e0e;
-    border: 1px solid #1f1f1f;
-    border-radius: 18px;
-    padding: 32px 24px;
-    max-width: 420px;
+    position: relative;
+    z-index: 1;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(6px);
+    border: 1px solid #222;
+    border-radius: 16px;
+    padding: 22px 20px;
+    max-width: 360px;
     width: 100%;
-    box-shadow: 0 0 40px rgba(57, 255, 20, 0.08), 0 8px 30px rgba(0,0,0,0.6);
+    box-shadow: 0 0 30px rgba(57,255,20,0.1), 0 8px 24px rgba(0,0,0,0.6);
     text-align: center;
   }
+
+  .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #39ff14;
+    box-shadow: 0 0 12px rgba(57,255,20,0.6);
+    margin-bottom: 8px;
+    animation: pulseGlow 1.8s infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 8px rgba(57,255,20,0.4); }
+    50% { box-shadow: 0 0 20px rgba(57,255,20,0.9); }
+  }
+
   .logo {
-    font-size: 26px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: 1px;
     color: #39ff14;
-    text-shadow: 0 0 10px rgba(57,255,20,0.5);
-    margin-bottom: 4px;
+    text-shadow: 0 0 8px rgba(57,255,20,0.5);
+    margin-bottom: 2px;
   }
+
   .subtitle {
-    color: #888;
-    font-size: 13px;
-    margin-bottom: 24px;
+    color: #999;
+    font-size: 12px;
+    margin-bottom: 16px;
   }
 
   .section-title {
     text-align: left;
     color: #39ff14;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
-    margin-bottom: 10px;
-    letter-spacing: 0.5px;
+    margin-bottom: 6px;
   }
 
   .servers {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 16px;
   }
+
   .server-btn {
-    background: #161616;
+    background: #131313;
     border: 1px solid #2a2a2a;
-    border-radius: 10px;
-    padding: 12px 6px;
+    border-radius: 8px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
     transition: 0.2s;
-    color: #fff;
+    position: relative;
   }
-  .server-btn:hover:not(.full) { border-color: #39ff14; }
+
+  .server-btn:not(.full):hover { border-color: #39ff14; }
+
   .server-btn.selected {
     border-color: #39ff14;
     background: #0f1f0f;
-    box-shadow: 0 0 12px rgba(57,255,20,0.35);
+    animation: blink 1s infinite;
   }
+
+  @keyframes blink {
+    0%, 100% { box-shadow: 0 0 6px rgba(57,255,20,0.5); }
+    50% { box-shadow: 0 0 14px rgba(57,255,20,1); }
+  }
+
   .server-btn.full {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
   }
-  .server-num {
-    font-size: 18px;
-    font-weight: 800;
-  }
-  .server-count {
-    font-size: 11px;
-    color: #999;
-    margin-top: 4px;
-  }
-  .server-btn.full .server-count { color: #ff5555; }
 
   input {
     width: 100%;
-    padding: 14px;
-    border-radius: 10px;
+    padding: 11px;
+    border-radius: 8px;
     border: 1px solid #2a2a2a;
     background: #050505;
     color: #fff;
-    font-size: 16px;
-    margin-bottom: 14px;
+    font-size: 14px;
+    margin-bottom: 12px;
     outline: none;
   }
   input:focus { border-color: #39ff14; }
 
   button.submit {
     width: 100%;
-    padding: 14px;
-    border-radius: 10px;
+    padding: 11px;
+    border-radius: 8px;
     border: none;
     background: #39ff14;
     color: #000;
     font-weight: 800;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
     transition: 0.2s;
   }
   button.submit:hover { background: #2fd90f; }
   button.submit:disabled { background: #333; color: #777; cursor: not-allowed; }
 
-  .result { margin-top: 22px; display: none; }
+  .result { margin-top: 16px; display: none; }
   .code-box {
     background: #050505;
     border: 2px dashed #39ff14;
-    border-radius: 10px;
-    padding: 18px;
-    font-size: 28px;
-    letter-spacing: 4px;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 24px;
+    letter-spacing: 3px;
     font-weight: 800;
     color: #39ff14;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    animation: blink 1.2s infinite;
   }
+
   .steps {
     text-align: left;
     color: #ccc;
-    font-size: 13px;
-    line-height: 1.6;
+    font-size: 12px;
+    line-height: 1.5;
   }
+
   .error {
     color: #ff5555;
-    font-size: 13px;
-    margin-top: 12px;
+    font-size: 12px;
+    margin-top: 10px;
     display: none;
   }
+
   .footer {
-    margin-top: 26px;
-    font-size: 11px;
-    color: #444;
+    margin-top: 18px;
+    font-size: 10px;
+    color: #555;
   }
-  .paw { font-size: 34px; margin-bottom: 6px; }
 </style>
 </head>
 <body>
 
 <div class="card">
-  <div class="paw">🐾</div>
+  <img class="avatar" src="https://files.catbox.moe/3cvx9z.jpg" alt="Chat Noir">
   <div class="logo">CHAT NOIR-MD</div>
   <div class="subtitle">Génère ton code de pairing WhatsApp</div>
 
-  <div class="section-title">📡 Choisis un serveur</div>
+  <div class="section-title">📡 Serveur</div>
   <div class="servers" id="serverList"></div>
 
-  <div class="section-title">📱 Ton numéro WhatsApp</div>
-  <input type="text" id="phoneInput" placeholder="Ex: 221776227173 (avec l'indicatif)">
+  <div class="section-title">📱 Numéro WhatsApp</div>
+  <input type="text" id="phoneInput" placeholder="Ex: 221776227173">
 
   <button class="submit" id="submitBtn" onclick="generateCode()">Générer le code</button>
 
@@ -165,9 +204,9 @@
   <div class="result" id="resultBox">
     <div class="code-box" id="codeText">------</div>
     <div class="steps">
-      1. Va sur WhatsApp > <b>Paramètres</b><br>
+      1. WhatsApp > <b>Paramètres</b><br>
       2. <b>Appareils connectés</b> > <b>Connecter un appareil</b><br>
-      3. Choisis <b>"Connecter avec un numéro"</b><br>
+      3. <b>Connecter avec un numéro</b><br>
       4. Entre le code ci-dessus
     </div>
   </div>
@@ -176,21 +215,16 @@
 </div>
 
 <script>
-  // ⚙️ Remplace par l'URL de ton API sur KataBump une fois le serveur créé
   const API_URL = "https://TON-URL-KATABUMP.com/api/pair";
-
   const MAX_PER_SERVER = 10;
   const servers = [1,2,3,4,5,6,7,8,9];
   let selectedServer = null;
 
-  // ⚠️ Ceci est un compteur LOCAL (démo uniquement).
-  // Un vrai compteur partagé entre tous les visiteurs doit venir du serveur (backend),
-  // sinon chaque personne voit ses propres chiffres, pas les chiffres réels de tout le monde.
   function getServerCounts() {
     const saved = localStorage.getItem("serverCounts");
     if (saved) return JSON.parse(saved);
     const initial = {};
-    servers.forEach(s => initial[s] = Math.floor(Math.random() * 6)); // valeurs de départ factices
+    servers.forEach(s => initial[s] = Math.floor(Math.random() * 6));
     localStorage.setItem("serverCounts", JSON.stringify(initial));
     return initial;
   }
@@ -204,12 +238,10 @@
       const isFull = count >= MAX_PER_SERVER;
       const div = document.createElement("div");
       div.className = "server-btn" + (isFull ? " full" : "") + (selectedServer === num ? " selected" : "");
-      div.innerHTML = `<div class="server-num">#${num}</div><div class="server-count">${count}/${MAX_PER_SERVER}</div>`;
+      div.textContent = num;
+      div.title = `${count}/${MAX_PER_SERVER}`;
       if (!isFull) {
-        div.onclick = () => {
-          selectedServer = num;
-          renderServers();
-        };
+        div.onclick = () => { selectedServer = num; renderServers(); };
       }
       list.appendChild(div);
     });
@@ -231,15 +263,14 @@
       errorBox.style.display = "block";
       return;
     }
-
     if (!phone || phone.length < 8) {
-      errorBox.textContent = "⚠️ Entre un numéro WhatsApp valide avec l'indicatif.";
+      errorBox.textContent = "⚠️ Entre un numéro WhatsApp valide.";
       errorBox.style.display = "block";
       return;
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "Génération en cours...";
+    submitBtn.textContent = "Génération...";
 
     try {
       const res = await fetch(API_URL, {
@@ -252,8 +283,6 @@
       if (data.success && data.code) {
         document.getElementById("codeText").textContent = data.code;
         resultBox.style.display = "block";
-
-        // Incrémente le compteur local (démo)
         const counts = getServerCounts();
         counts[selectedServer] = (counts[selectedServer] || 0) + 1;
         localStorage.setItem("serverCounts", JSON.stringify(counts));
@@ -263,7 +292,7 @@
         errorBox.style.display = "block";
       }
     } catch (err) {
-      errorBox.textContent = "❌ Impossible de contacter le serveur. Vérifie que le backend est en ligne.";
+      errorBox.textContent = "❌ Impossible de contacter le serveur.";
       errorBox.style.display = "block";
     }
 
