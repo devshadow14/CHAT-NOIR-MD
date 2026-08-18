@@ -1,6 +1,7 @@
 {
   "name": "chat-noir-vercel",
   "version": "1.0.0",
+  "description": "Générateur de code WhatsApp",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.9",
     "pino": "^8.14.1"
