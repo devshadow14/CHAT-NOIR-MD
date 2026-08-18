@@ -32,7 +32,6 @@
     background: rgba(0,0,0,0.35);
   }
 
-  /* ---------- Bouton Mode Sombre/Nuit (coin haut) ---------- */
   .mode-toggle {
     position: fixed;
     top: 16px;
@@ -54,7 +53,6 @@
   }
   .mode-toggle:hover { box-shadow: 0 0 16px rgba(57,255,20,0.6); }
 
-  /* ---------- Bouton Son (bas de page) ---------- */
   .sound-toggle {
     position: fixed;
     bottom: 16px;
@@ -90,7 +88,6 @@
     text-align: center;
   }
 
-  /* ---------- Yeux de chat noir animés ---------- */
   .cat-eyes {
     display: flex;
     justify-content: center;
@@ -232,10 +229,10 @@
 </head>
 <body>
 
-<!-- Bouton mode sombre/nuit -->
-<button class="mode-toggle" id="modeToggle" title="Basculer le mode">🌙</button>
+<!-- Son d'ambiance (démarre coupé, l'utilisateur doit cliquer pour l'activer) -->
+<audio id="ambientSound" src="https://files.catbox.moe/zf8z97.opus" loop preload="none"></audio>
 
-<!-- Bouton son (pas encore de fichier audio configuré) -->
+<button class="mode-toggle" id="modeToggle" title="Basculer le mode">🌙</button>
 <button class="sound-toggle" id="soundToggle" title="Activer/couper le son">🔇</button>
 
 <div class="card">
@@ -280,15 +277,20 @@
     modeToggle.textContent = isLightMode ? "☀️" : "🌙";
   });
 
-  // ---------- Bouton son (pas de fichier audio pour l'instant) ----------
+  // ---------- Bouton son ----------
   const soundToggle = document.getElementById("soundToggle");
+  const ambientSound = document.getElementById("ambientSound");
   let soundOn = false;
   soundToggle.addEventListener("click", () => {
     soundOn = !soundOn;
     soundToggle.textContent = soundOn ? "🔊" : "🔇";
-    // Quand tu auras un lien audio, on ajoutera ici :
-    // const audio = document.getElementById("ambientSound");
-    // soundOn ? audio.play() : audio.pause();
+    if (soundOn) {
+      ambientSound.play().catch(() => {
+        // Certains navigateurs bloquent l'audio auto — on ignore l'erreur silencieusement
+      });
+    } else {
+      ambientSound.pause();
+    }
   });
 
   // ---------- Génération du code de pairing ----------
