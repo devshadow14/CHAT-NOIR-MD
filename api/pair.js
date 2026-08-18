@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = async (req, res) => {
-    // Autoriser CORS
+    // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -24,10 +24,10 @@ module.exports = async (req, res) => {
         }
         const cleanNumber = number.replace(/[^0-9]/g, '');
         if (cleanNumber.length < 8) {
-            return res.status(400).json({ success: false, message: 'Numéro invalide.' });
+            return res.status(400).json({ success: false, message: 'Numéro invalide (minimum 8 chiffres).' });
         }
 
-        // Dossier de session temporaire (dans /tmp pour Vercel)
+        // Dossier temporaire dans /tmp (Vercel le permet)
         const authFolder = path.join('/tmp', `sessions_${cleanNumber}`);
         if (!fs.existsSync(authFolder)) {
             fs.mkdirSync(authFolder, { recursive: true });
@@ -43,16 +43,16 @@ module.exports = async (req, res) => {
 
         sock.ev.on('creds.update', saveCreds);
 
-        // Générer le code
+        // Génération du code
         const code = await sock.requestPairingCode(cleanNumber);
         await sock.logout();
 
-        // Nettoyer le dossier temporaire
+        // Nettoyage
         fs.rmSync(authFolder, { recursive: true, force: true });
 
-        return res.json({ success: true, code });
+        return res.status(200).json({ success: true, code });
     } catch (err) {
-        console.error('Erreur pairing:', err.message);
-        return res.status(500).json({ success: false, message: err.message });
+        console.error('❌ Erreur pairing:', err.message);
+        return res.status(500).json({ success: false, message: `Erreur: ${err.message}` });
     }
 };
