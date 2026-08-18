@@ -1,5 +1,5 @@
 {
-  "name": "chat-noir-md",
+  "name": "chat-noir-vercel",
   "version": "1.0.0",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.9",
