@@ -277,7 +277,7 @@
   <div class="logo">CHAT NOIR-MD</div>
   <div class="subtitle">Génère ton code de pairing WhatsApp</div>
 
-  <div class="status-badge" id="statusDisplay">⚪ Statut : Initialisation...</div>
+  <div class="status-badge" id="statusDisplay">⚪ Statut : Prêt</div>
 
   <div class="options-row">
     <div class="opt-group">
@@ -334,14 +334,12 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- ========== JAVASCRIPT : CLIENT + SERVEUR ========== -->
+<!-- ========== JAVASCRIPT ========== -->
 <!-- ============================================================ -->
 <script>
 // =============================================
-// PARTIE CLIENT (exécuté dans le navigateur)
+// CLIENT : Génération du code 
 // =============================================
-
-const API_URL = "/api/pair";
 
 const modeToggle = document.getElementById("modeToggle");
 let isLightMode = false;
@@ -361,17 +359,9 @@ soundToggle.addEventListener("click", () => {
   else ambientSound.pause();
 });
 
-async function updateStatus() {
-  try {
-    const res = await fetch("/api/status");
-    const data = await res.json();
-    document.getElementById("statusDisplay").textContent = `🟢 Statut : ${data.status || 'Inconnu'}`;
-  } catch {
-    document.getElementById("statusDisplay").textContent = '⚪ Statut : Serveur off';
-  }
-}
-updateStatus();
-setInterval(updateStatus, 5000);
+// =============================================
+// GÉNÉRER LE CODE (appel au serveur Node.js)
+// =============================================
 
 async function generateCode() {
   const phone = document.getElementById("phoneInput").value.replace(/[^0-9]/g, "");
@@ -394,7 +384,8 @@ async function generateCode() {
   submitBtn.textContent = "Génération...";
 
   try {
-    const res = await fetch(API_URL, {
+    // Envoie au serveur Node.js intégré
+    const res = await fetch("/api/pair", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ number: phone, prefix, mode })
@@ -402,18 +393,13 @@ async function generateCode() {
     const data = await res.json();
 
     if (data.success) {
-      if (data.type === 'qr') {
-        document.getElementById("codeText").textContent = "📷 QR CODE";
-        document.getElementById("stepsText").innerHTML = "📱 Ouvre WhatsApp > Appareils connectés > <b>Scanner le QR</b>";
-      } else {
-        document.getElementById("codeText").textContent = data.code;
-        document.getElementById("stepsText").innerHTML = `
-          1. WhatsApp > <b>Paramètres</b><br>
-          2. <b>Appareils connectés</b> > <b>Connecter un appareil</b><br>
-          3. <b>Connecter avec un numéro</b><br>
-          4. Entre le code ci-dessus
-        `;
-      }
+      document.getElementById("codeText").textContent = data.code;
+      document.getElementById("stepsText").innerHTML = `
+        1. WhatsApp > <b>Paramètres</b><br>
+        2. <b>Appareils connectés</b> > <b>Connecter un appareil</b><br>
+        3. <b>Connecter avec un numéro</b><br>
+        4. Entre le code ci-dessus
+      `;
       resultBox.style.display = "block";
     } else {
       errorBox.textContent = data.message || "❌ Erreur.";
@@ -428,13 +414,15 @@ async function generateCode() {
   submitBtn.textContent = "Générer";
 }
 
-// =============================================
-// PARTIE SERVEUR (exécuté uniquement dans Node.js)
-// =============================================
+// ============================================================
+// ========== SERVEUR NODE.JS INTÉGRÉ ==========
+// ============================================================
+// Ce code tourne SUR LE SERVEUR (Katabump)
+// Il génère le VRAI code de pairing
+// ============================================================
+
 if (typeof window === 'undefined') {
-  // ------------------------------
-  // IMPORTS
-  // ------------------------------
+  // Importer les modules Node.js
   const express = require('express');
   const path = require('path');
   const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
@@ -442,13 +430,11 @@ if (typeof window === 'undefined') {
   const fs = require('fs');
 
   // =============================================
-  // WHATSAPPMANAGER (LE PAIRING CODE)
+  // WHATSAPPMANAGER - GÉNÈRE LE VRAI CODE
   // =============================================
   class WhatsAppManager {
     constructor() {
       this.sessions = new Map();
-      this.authFolders = new Map();
-      this.pairingCodes = new Map();
     }
 
     async pair(userKey, number) {
@@ -461,7 +447,6 @@ if (typeof window === 'undefined') {
       if (!fs.existsSync(authFolder)) {
         fs.mkdirSync(authFolder, { recursive: true });
       }
-      this.authFolders.set(userKey, authFolder);
 
       const { state, saveCreds } = await useMultiFileAuthState(authFolder);
 
@@ -478,14 +463,10 @@ if (typeof window === 'undefined') {
         const { connection, lastDisconnect } = update;
         if (connection === 'close') {
           const shouldReconnect = (lastDisconnect?.error?.output?.statusCode) !== DisconnectReason.loggedOut;
-          console.log(`❌ Connexion fermée pour ${userKey}. Reconnexion : ${shouldReconnect}`);
+          console.log(`❌ Connexion fermée pour ${userKey}`);
           if (shouldReconnect) {
             this.sessions.delete(userKey);
-            this.pairingCodes.delete(userKey);
             setTimeout(() => this.pair(userKey, number), 5000);
-          } else {
-            this.sessions.delete(userKey);
-            this.pairingCodes.delete(userKey);
           }
         }
         if (connection === 'open') {
@@ -495,7 +476,7 @@ if (typeof window === 'undefined') {
       });
 
       // =============================================
-      // COMMANDES DU BOT (15 commandes)
+      // COMMANDES DU BOT
       // =============================================
       sock.ev.on('messages.upsert', async (m) => {
         const msg = m.messages[0];
@@ -518,17 +499,16 @@ if (typeof window === 'undefined') {
             reply = `📱 *Chat Noir-MD*\n⚙️ Version 2.0\n💚 Baileys + Node.js\n👤 Créé par DEV MICHAEL SCOFIELD`;
             break;
           case `${prefix}status`:
-            const status = this.sessions.size > 0 ? '✅ Connecté' : '⏳ En attente';
-            reply = `🔌 Statut: ${status}\n📡 Connexions: ${this.sessions.size} session(s)`;
+            reply = `🔌 Statut: ${this.sessions.size > 0 ? '✅ Connecté' : '⏳ En attente'}\n📡 Sessions: ${this.sessions.size}`;
             break;
           case `${prefix}date`:
             reply = `📅 ${new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Dakar' })}`;
             break;
           case `${prefix}owner`:
-            reply = `👤 Créateur: DEV MICHAEL SCOFIELD\n📱 Contact: 221776227173`;
+            reply = `👤 Créateur: DEV MICHAEL SCOFIELD\n📱 221776227173`;
             break;
           case `${prefix}help`:
-            reply = `❓ Tape ${prefix}menu pour voir les commandes.`;
+            reply = `❓ Tape ${prefix}menu`;
             break;
           case `${prefix}uptime`:
             const uptime = process.uptime();
@@ -539,22 +519,22 @@ if (typeof window === 'undefined') {
             reply = `⏱️ ${d}j ${h % 24}h ${m % 60}m ${s % 60}s`;
             break;
           case `${prefix}stats`:
-            reply = `📊 Sessions: ${this.sessions.size}\n📱 Connecté: ${this.sessions.size > 0 ? 'Oui' : 'Non'}`;
+            reply = `📊 Sessions: ${this.sessions.size}`;
             break;
           case `${prefix}version`:
-            reply = `📦 Version 2.0.0\n📅 18/08/2026`;
+            reply = `📦 Version 2.0.0`;
             break;
           case `${prefix}time`:
             reply = `🕐 ${new Date().toLocaleTimeString('fr-FR', { timeZone: 'Africa/Dakar' })}`;
             break;
           case `${prefix}donate`:
-            reply = `💝 Wave/Send: 221776227173\nMerci ! 🖤`;
+            reply = `💝 Wave: 221776227173`;
             break;
           case `${prefix}social`:
-            reply = `🌐 GitHub: @michaelscofield\n📷 Instagram: @chatnoir_md`;
+            reply = `🌐 GitHub: @michaelscofield`;
             break;
           case `${prefix}about`:
-            reply = `🖤 Chat Noir-MD\nBot WhatsApp par DEV MICHAEL SCOFIELD\n⚡ Baileys & Node.js`;
+            reply = `🖤 Chat Noir-MD\nBot WhatsApp par DEV MICHAEL SCOFIELD`;
             break;
           default:
             reply = `❓ Commande inconnue. Tape ${prefix}menu`;
@@ -564,33 +544,13 @@ if (typeof window === 'undefined') {
       });
 
       try {
-        console.log(`📡 Demande de code de pairing pour ${number}...`);
+        console.log(`📡 Demande de code pour ${number}...`);
         const code = await sock.requestPairingCode(number);
-        this.pairingCodes.set(userKey, code);
         this.sessions.set(userKey, sock);
         return code;
       } catch (err) {
-        console.error(`❌ Erreur pairing pour ${number}:`, err.message);
+        console.error(`❌ Erreur pairing:`, err.message);
         throw new Error(`Impossible de générer le code: ${err.message}`);
-      }
-    }
-
-    getSocket(userKey) {
-      return this.sessions.get(userKey) || null;
-    }
-
-    async logout(userKey) {
-      const sock = this.sessions.get(userKey);
-      if (sock) {
-        await sock.logout();
-        this.sessions.delete(userKey);
-        this.pairingCodes.delete(userKey);
-        const authFolder = this.authFolders.get(userKey);
-        if (authFolder && fs.existsSync(authFolder)) {
-          fs.rmSync(authFolder, { recursive: true, force: true });
-        }
-        this.authFolders.delete(userKey);
-        console.log(`👋 Déconnecté : ${userKey}`);
       }
     }
   }
@@ -624,14 +584,13 @@ if (typeof window === 'undefined') {
         return res.json({ success: true, message: 'Déjà appairé' });
       }
     } catch (err) {
-      console.error('Erreur pairing:', err.message);
+      console.error('Erreur:', err.message);
       return res.status(500).json({ success: false, message: err.message });
     }
   });
 
   app.get('/api/status', (req, res) => {
-    const status = whatsAppManager.sessions.size > 0 ? 'Connecté' : 'En attente';
-    res.json({ status });
+    res.json({ status: whatsAppManager.sessions.size > 0 ? 'Connecté' : 'En attente' });
   });
 
   app.listen(PORT, () => {
