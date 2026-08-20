@@ -487,6 +487,13 @@
             }
         }
 
+        // FIX: les boutons du menu du bas n'avaient aucun gestionnaire de clic
+        // (seulement un attribut data-page, sans onclick ni addEventListener).
+        // C'est pourquoi rien ne se passait en cliquant dessus.
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+            btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+        });
+
         // ============================================================
         // 📊 TABLEAU DE BORD
         // ============================================================
