@@ -1,341 +1,1855 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🖤 Chat Noir-MD | Pairing</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MICHAEL SCOFIELD SMS</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: url('https://files.catbox.moe/pnl7iq.jpg') center/cover no-repeat fixed;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    transition: background 0.4s ease;
-  }
+    <style>
+        /* ===== COULEURS ===== */
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #12122a;
+            --bg-card: #1a1a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0c0;
+            --accent-purple: #7c3aed;
+            --accent-orange: #f59e0b;
+            --accent-cyan: #06b6d4;
+            --border-color: #2a2a5a;
+            --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.3);
+        }
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 0;
-    transition: background 0.4s ease;
-  }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  body.light-mode::before {
-    background: rgba(0,0,0,0.35);
-  }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-  .mode-toggle {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 5;
-    background: rgba(10,10,10,0.85);
-    border: 1px solid #2a2a2a;
-    color: #39ff14;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(57,255,20,0.3);
-    transition: 0.2s;
-  }
-  .mode-toggle:hover { box-shadow: 0 0 16px rgba(57,255,20,0.6); }
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 10px; }
 
-  .sound-toggle {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-    z-index: 5;
-    background: rgba(10,10,10,0.85);
-    border: 1px solid #2a2a2a;
-    color: #39ff14;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(57,255,20,0.3);
-    transition: 0.2s;
-  }
-  .sound-toggle:hover { box-shadow: 0 0 16px rgba(57,255,20,0.6); }
+        /* ===== CONTAINER ===== */
+        .app-container {
+            max-width: 420px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            background: var(--bg-primary);
+            padding-bottom: 80px;
+        }
 
-  .card {
-    position: relative;
-    z-index: 1;
-    background: rgba(10,10,10,0.85);
-    backdrop-filter: blur(6px);
-    border: 1px solid #222;
-    border-radius: 20px;
-    padding: 40px 32px;
-    max-width: 480px;
-    width: 100%;
-    box-shadow: 0 0 30px rgba(57,255,20,0.1), 0 8px 24px rgba(0,0,0,0.6);
-    text-align: center;
-  }
+        /* ===== ÉCRAN DE CONNEXION ===== */
+        #authScreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 24px;
+            background: linear-gradient(145deg, #0a0a1a 0%, #1a0a2a 100%);
+        }
 
-  .cat-eyes {
-    display: flex;
-    justify-content: center;
-    gap: 14px;
-    margin-bottom: 12px;
-  }
-  .cat-eye {
-    width: 34px;
-    height: 20px;
-    background: #050505;
-    border-radius: 50%;
-    border: 1.5px solid #39ff14;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    box-shadow: 0 0 8px rgba(57,255,20,0.6);
-  }
-  .cat-pupil {
-    width: 8px;
-    height: 12px;
-    background: #39ff14;
-    border-radius: 50%;
-    box-shadow: 0 0 6px rgba(57,255,20,0.9);
-    animation: lookAround 4s infinite ease-in-out;
-  }
-  @keyframes lookAround {
-    0%, 10%   { transform: translateX(-6px); }
-    45%, 55%  { transform: translateX(6px); }
-    90%, 100% { transform: translateX(-6px); }
-  }
+        #authScreen .logo {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
 
-  .avatar {
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #39ff14;
-    box-shadow: 0 0 12px rgba(57,255,20,0.6);
-    margin-bottom: 14px;
-    animation: pulseGlow 1.8s infinite;
-  }
+        #authScreen .sub-logo {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+        }
 
-  @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 8px rgba(57,255,20,0.4); }
-    50% { box-shadow: 0 0 20px rgba(57,255,20,0.9); }
-  }
+        #authScreen .auth-box {
+            width: 100%;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 32px 24px;
+            border: 1px solid var(--border-color);
+        }
 
-  .logo {
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: #39ff14;
-    text-shadow: 0 0 8px rgba(57,255,20,0.5);
-    margin-bottom: 6px;
-  }
+        #authScreen .auth-box h2 {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
 
-  .subtitle {
-    color: #999;
-    font-size: 14px;
-    margin-bottom: 28px;
-  }
+        #authScreen .auth-box p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
 
-  .section-title {
-    text-align: left;
-    color: #39ff14;
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
+        #authScreen input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 14px;
+            transition: 0.3s;
+        }
 
-  input {
-    width: 100%;
-    padding: 16px;
-    border-radius: 10px;
-    border: 1px solid #2a2a2a;
-    background: #050505;
-    color: #fff;
-    font-size: 16px;
-    margin-bottom: 20px;
-    outline: none;
-  }
-  input:focus { border-color: #39ff14; }
+        #authScreen input:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
 
-  button.submit {
-    width: 100%;
-    padding: 16px;
-    border-radius: 10px;
-    border: none;
-    background: #39ff14;
-    color: #000;
-    font-weight: 800;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  button.submit:hover { background: #2fd90f; }
-  button.submit:disabled { background: #333; color: #777; cursor: not-allowed; }
+        #authScreen input::placeholder {
+            color: var(--text-secondary);
+        }
 
-  .result { margin-top: 24px; display: none; }
-  .code-box {
-    background: #050505;
-    border: 2px dashed #39ff14;
-    border-radius: 10px;
-    padding: 20px;
-    font-size: 32px;
-    letter-spacing: 5px;
-    font-weight: 800;
-    color: #39ff14;
-    margin-bottom: 16px;
-    animation: blink 1.2s infinite;
-  }
+        #authScreen .btn-primary {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-purple), #6d28d9);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-  @keyframes blink {
-    0%, 100% { box-shadow: 0 0 6px rgba(57,255,20,0.5); }
-    50% { box-shadow: 0 0 14px rgba(57,255,20,1); }
-  }
+        #authScreen .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
 
-  .steps {
-    text-align: left;
-    color: #ccc;
-    font-size: 14px;
-    line-height: 1.7;
-  }
+        #authScreen .btn-secondary {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
 
-  .error {
-    color: #ff5555;
-    font-size: 13px;
-    margin-top: 12px;
-    display: none;
-  }
+        #authScreen .btn-secondary:hover {
+            background: var(--bg-card);
+        }
 
-  .footer {
-    margin-top: 26px;
-    font-size: 11px;
-    color: #555;
-  }
-</style>
+        #authScreen .switch-link {
+            text-align: center;
+            margin-top: 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        #authScreen .switch-link span {
+            color: var(--accent-purple);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        #authScreen .switch-link span:hover {
+            color: var(--accent-orange);
+        }
+
+        /* ===== PAGE PRINCIPALE (après connexion) ===== */
+        #mainApp {
+            display: none;
+            padding: 20px 16px 90px;
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0 16px;
+        }
+
+        .app-header .brand {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .app-header .badge {
+            background: var(--accent-orange);
+            color: #000;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        /* ===== SALUTATION ===== */
+        .greeting {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .greeting h2 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .greeting h2 span {
+            color: var(--accent-orange);
+        }
+
+        .greeting p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .greeting .quick-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .greeting .quick-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .greeting .quick-actions .btn-nokos {
+            background: linear-gradient(135deg, var(--accent-purple), #6d28d9);
+            color: white;
+        }
+
+        .greeting .quick-actions .btn-nokos:hover {
+            transform: scale(0.97);
+        }
+
+        .greeting .quick-actions .btn-deposit {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .greeting .quick-actions .btn-deposit:hover {
+            background: var(--border-color);
+        }
+
+        /* ===== SOLDE ===== */
+        .balance-card {
+            background: linear-gradient(135deg, #1a0a3a, #0a0a2a);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(124,58,237,0.15), transparent);
+            border-radius: 50%;
+        }
+
+        .balance-card .label {
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-card .amount {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 4px 0 12px;
+            color: var(--text-primary);
+        }
+
+        .balance-card .amount span {
+            color: var(--accent-orange);
+        }
+
+        .balance-card .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .balance-card .actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .balance-card .actions .btn-deposit-small {
+            background: var(--accent-orange);
+            color: #000;
+        }
+
+        .balance-card .actions .btn-deposit-small:hover {
+            transform: scale(0.97);
+        }
+
+        .balance-card .actions .btn-order-small {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .balance-card .actions .btn-order-small:hover {
+            background: var(--border-color);
+        }
+
+        /* ===== STATS ===== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stats .stat-item {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stats .stat-item .number {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .stats .stat-item .number.orange {
+            color: var(--accent-orange);
+        }
+        .stats .stat-item .number.purple {
+            color: var(--accent-purple);
+        }
+        .stats .stat-item .number.cyan {
+            color: var(--accent-cyan);
+        }
+
+        .stats .stat-item .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* ===== DÉPÔT DU JOUR ===== */
+        .daily-deposit {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .daily-deposit .label {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .daily-deposit .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-orange);
+        }
+
+        /* ===== CONTENU DES PAGES DYNAMIQUES ===== */
+        .page-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+        }
+
+        /* ===== LISTE CATÉGORIES / PAYS / NUMÉROS ===== */
+        .list-item {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .list-item:hover {
+            border-color: var(--accent-purple);
+            transform: translateX(4px);
+        }
+
+        .list-item .left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .list-item .left .icon {
+            font-size: 22px;
+        }
+
+        .list-item .left .name {
+            font-weight: 600;
+        }
+
+        .list-item .left .sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .list-item .right {
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .list-item .price-tag {
+            background: var(--accent-orange);
+            color: #000;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .list-item .btn-buy {
+            background: linear-gradient(135deg, var(--accent-purple), #6d28d9);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .list-item .btn-buy:hover {
+            transform: scale(1.05);
+        }
+
+        .list-item .btn-buy:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== ADMIN PANEL ===== */
+        .admin-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .admin-section h4 {
+            font-size: 15px;
+            margin-bottom: 12px;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-section input, 
+        .admin-section select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .admin-section input:focus,
+        .admin-section select:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+        }
+
+        .admin-section .btn-admin {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+        }
+
+        .admin-section .btn-admin.add {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        .admin-section .btn-admin.add:hover {
+            box-shadow: var(--shadow-glow);
+        }
+
+        .admin-section .btn-admin.verify {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .admin-section .btn-admin.reject {
+            background: #ef4444;
+            color: white;
+        }
+
+        .admin-section .btn-admin.add-balance {
+            background: var(--accent-orange);
+            color: #000;
+        }
+
+        .admin-user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-user-item:last-child {
+            border-bottom: none;
+        }
+
+        .admin-user-item .info {
+            font-size: 13px;
+        }
+
+        .admin-user-item .info .email {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .admin-user-item .btn-add-balance {
+            background: var(--accent-orange);
+            color: #000;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .admin-deposit-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-deposit-item:last-child {
+            border-bottom: none;
+        }
+
+        .admin-deposit-item .info {
+            font-size: 13px;
+        }
+
+        .admin-deposit-item .info .user {
+            font-weight: 600;
+        }
+        .admin-deposit-item .info .amount {
+            color: var(--accent-orange);
+        }
+
+        .admin-deposit-item .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* ===== NAVIGATION BASSE ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 420px;
+            width: 100%;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 4px 10px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 10px;
+            cursor: pointer;
+            padding: 4px 8px;
+            transition: 0.3s;
+            border-radius: 12px;
+            min-width: 48px;
+        }
+
+        .bottom-nav .nav-item .icon {
+            font-size: 20px;
+            margin-bottom: 1px;
+        }
+
+        .bottom-nav .nav-item.active {
+            color: var(--accent-purple);
+        }
+
+        .bottom-nav .nav-item.active .icon {
+            color: var(--accent-purple);
+        }
+
+        .bottom-nav .nav-item:hover {
+            color: var(--text-primary);
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            z-index: 999;
+            display: none;
+            max-width: 90%;
+            text-align: center;
+            font-size: 14px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .toast.success {
+            border-color: var(--accent-cyan);
+        }
+        .toast.error {
+            border-color: #ef4444;
+        }
+        .toast.warning {
+            border-color: var(--accent-orange);
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 420px) {
+            .app-container { padding: 16px 12px 80px; }
+            .balance-card .amount { font-size: 28px; }
+            .stats .stat-item .number { font-size: 20px; }
+            .bottom-nav .nav-item { min-width: 40px; font-size: 9px; }
+            .bottom-nav .nav-item .icon { font-size: 18px; }
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-secondary);
+        }
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        @keyframes dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+        }
+
+        .badge-admin {
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-left: 6px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
 
-<!-- Son d'ambiance (démarre coupé, l'utilisateur doit cliquer pour l'activer) -->
-<audio id="ambientSound" src="https://files.catbox.moe/zf8z97.opus" loop preload="none"></audio>
+    <!-- ===== TOAST ===== -->
+    <div id="toast" class="toast"></div>
 
-<button class="mode-toggle" id="modeToggle" title="Basculer le mode">🌙</button>
-<button class="sound-toggle" id="soundToggle" title="Activer/couper le son">🔇</button>
+    <div class="app-container">
 
-<div class="card">
-  <div class="cat-eyes">
-    <div class="cat-eye"><div class="cat-pupil"></div></div>
-    <div class="cat-eye"><div class="cat-pupil"></div></div>
-  </div>
+        <!-- ===== ÉCRAN D'AUTHENTIFICATION ===== -->
+        <div id="authScreen">
+            <div class="logo">MICHAEL SCOFIELD</div>
+            <div class="sub-logo">✦ SMS VIRTUAL ✦</div>
+            <div class="auth-box">
+                <h2 id="authTitle">Connexion</h2>
+                <p id="authSub">Connectez-vous à votre compte</p>
+                <input type="email" id="authEmail" placeholder="Email">
+                <input type="password" id="authPassword" placeholder="Mot de passe">
+                <button class="btn-primary" id="authSubmitBtn">Se connecter</button>
+                <button class="btn-secondary" id="authSwitchBtn">Créer un compte</button>
+                <div class="switch-link">
+                    <span id="authSwitchText">Pas encore de compte ? <span id="authSwitchLink">S'inscrire</span></span>
+                </div>
+            </div>
+        </div>
 
-  <img class="avatar" src="https://files.catbox.moe/3cvx9z.jpg" alt="Chat Noir">
-  <div class="logo">CHAT NOIR-MD</div>
-  <div class="subtitle">Génère ton code de pairing WhatsApp</div>
+        <!-- ===== APPLICATION PRINCIPALE ===== -->
+        <div id="mainApp">
 
-  <div class="section-title">📱 Numéro WhatsApp</div>
-  <input type="text" id="phoneInput" placeholder="Ex: 221776227173">
+            <!-- HEADER -->
+            <div class="app-header">
+                <div class="brand">MICHAEL SCOFIELD</div>
+                <div class="badge">SMS</div>
+            </div>
 
-  <button class="submit" id="submitBtn" onclick="generateCode()">Générer le code</button>
+            <!-- GREETING -->
+            <div class="greeting" id="greetingBlock">
+                <h2>Salut, <span id="userDisplayName">...</span> ! 🥰</h2>
+                <p>Bienvenue sur Michael Scofield SMS</p>
+                <div class="quick-actions">
+                    <button class="btn-nokos" onclick="navigateTo('nokos')">📱 Commander Nokos</button>
+                    <button class="btn-deposit" onclick="navigateTo('deposit')">💰 Dépôt</button>
+                </div>
+            </div>
 
-  <div class="error" id="errorBox"></div>
+            <!-- BALANCE -->
+            <div class="balance-card">
+                <div class="label">Votre solde</div>
+                <div class="amount">Rp<span id="userBalance">0</span></div>
+                <div class="actions">
+                    <button class="btn-deposit-small" onclick="navigateTo('deposit')">💲 Dépôt</button>
+                    <button class="btn-order-small" onclick="navigateTo('nokos')">Commande</button>
+                </div>
+            </div>
 
-  <div class="result" id="resultBox">
-    <div class="code-box" id="codeText">------</div>
-    <div class="steps">
-      1. WhatsApp > <b>Paramètres</b><br>
-      2. <b>Appareils connectés</b> > <b>Connecter un appareil</b><br>
-      3. <b>Connecter avec un numéro</b><br>
-      4. Entre le code ci-dessus
-    </div>
-  </div>
+            <!-- STATS -->
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="number orange" id="statTotalOrders">0</div>
+                    <div class="stat-label">Commande totale</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number purple" id="statPendingOrders">0</div>
+                    <div class="stat-label">Commandes en cours</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number cyan" id="statSuccessOrders">0</div>
+                    <div class="stat-label">Succès</div>
+                </div>
+            </div>
 
-  <div class="footer">🖤 Créé par DEV MICHAEL SCOFIELD</div>
-</div>
+            <!-- DAILY DEPOSIT -->
+            <div class="daily-deposit">
+                <div class="label">📊 Dépôt du jour</div>
+                <div class="value" id="dailyDeposit">Rp0</div>
+            </div>
 
-<script>
-  const API_URL = "/api/pair";
+            <!-- ===== PAGES DYNAMIQUES ===== -->
 
-  // ---------- Mode sombre/nuit ----------
-  const modeToggle = document.getElementById("modeToggle");
-  let isLightMode = false;
-  modeToggle.addEventListener("click", () => {
-    isLightMode = !isLightMode;
-    document.body.classList.toggle("light-mode", isLightMode);
-    modeToggle.textContent = isLightMode ? "☀️" : "🌙";
-  });
+            <!-- PAGE : TABLEAU (DASHBOARD) -->
+            <div class="page-content active" id="page-dashboard">
+                <!-- Le contenu du dashboard est déjà affiché hors des pages -->
+                <!-- On garde cette page vide car le dashboard est le contenu par défaut -->
+            </div>
 
-  // ---------- Bouton son ----------
-  const soundToggle = document.getElementById("soundToggle");
-  const ambientSound = document.getElementById("ambientSound");
-  let soundOn = false;
-  soundToggle.addEventListener("click", () => {
-    soundOn = !soundOn;
-    soundToggle.textContent = soundOn ? "🔊" : "🔇";
-    if (soundOn) {
-      ambientSound.play().catch(() => {
-        // Certains navigateurs bloquent l'audio auto — on ignore l'erreur silencieusement
-      });
-    } else {
-      ambientSound.pause();
-    }
-  });
+            <!-- PAGE : NOKOS (Catégories) -->
+            <div class="page-content" id="page-nokos">
+                <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
+                <div class="page-title">📱 Nokos</div>
+                <div class="page-subtitle">Choisis une catégorie</div>
+                <div id="categoriesList"></div>
+            </div>
 
-  // ---------- Génération du code de pairing ----------
-  async function generateCode() {
-    const phone = document.getElementById("phoneInput").value.replace(/[^0-9]/g, "");
-    const errorBox = document.getElementById("errorBox");
-    const resultBox = document.getElementById("resultBox");
-    const submitBtn = document.getElementById("submitBtn");
+            <!-- PAGE : PAYS -->
+            <div class="page-content" id="page-countries">
+                <button class="back-btn" onclick="navigateTo('nokos')">← Catégories</button>
+                <div class="page-title" id="countriesTitle">🇸🇳 WhatsApp</div>
+                <div class="page-subtitle">Choisis un pays</div>
+                <div id="countriesList"></div>
+            </div>
 
-    errorBox.style.display = "none";
-    resultBox.style.display = "none";
+            <!-- PAGE : NUMÉROS -->
+            <div class="page-content" id="page-numbers">
+                <button class="back-btn" onclick="navigateTo('countries')">← Pays</button>
+                <div class="page-title" id="numbersTitle">📞 Numéros</div>
+                <div class="page-subtitle" id="numbersSubtitle">Sénégal</div>
+                <div id="numbersList"></div>
+            </div>
 
-    if (!phone || phone.length < 8) {
-      errorBox.textContent = "⚠️ Entre un numéro WhatsApp valide.";
-      errorBox.style.display = "block";
-      return;
-    }
+            <!-- PAGE : DÉPÔT -->
+            <div class="page-content" id="page-deposit">
+                <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
+                <div class="page-title">💳 Dépôt</div>
+                <div class="page-subtitle">Recharge ton compte</div>
+                
+                <div style="background:var(--bg-secondary);border-radius:16px;padding:18px;border:1px solid var(--border-color);margin-bottom:16px;">
+                    <label style="font-size:14px;color:var(--text-secondary);display:block;margin-bottom:6px;">Montant (Rp)</label>
+                    <input type="number" id="depositAmount" placeholder="Ex: 10000" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:15px;">
+                    
+                    <label style="font-size:14px;color:var(--text-secondary);display:block;margin:12px 0 6px;">Méthode</label>
+                    <select id="depositMethod" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:15px;">
+                        <option value="QRIS">💳 QRIS</option>
+                        <option value="Banque">🏦 Banque</option>
+                        <option value="Orange Money">📱 Orange Money</option>
+                    </select>
+                    
+                    <label style="font-size:14px;color:var(--text-secondary);display:block;margin:12px 0 6px;">Preuve (lien image)</label>
+                    <input type="text" id="depositProof" placeholder="https://... (lien vers la capture)" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:15px;">
+                    
+                    <button class="btn-primary" style="margin-top:14px;width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent-purple),#6d28d9);color:white;font-size:16px;font-weight:700;cursor:pointer;" onclick="requestDeposit()">💰 VALIDER LA DEMANDE</button>
+                </div>
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Génération...";
+                <div style="background:var(--bg-secondary);border-radius:16px;padding:16px;border:1px solid var(--border-color);">
+                    <div style="font-size:13px;color:var(--text-secondary);">📌 En attente de validation par l'admin</div>
+                    <div id="pendingDepositsList" style="margin-top:10px;"></div>
+                </div>
+            </div>
 
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ number: phone })
-      });
-      const data = await res.json();
+            <!-- PAGE : HISTOIRE -->
+            <div class="page-content" id="page-history">
+                <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
+                <div class="page-title">📜 Histoire</div>
+                <div class="page-subtitle">Toutes tes transactions</div>
+                <div id="historyList"></div>
+            </div>
 
-      if (data.success && data.code) {
-        document.getElementById("codeText").textContent = data.code;
-        resultBox.style.display = "block";
-      } else {
-        errorBox.textContent = data.message || "❌ Erreur lors de la génération du code.";
-        errorBox.style.display = "block";
-      }
-    } catch (err) {
-      errorBox.textContent = "❌ Impossible de contacter le serveur.";
-      errorBox.style.display = "block";
-    }
+            <!-- PAGE : PROFIL -->
+            <div class="page-content" id="page-profile">
+                <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
+                <div class="page-title">ℹ️ Profil</div>
+                <div class="page-subtitle">Gère ton compte</div>
+                
+                <div style="background:var(--bg-secondary);border-radius:16px;padding:20px;border:1px solid var(--border-color);margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
+                        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent-purple),var(--accent-orange));display:flex;align-items:center;justify-content:center;font-size:28px;">👤</div>
+                        <div>
+                            <div style="font-size:18px;font-weight:700;" id="profileName">Devshadow</div>
+                            <div style="color:var(--text-secondary);font-size:13px;" id="profileEmail">email@exemple.com</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border-color);">
+                        <span style="color:var(--text-secondary);">💰 Solde</span>
+                        <span style="font-weight:700;">Rp<span id="profileBalance">0</span></span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border-color);">
+                        <span style="color:var(--text-secondary);">👑 Rôle</span>
+                        <span style="font-weight:700;" id="profileRole">user</span>
+                    </div>
+                </div>
 
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Générer le code";
-  }
-</script>
+                <button class="btn-secondary" style="width:100%;padding:14px;border:1px solid var(--border-color);border-radius:12px;background:transparent;color:#ef4444;font-size:16px;font-weight:600;cursor:pointer;margin-top:4px;" onclick="logout()">🚪 Se déconnecter</button>
+
+                <!-- ADMIN PANEL (caché si pas admin) -->
+                <div id="adminPanel" class="hidden" style="margin-top:20px;border-top:2px solid var(--accent-orange);padding-top:20px;">
+                    <div style="font-size:18px;font-weight:700;color:var(--accent-orange);margin-bottom:16px;">⚙️ PANEL ADMIN</div>
+
+                    <!-- 1. Ajouter un numéro -->
+                    <div class="admin-section">
+                        <h4>➕ Ajouter un numéro</h4>
+                        <select id="adminNumberCategory">
+                            <option value="WhatsApp">💬 WhatsApp</option>
+                            <option value="Telegram">✈️ Telegram</option>
+                            <option value="TikTok">🎵 TikTok</option>
+                            <option value="Autre">📱 Autre</option>
+                        </select>
+                        <input type="text" id="adminNumberCountry" placeholder="Pays (ex: Sénégal)">
+                        <input type="text" id="adminNumberValue" placeholder="Numéro (ex: +221 77 123 45 67)">
+                        <input type="number" id="adminNumberPrice" placeholder="Prix (Rp)">
+                        <button class="btn-admin add" onclick="adminAddNumber()">➕ AJOUTER</button>
+                    </div>
+
+                    <!-- 2. Valider les dépôts -->
+                    <div class="admin-section">
+                        <h4>✅ Valider les dépôts</h4>
+                        <div id="adminDepositsList"></div>
+                    </div>
+
+                    <!-- 3. Gérer les utilisateurs -->
+                    <div class="admin-section">
+                        <h4>👥 Gérer les utilisateurs</h4>
+                        <div id="adminUsersList"></div>
+                    </div>
+
+                    <!-- 4. Liste des numéros -->
+                    <div class="admin-section">
+                        <h4>📋 Tous les numéros</h4>
+                        <div id="adminNumbersList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== NAVIGATION BASSE ===== -->
+            <div class="bottom-nav">
+                <button class="nav-item active" data-page="dashboard">
+                    <span class="icon">📊</span>
+                    Tableau
+                </button>
+                <button class="nav-item" data-page="deposit">
+                    <span class="icon">💳</span>
+                    Dépôt
+                </button>
+                <button class="nav-item" data-page="nokos">
+                    <span class="icon">📱</span>
+                    Nokos
+                </button>
+                <button class="nav-item" data-page="history">
+                    <span class="icon">📜</span>
+                    Histoire
+                </button>
+                <button class="nav-item" data-page="profile">
+                    <span class="icon">ℹ️</span>
+                    Profil
+                </button>
+            </div>
+
+        </div><!-- /mainApp -->
+    </div><!-- /app-container -->
+
+    <script>
+        // ============================================================
+        // 🔐 CONFIGURATION FIREBASE - REMPLACE PAR TES DONNÉES
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "VOTRE_AUTH_DOMAIN",
+            projectId: "VOTRE_PROJECT_ID",
+            storageBucket: "VOTRE_STORAGE_BUCKET",
+            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+            appId: "VOTRE_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ============================================================
+        // 📦 ÉTAT GLOBAL
+        // ============================================================
+        let currentUser = null;
+        let currentUserData = null;
+        let currentCategory = 'WhatsApp';
+        let currentCountry = 'Sénégal';
+        let currentPage = 'dashboard';
+        let allNumbers = [];
+        let allUsers = [];
+        let allDeposits = [];
+
+        // ============================================================
+        // 🛠️ UTILITAIRES
+        // ============================================================
+        function showToast(msg, type = '') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show ' + type;
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.className = 'toast', 3000);
+        }
+
+        function formatCurrency(n) {
+            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function getUid() {
+            return currentUser ? currentUser.uid : null;
+        }
+
+        // ============================================================
+        // 🔐 AUTHENTIFICATION
+        // ============================================================
+        let isLoginMode = true;
+
+        document.getElementById('authSwitchLink').addEventListener('click', toggleAuthMode);
+        document.getElementById('authSwitchBtn').addEventListener('click', toggleAuthMode);
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            const title = document.getElementById('authTitle');
+            const sub = document.getElementById('authSub');
+            const btn = document.getElementById('authSubmitBtn');
+            const switchBtn = document.getElementById('authSwitchBtn');
+            const switchText = document.getElementById('authSwitchText');
+
+            if (isLoginMode) {
+                title.textContent = 'Connexion';
+                sub.textContent = 'Connectez-vous à votre compte';
+                btn.textContent = 'Se connecter';
+                switchBtn.textContent = 'Créer un compte';
+                switchText.innerHTML = 'Pas encore de compte ? <span id="authSwitchLink">S\'inscrire</span>';
+                document.getElementById('authSwitchLink').addEventListener('click', toggleAuthMode);
+            } else {
+                title.textContent = 'Inscription';
+                sub.textContent = 'Créez votre compte Michael Scofield';
+                btn.textContent = 'S\'inscrire';
+                switchBtn.textContent = 'Déjà un compte';
+                switchText.innerHTML = 'Déjà un compte ? <span id="authSwitchLink">Se connecter</span>';
+                document.getElementById('authSwitchLink').addEventListener('click', toggleAuthMode);
+            }
+        }
+
+        document.getElementById('authSubmitBtn').addEventListener('click', async () => {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+
+            if (!email || !password) {
+                showToast('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('Mot de passe : au moins 6 caractères', 'error');
+                return;
+            }
+
+            try {
+                if (isLoginMode) {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } else {
+                    const cred = await auth.createUserWithEmailAndPassword(email, password);
+                    // Créer le document utilisateur
+                    await db.collection('users').doc(cred.user.uid).set({
+                        email: email,
+                        displayName: email.split('@')[0] || 'Utilisateur',
+                        balance: 0,
+                        role: 'user',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showToast('Compte créé avec succès !', 'success');
+                }
+            } catch (err) {
+                let msg = err.message;
+                if (msg.includes('user-not-found')) msg = 'Email ou mot de passe incorrect';
+                else if (msg.includes('wrong-password')) msg = 'Mot de passe incorrect';
+                else if (msg.includes('email-already-in-use')) msg = 'Cet email est déjà utilisé';
+                else if (msg.includes('network')) msg = 'Erreur réseau, vérifie ta connexion';
+                showToast(msg, 'error');
+                console.error(err);
+            }
+        });
+
+        // ============================================================
+        // 👤 SUIVI DE L'UTILISATEUR
+        // ============================================================
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                await loadUserData();
+                await loadAllData();
+                renderDashboard();
+                navigateTo('dashboard');
+            } else {
+                currentUser = null;
+                currentUserData = null;
+                document.getElementById('authScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+                // Réinitialiser le formulaire
+                document.getElementById('authEmail').value = '';
+                document.getElementById('authPassword').value = '';
+                isLoginMode = true;
+                document.getElementById('authTitle').textContent = 'Connexion';
+                document.getElementById('authSub').textContent = 'Connectez-vous à votre compte';
+                document.getElementById('authSubmitBtn').textContent = 'Se connecter';
+                document.getElementById('authSwitchBtn').textContent = 'Créer un compte';
+                document.getElementById('authSwitchText').innerHTML = 'Pas encore de compte ? <span id="authSwitchLink">S\'inscrire</span>';
+                document.getElementById('authSwitchLink').addEventListener('click', toggleAuthMode);
+            }
+        });
+
+        async function loadUserData() {
+            if (!currentUser) return;
+            try {
+                const doc = await db.collection('users').doc(currentUser.uid).get();
+                if (doc.exists) {
+                    currentUserData = { id: doc.id, ...doc.data() };
+                    // S'assurer que l'utilisateur a un displayName
+                    if (!currentUserData.displayName) {
+                        currentUserData.displayName = currentUser.email.split('@')[0] || 'Utilisateur';
+                        await db.collection('users').doc(currentUser.uid).update({ displayName: currentUserData.displayName });
+                    }
+                } else {
+                    // Créer le document si inexistant
+                    const newUser = {
+                        email: currentUser.email,
+                        displayName: currentUser.email.split('@')[0] || 'Utilisateur',
+                        balance: 0,
+                        role: 'user',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    await db.collection('users').doc(currentUser.uid).set(newUser);
+                    currentUserData = { id: currentUser.uid, ...newUser };
+                }
+            } catch (err) {
+                console.error('Erreur chargement user:', err);
+                showToast('Erreur chargement profil', 'error');
+            }
+        }
+
+        async function loadAllData() {
+            if (!currentUser) return;
+            try {
+                // Charger tous les numéros
+                const numSnap = await db.collection('numbers').get();
+                allNumbers = numSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                // Charger tous les utilisateurs (admin)
+                const userSnap = await db.collection('users').get();
+                allUsers = userSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+                // Charger tous les dépôts
+                const depSnap = await db.collection('deposits').orderBy('createdAt', 'desc').get();
+                allDeposits = depSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            } catch (err) {
+                console.error('Erreur chargement données:', err);
+            }
+        }
+
+        // ============================================================
+        // 📊 TABLEAU DE BORD
+        // ============================================================
+        function renderDashboard() {
+            if (!currentUserData) return;
+            document.getElementById('userDisplayName').textContent = currentUserData.displayName || 'Utilisateur';
+            document.getElementById('userBalance').textContent = formatCurrency(currentUserData.balance || 0);
+            document.getElementById('profileName').textContent = currentUserData.displayName || 'Utilisateur';
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('profileBalance').textContent = formatCurrency(currentUserData.balance || 0);
+            document.getElementById('profileRole').textContent = currentUserData.role || 'user';
+
+            // Stats
+            const userTransactions = allNumbers.filter(n => n.purchasedBy === currentUser.uid);
+            const pendingTransactions = allNumbers.filter(n => n.purchasedBy === currentUser.uid && n.status === 'pending');
+            const successTransactions = allNumbers.filter(n => n.purchasedBy === currentUser.uid && n.status === 'sold');
+
+            document.getElementById('statTotalOrders').textContent = userTransactions.length;
+            document.getElementById('statPendingOrders').textContent = pendingTransactions.length;
+            document.getElementById('statSuccessOrders').textContent = successTransactions.length;
+
+            // Dépôt du jour (simulé - on prend les dépôts validés du jour)
+            const today = new Date().toDateString();
+            const dailyTotal = allDeposits
+                .filter(d => d.userId === currentUser.uid && d.status === 'verified')
+                .reduce((sum, d) => sum + (d.amount || 0), 0);
+            document.getElementById('dailyDeposit').textContent = 'Rp' + formatCurrency(dailyTotal);
+
+            // Admin panel
+            const adminPanel = document.getElementById('adminPanel');
+            if (currentUserData.role === 'admin') {
+                adminPanel.classList.remove('hidden');
+                renderAdminPanel();
+            } else {
+                adminPanel.classList.add('hidden');
+            }
+        }
+
+        // ============================================================
+        // 🧭 NAVIGATION
+        // ============================================================
+        function navigateTo(page, data = null) {
+            currentPage = page;
+
+            // Cacher toutes les pages
+            document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
+
+            // Afficher la page demandée
+            const target = document.getElementById('page-' + page);
+            if (target) target.classList.add('active');
+
+            // Mettre à jour la nav
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.page === page);
+            });
+
+            // Charger les données selon la page
+            switch (page) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'nokos':
+                    renderCategories();
+                    break;
+                case 'countries':
+                    if (data) currentCategory = data;
+                    renderCountries();
+                    break;
+                case 'numbers':
+                    if (data) currentCountry = data;
+                    renderNumbers();
+                    break;
+                case 'deposit':
+                    renderDeposits();
+                    break;
+                case 'history':
+                    renderHistory();
+                    break;
+                case 'profile':
+                    renderDashboard();
+                    break;
+            }
+        }
+
+        // ============================================================
+        // 📱 PAGE NOKOS - CATÉGORIES
+        // ============================================================
+        function renderCategories() {
+            const container = document.getElementById('categoriesList');
+            const categories = ['WhatsApp', 'Telegram', 'TikTok', 'Autre'];
+            const icons = { 'WhatsApp': '💬', 'Telegram': '✈️', 'TikTok': '🎵', 'Autre': '📱' };
+
+            container.innerHTML = categories.map(cat => `
+                <div class="list-item" onclick="navigateTo('countries', '${cat}')">
+                    <div class="left">
+                        <span class="icon">${icons[cat]}</span>
+                        <div>
+                            <div class="name">${cat}</div>
+                            <div class="sub">${allNumbers.filter(n => n.category === cat && n.status === 'available').length} disponible(s)</div>
+                        </div>
+                    </div>
+                    <div class="right">›</div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================================
+        // 🌍 PAGE PAYS
+        // ============================================================
+        function renderCountries() {
+            document.getElementById('countriesTitle').textContent = '🇸🇳 ' + currentCategory;
+            const container = document.getElementById('countriesList');
+            const countries = [...new Set(allNumbers
+                .filter(n => n.category === currentCategory)
+                .map(n => n.country)
+                .filter(Boolean)
+            )];
+
+            if (countries.length === 0) {
+                container.innerHTML = `
+                    <div style="background:var(--bg-secondary);border-radius:16px;padding:30px;text-align:center;border:1px solid var(--border-color);">
+                        <div style="font-size:40px;margin-bottom:10px;">🌍</div>
+                        <div style="color:var(--text-secondary);">Aucun pays disponible pour cette catégorie</div>
+                        <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">Ajoute des numéros depuis le panel admin</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = countries.map(country => {
+                const count = allNumbers.filter(n => n.category === currentCategory && n.country === country && n.status === 'available').length;
+                return `
+                    <div class="list-item" onclick="navigateTo('numbers', '${country}')">
+                        <div class="left">
+                            <span class="icon">🌍</span>
+                            <div>
+                                <div class="name">${country}</div>
+                                <div class="sub">${count} numéro(s) disponible(s)</div>
+                            </div>
+                        </div>
+                        <div class="right">›</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // 📞 PAGE NUMÉROS
+        // ============================================================
+        function renderNumbers() {
+            document.getElementById('numbersTitle').textContent = '📞 Numéros';
+            document.getElementById('numbersSubtitle').textContent = `${currentCategory} - ${currentCountry}`;
+            const container = document.getElementById('numbersList');
+
+            const available = allNumbers.filter(n =>
+                n.category === currentCategory &&
+                n.country === currentCountry &&
+                n.status === 'available'
+            );
+
+            if (available.length === 0) {
+                container.innerHTML = `
+                    <div style="background:var(--bg-secondary);border-radius:16px;padding:30px;text-align:center;border:1px solid var(--border-color);">
+                        <div style="font-size:40px;margin-bottom:10px;">📭</div>
+                        <div style="color:var(--text-secondary);">Aucun numéro disponible</div>
+                        <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">Reviens plus tard ou contacte l'admin</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = available.map(num => `
+                <div class="list-item" style="cursor:default;">
+                    <div class="left">
+                        <div>
+                            <div class="name">${num.number}</div>
+                            <div class="sub">${num.category} • ${num.country}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span class="price-tag">${formatCurrency(num.price)} Rp</span>
+                        <button class="btn-buy" onclick="buyNumber('${num.id}', ${num.price})">Acheter</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================================
+        // 🛒 ACHAT D'UN NUMÉRO
+        // ============================================================
+        async function buyNumber(numberId, price) {
+            if (!currentUser) {
+                showToast('Connecte-toi d\'abord', 'error');
+                return;
+            }
+
+            if (!currentUserData) {
+                showToast('Erreur chargement profil', 'error');
+                return;
+            }
+
+            if (currentUserData.balance < price) {
+                showToast(`Solde insuffisant ! Tu as Rp${formatCurrency(currentUserData.balance)}`, 'error');
+                return;
+            }
+
+            if (!confirm(`Acheter ce numéro pour Rp${formatCurrency(price)} ?`)) return;
+
+            try {
+                // Transaction Firestore
+                const userRef = db.collection('users').doc(currentUser.uid);
+                const numberRef = db.collection('numbers').doc(numberId);
+
+                await db.runTransaction(async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    const numDoc = await transaction.get(numberRef);
+
+                    if (!userDoc.exists) throw new Error('Utilisateur introuvable');
+                    if (!numDoc.exists) throw new Error('Numéro introuvable');
+                    if (numDoc.data().status !== 'available') throw new Error('Numéro déjà vendu');
+                    if (userDoc.data().balance < price) throw new Error('Solde insuffisant');
+
+                    const newBalance = userDoc.data().balance - price;
+                    transaction.update(userRef, { balance: newBalance });
+                    transaction.update(numberRef, {
+                        status: 'sold',
+                        purchasedBy: currentUser.uid,
+                        purchasedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // Ajouter une transaction
+                    const transRef = db.collection('transactions').doc();
+                    transaction.set(transRef, {
+                        userId: currentUser.uid,
+                        numberId: numberId,
+                        number: numDoc.data().number,
+                        category: numDoc.data().category,
+                        country: numDoc.data().country,
+                        amount: -price,
+                        status: 'success',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+
+                showToast('🎉 Achat réussi !', 'success');
+                await loadUserData();
+                await loadAllData();
+                renderDashboard();
+                renderNumbers();
+                renderHistory();
+
+            } catch (err) {
+                showToast(err.message || 'Erreur lors de l\'achat', 'error');
+                console.error(err);
+            }
+        }
+
+        // ============================================================
+        // 💰 PAGE DÉPÔT
+        // ============================================================
+        async function renderDeposits() {
+            const container = document.getElementById('pendingDepositsList');
+            if (!currentUser) return;
+
+            try {
+                const snap = await db.collection('deposits')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('createdAt', 'desc')
+                    .limit(10)
+                    .get();
+
+                if (snap.empty) {
+                    container.innerHTML = `<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucune demande de dépôt</div>`;
+                    return;
+                }
+
+                container.innerHTML = snap.docs.map(d => {
+                    const data = d.data();
+                    const statusMap = {
+                        'pending': '⏳ En attente',
+                        'verified': '✅ Validé',
+                        'rejected': '❌ Rejeté'
+                    };
+                    return `
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
+                            <span>${formatCurrency(data.amount)} Rp - ${data.method}</span>
+                            <span>${statusMap[data.status] || data.status}</span>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function requestDeposit() {
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            const method = document.getElementById('depositMethod').value;
+            const proof = document.getElementById('depositProof').value.trim();
+
+            if (!amount || amount < 1000) {
+                showToast('Montant minimum : 1000 Rp', 'error');
+                return;
+            }
+
+            if (!proof) {
+                showToast('Veuillez fournir un lien de preuve', 'error');
+                return;
+            }
+
+            try {
+                await db.collection('deposits').add({
+                    userId: currentUser.uid,
+                    amount: amount,
+                    method: method,
+                    proof: proof,
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showToast('Demande de dépôt envoyée ! En attente de validation', 'success');
+                document.getElementById('depositAmount').value = '';
+                document.getElementById('depositProof').value = '';
+                await renderDeposits();
+                await loadAllData();
+            } catch (err) {
+                showToast('Erreur lors de la demande', 'error');
+                console.error(err);
+            }
+        }
+
+        // ============================================================
+        // 📜 PAGE HISTOIRE
+        // ============================================================
+        async function renderHistory() {
+            const container = document.getElementById('historyList');
+            if (!currentUser) return;
+
+            try {
+                const snap = await db.collection('transactions')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('createdAt', 'desc')
+                    .limit(50)
+                    .get();
+
+                if (snap.empty) {
+                    container.innerHTML = `
+                        <div style="background:var(--bg-secondary);border-radius:16px;padding:30px;text-align:center;border:1px solid var(--border-color);">
+                            <div style="font-size:40px;margin-bottom:10px;">📭</div>
+                            <div style="color:var(--text-secondary);">Aucune transaction</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = snap.docs.map(d => {
+                    const data = d.data();
+                    const isDeposit = data.amount > 0;
+                    const sign = isDeposit ? '+' : '';
+                    const color = isDeposit ? 'var(--accent-cyan)' : '#ef4444';
+                    const emoji = isDeposit ? '✅' : '❌';
+
+                    let detail = '';
+                    if (data.number) {
+                        detail = `<div style="font-size:12px;color:var(--text-secondary);">📱 ${data.number}</div>`;
+                    }
+
+                    return `
+                        <div style="background:var(--bg-secondary);border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border-color);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div>
+                                    <div style="font-weight:600;">${emoji} ${sign}${formatCurrency(Math.abs(data.amount))} Rp</div>
+                                    ${detail}
+                                    <div style="font-size:11px;color:var(--text-secondary);">${data.category || ''} ${data.country || ''}</div>
+                                </div>
+                                <div style="font-size:11px;color:var(--text-secondary);text-align:right;">
+                                    ${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div style="color:var(--text-secondary);">Erreur chargement historique</div>';
+            }
+        }
+
+        // ============================================================
+        // ⚙️ PANEL ADMIN
+        // ============================================================
+        function renderAdminPanel() {
+            renderAdminDeposits();
+            renderAdminUsers();
+            renderAdminNumbers();
+        }
+
+        async function renderAdminDeposits() {
+            const container = document.getElementById('adminDepositsList');
+            try {
+                const snap = await db.collection('deposits')
+                    .where('status', '==', 'pending')
+                    .orderBy('createdAt', 'asc')
+                    .limit(20)
+                    .get();
+
+                if (snap.empty) {
+                    container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucun dépôt en attente</div>';
+                    return;
+                }
+
+                container.innerHTML = snap.docs.map(d => {
+                    const data = d.data();
+                    return `
+                        <div class="admin-deposit-item">
+                            <div class="info">
+                                <div class="user">${data.userId ? data.userId.slice(0,8) : 'Inconnu'}</div>
+                                <div class="amount">${formatCurrency(data.amount)} Rp</div>
+                                <div style="font-size:11px;color:var(--text-secondary);">${data.method} • ${data.proof ? '📸 Preuve' : ''}</div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn-admin verify" onclick="adminVerifyDeposit('${d.id}', ${data.amount}, '${data.userId}')">✅</button>
+                                <button class="btn-admin reject" onclick="adminRejectDeposit('${d.id}')">❌</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function adminVerifyDeposit(depositId, amount, userId) {
+            if (!confirm(`Valider ce dépôt de ${formatCurrency(amount)} Rp ?`)) return;
+            try {
+                await db.runTransaction(async (transaction) => {
+                    const depRef = db.collection('deposits').doc(depositId);
+                    const userRef = db.collection('users').doc(userId);
+
+                    const depDoc = await transaction.get(depRef);
+                    const userDoc = await transaction.get(userRef);
+
+                    if (!depDoc.exists) throw new Error('Dépôt introuvable');
+                    if (depDoc.data().status !== 'pending') throw new Error('Dépôt déjà traité');
+                    if (!userDoc.exists) throw new Error('Utilisateur introuvable');
+
+                    const currentBalance = userDoc.data().balance || 0;
+                    transaction.update(userRef, { balance: currentBalance + amount });
+                    transaction.update(depRef, { status: 'verified' });
+
+                    // Ajouter une transaction
+                    const transRef = db.collection('transactions').doc();
+                    transaction.set(transRef, {
+                        userId: userId,
+                        amount: amount,
+                        status: 'success',
+                        type: 'deposit',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+
+                showToast('✅ Dépôt validé ! Solde mis à jour', 'success');
+                await loadAllData();
+                renderAdminPanel();
+                renderDashboard();
+
+            } catch (err) {
+                showToast(err.message || 'Erreur', 'error');
+                console.error(err);
+            }
+        }
+
+        async function adminRejectDeposit(depositId) {
+            if (!confirm('Rejeter ce dépôt ?')) return;
+            try {
+                await db.collection('deposits').doc(depositId).update({
+                    status: 'rejected'
+                });
+                showToast('❌ Dépôt rejeté', 'warning');
+                await loadAllData();
+                renderAdminPanel();
+            } catch (err) {
+                showToast('Erreur', 'error');
+                console.error(err);
+            }
+        }
+
+        async function renderAdminUsers() {
+            const container = document.getElementById('adminUsersList');
+            try {
+                const snap = await db.collection('users').orderBy('createdAt', 'desc').limit(20).get();
+                if (snap.empty) {
+                    container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucun utilisateur</div>';
+                    return;
+                }
+
+                container.innerHTML = snap.docs.map(d => {
+                    const data = d.data();
+                    return `
+                        <div class="admin-user-item">
+                            <div class="info">
+                                <div>${data.displayName || 'Anonyme'} ${data.role === 'admin' ? '<span class="badge-admin">ADMIN</span>' : ''}</div>
+                                <div class="email">${data.email || ''}</div>
+                                <div style="font-size:12px;color:var(--accent-orange);">Solde: ${formatCurrency(data.balance || 0)} Rp</div>
+                            </div>
+                            <div>
+                                <input type="number" id="addBalance_${d.id}" placeholder="Rp" style="width:80px;padding:4px 6px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:12px;">
+                                <button class="btn-add-balance" onclick="adminAddBalance('${d.id}')">+</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function adminAddBalance(userId) {
+            const input = document.getElementById('addBalance_' + userId);
+            const amount = parseInt(input.value);
+            if (!amount || amount <= 0) {
+                showToast('Montant invalide', 'error');
+                return;
+            }
+
+            if (!confirm(`Ajouter ${formatCurrency(amount)} Rp à cet utilisateur ?`)) return;
+
+            try {
+                const userRef = db.collection('users').doc(userId);
+                await db.runTransaction(async (transaction) => {
+                    const doc = await transaction.get(userRef);
+                    if (!doc.exists) throw new Error('Utilisateur introuvable');
+                    const newBalance = (doc.data().balance || 0) + amount;
+                    transaction.update(userRef, { balance: newBalance });
+
+                    const transRef = db.collection('transactions').doc();
+                    transaction.set(transRef, {
+                        userId: userId,
+                        amount: amount,
+                        status: 'success',
+                        type: 'admin_add',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+
+                showToast(`✅ ${formatCurrency(amount)} Rp ajouté !`, 'success');
+                input.value = '';
+                await loadAllData();
+                renderAdminPanel();
+                renderDashboard();
+
+            } catch (err) {
+                showToast(err.message || 'Erreur', 'error');
+                console.error(err);
+            }
+        }
+
+        function renderAdminNumbers() {
+            const container = document.getElementById('adminNumbersList');
+            const nums = allNumbers.slice(0, 20);
+            if (nums.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucun numéro</div>';
+                return;
+            }
+
+            container.innerHTML = nums.map(n => `
+                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
+                    <span>${n.category} - ${n.country || '?'}</span>
+                    <span>${n.number}</span>
+                    <span style="color:${n.status === 'available' ? 'var(--accent-cyan)' : '#ef4444'}">${n.status}</span>
+                </div>
+            `).join('');
+        }
+
+        async function adminAddNumber() {
+            const category = document.getElementById('adminNumberCategory').value;
+            const country = document.getElementById('adminNumberCountry').value.trim();
+            const number = document.getElementById('adminNumberValue').value.trim();
+            const price = parseInt(document.getElementById('adminNumberPrice').value);
+
+            if (!country || !number || !price) {
+                showToast('Remplis tous les champs', 'error');
+                return;
+            }
+
+            if (price < 1) {
+                showToast('Prix invalide', 'error');
+                return;
+            }
+
+            try {
+                await db.collection('numbers').add({
+                    category: category,
+                    country: country,
+                    number: number,
+                    price: price,
+                    status: 'available',
+                    purchasedBy: null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showToast('✅ Numéro ajouté !', 'success');
+                document.getElementById('adminNumberCountry').value = '';
+                document.getElementById('adminNumberValue').value = '';
+                document.getElementById('adminNumberPrice').value = '';
+                await loadAllData();
+                renderAdminPanel();
+                renderNumbers();
+
+            } catch (err) {
+                showToast('Erreur lors de l\'ajout', 'error');
+                console.error(err);
+            }
+        }
+
+        // ============================================================
+        // 🚪 DÉCONNEXION
+        // ============================================================
+        function logout() {
+            if (confirm('Se déconnecter ?')) {
+                auth.signOut();
+                showToast('Déconnecté', 'warning');
+            }
+        }
+
+        // ============================================================
+        // 📦 INITIALISATION
+        // ============================================================
+        console.log('🦋 MICHAEL SCOFIELD SMS - Prêt !');
+        console.log('📌 Admin par défaut : créer un compte puis modifier role="admin" dans Firestore');
+    </script>
 
 </body>
 </html>
