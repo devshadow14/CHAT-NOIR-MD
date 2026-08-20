@@ -21,26 +21,35 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:system-ui, -apple-system, sans-serif; background:var(--bg-primary); color:var(--text-primary); min-height:100vh; }
         .app { max-width:420px; margin:0 auto; padding-bottom:80px; background:var(--bg-primary); }
-        #authScreen { display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:100vh; padding:30px 24px; background:linear-gradient(145deg,#0a0a1a,#1a0a2a); }
-        .auth-logo { text-align:center; margin-bottom:40px; }
-        .auth-logo .logo-main { font-size:28px; font-weight:900; background:linear-gradient(135deg,var(--accent-purple),var(--accent-orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-        .auth-logo .logo-sub { font-size:12px; color:var(--text-secondary); letter-spacing:6px; margin-top:-2px; }
-        .auth-box { width:100%; background:var(--bg-secondary); border-radius:24px; padding:32px 24px; border:1px solid var(--border-color); }
-        .auth-box h2 { font-size:20px; margin-bottom:6px; }
-        .auth-box p { color:var(--text-secondary); font-size:14px; margin-bottom:24px; }
-        .auth-box input { width:100%; padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:15px; margin-bottom:8px; }
-        .auth-box input:focus { outline:none; border-color:var(--accent-purple); }
-        .field-hint { font-size:11px; color:var(--text-secondary); margin-bottom:10px; padding-left:4px; }
-        .pw-strength { display:flex; gap:4px; margin-bottom:10px; }
+
+        /* ===================== AUTH (restylé) ===================== */
+        #authScreen { display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:100vh; padding:30px 24px; background:radial-gradient(circle at 20% 0%, rgba(124,58,237,0.25), transparent 55%), radial-gradient(circle at 100% 100%, rgba(245,158,11,0.15), transparent 50%), linear-gradient(160deg,#08081a,#150a2e 60%,#0a0a1a); position:relative; overflow:hidden; }
+        .auth-logo { text-align:center; margin-bottom:34px; }
+        .auth-logo .logo-icon { font-size:44px; filter:drop-shadow(0 0 18px rgba(124,58,237,0.6)); }
+        .auth-logo .logo-main { font-size:26px; font-weight:900; background:linear-gradient(135deg,var(--accent-purple),var(--accent-orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-top:6px; }
+        .auth-logo .logo-sub { font-size:11px; color:var(--text-secondary); letter-spacing:5px; margin-top:-2px; }
+        .auth-box { width:100%; background:rgba(18,18,42,0.85); backdrop-filter:blur(14px); border-radius:26px; padding:8px; border:1px solid var(--border-color); box-shadow:0 20px 60px rgba(0,0,0,0.45); }
+        .auth-tabs { display:flex; background:var(--bg-primary); border-radius:20px; padding:4px; margin-bottom:20px; }
+        .auth-tabs button { flex:1; padding:12px; border:none; background:transparent; color:var(--text-secondary); font-weight:700; font-size:14px; border-radius:16px; cursor:pointer; transition:0.25s; }
+        .auth-tabs button.active { background:linear-gradient(135deg,var(--accent-purple),#6d28d9); color:#fff; box-shadow:0 6px 18px rgba(124,58,237,0.35); }
+        .auth-inner { padding:8px 16px 20px; }
+        .auth-inner h2 { font-size:19px; margin-bottom:4px; }
+        .auth-inner p { color:var(--text-secondary); font-size:13px; margin-bottom:20px; }
+        .input-wrap { position:relative; margin-bottom:10px; }
+        .input-wrap .field-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; opacity:0.7; }
+        .auth-box input { width:100%; padding:14px 16px 14px 42px; border-radius:14px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:15px; }
+        .auth-box input:focus { outline:none; border-color:var(--accent-purple); box-shadow:0 0 0 3px rgba(124,58,237,0.2); }
+        .field-hint { font-size:11px; color:var(--text-secondary); margin:2px 0 10px 4px; }
+        .pw-strength { display:flex; gap:4px; margin:0 0 6px 4px; }
         .pw-strength span { height:4px; flex:1; border-radius:4px; background:var(--border-color); transition:0.3s; }
-        .btn-primary { width:100%; padding:14px; border:none; border-radius:12px; background:linear-gradient(135deg,var(--accent-purple),#6d28d9); color:white; font-size:16px; font-weight:700; cursor:pointer; transition:0.3s; }
-        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 20px rgba(124,58,237,0.3); }
+        .btn-primary { width:100%; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,var(--accent-purple),#6d28d9); color:white; font-size:15px; font-weight:700; cursor:pointer; transition:0.3s; box-shadow:0 8px 24px rgba(124,58,237,0.35); margin-top:6px; }
+        .btn-primary:hover { transform:translateY(-2px); }
         .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
         .btn-secondary { width:100%; padding:14px; border:1px solid var(--border-color); border-radius:12px; background:transparent; color:var(--text-primary); font-size:16px; font-weight:600; cursor:pointer; margin-top:10px; }
         .btn-secondary:hover { background:var(--bg-card); }
-        .switch-link { text-align:center; margin-top:16px; color:var(--text-secondary); font-size:14px; }
-        .switch-link span { color:var(--accent-purple); cursor:pointer; font-weight:600; }
-        .switch-link span:hover { color:var(--accent-orange); }
+        .secure-note { display:flex; align-items:center; gap:8px; justify-content:center; margin-top:18px; color:var(--text-secondary); font-size:11px; }
+        .secure-note .dot { width:6px; height:6px; border-radius:50%; background:var(--accent-green); box-shadow:0 0 6px var(--accent-green); animation:blinkDot 1.4s infinite; }
+
         #mainApp { display:none; padding:20px 16px 90px; }
         .app-header { display:flex; justify-content:space-between; align-items:center; padding:8px 0 16px; }
         .app-header .logo-main { font-size:18px; font-weight:900; background:linear-gradient(135deg,var(--accent-purple),var(--accent-orange)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
@@ -115,9 +124,13 @@
         .deposit-step-panel input, .deposit-step-panel select { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:15px; margin-bottom:14px; }
         .deposit-step-panel input:focus { outline:none; border-color:var(--accent-purple); }
         .payment-info-box { background:var(--bg-primary); border:1px dashed var(--accent-orange); border-radius:12px; padding:14px; margin-bottom:16px; }
-        .payment-info-box div { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
-        .payment-info-box div span:first-child { color:var(--text-secondary); }
-        .payment-info-box div span:last-child { font-weight:700; }
+        .payment-info-box .row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
+        .payment-info-box .row span:first-child { color:var(--text-secondary); }
+        .payment-info-box .row span:last-child { font-weight:700; }
+        .payment-steps { list-style:none; margin-bottom:16px; }
+        .payment-steps li { display:flex; gap:10px; align-items:flex-start; padding:8px 0; font-size:13px; color:var(--text-primary); border-bottom:1px solid var(--border-color); }
+        .payment-steps li:last-child { border-bottom:none; }
+        .payment-steps .num { background:var(--accent-purple); color:#fff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
         .upload-zone { border:2px dashed var(--border-color); border-radius:14px; padding:20px; text-align:center; cursor:pointer; margin-bottom:14px; transition:0.3s; }
         .upload-zone:hover { border-color:var(--accent-purple); }
         .upload-zone img { max-width:100%; max-height:200px; border-radius:10px; margin-top:10px; }
@@ -125,7 +138,6 @@
         .step-nav button { flex:1; }
         .btn-ghost { background:transparent; border:1px solid var(--border-color); color:var(--text-primary); padding:14px; border-radius:12px; font-weight:600; cursor:pointer; }
 
-        .deposit-form { background:var(--bg-secondary); border-radius:16px; padding:18px; border:1px solid var(--border-color); margin-bottom:16px; }
         .pending-deposits { background:var(--bg-secondary); border-radius:16px; padding:16px; border:1px solid var(--border-color); }
         .pending-deposits .label { font-size:13px; color:var(--text-secondary); margin-bottom:10px; }
         .profile-card { background:var(--bg-secondary); border-radius:16px; padding:20px; border:1px solid var(--border-color); display:flex; align-items:center; gap:16px; margin-bottom:16px; }
@@ -185,6 +197,23 @@
         .img-modal.show { display:flex; }
         .img-modal img { max-width:100%; max-height:85vh; border-radius:12px; }
         .img-modal .close-modal { position:absolute; top:20px; right:20px; background:var(--bg-card); border:1px solid var(--border-color); color:white; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer; }
+
+        /* RECEIPT MODAL */
+        .receipt-modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+        .receipt-modal.show { display:flex; }
+        .receipt-card { width:100%; max-width:360px; background:linear-gradient(160deg,#12122a,#1a0a2e); border:1px solid var(--border-color); border-radius:22px; padding:26px 22px; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+        .receipt-card .r-check { width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,var(--accent-green),#059669); display:flex; align-items:center; justify-content:center; font-size:30px; margin:0 auto 14px; box-shadow:0 0 30px rgba(16,185,129,0.4); }
+        .receipt-card h3 { text-align:center; font-size:18px; margin-bottom:2px; }
+        .receipt-card .r-sub { text-align:center; color:var(--text-secondary); font-size:12px; margin-bottom:18px; }
+        .receipt-card .r-divider { border-top:1px dashed var(--border-color); margin:14px 0; }
+        .receipt-card .r-row { display:flex; justify-content:space-between; font-size:13px; padding:6px 0; }
+        .receipt-card .r-row span:first-child { color:var(--text-secondary); }
+        .receipt-card .r-row span:last-child { font-weight:700; }
+        .receipt-card .r-total { font-size:20px; font-weight:800; color:var(--accent-orange); text-align:center; margin:14px 0; }
+        .btn-whatsapp { width:100%; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,#25D366,#128C7E); color:#fff; font-weight:700; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px; }
+        .btn-whatsapp:hover { transform:translateY(-2px); }
+        .close-modal-x { position:absolute; top:14px; right:14px; background:var(--bg-card); border:1px solid var(--border-color); color:white; width:30px; height:30px; border-radius:50%; font-size:14px; cursor:pointer; }
+
         @media (max-width:420px) { .app { padding:16px 12px 80px; } .balance-card .amount { font-size:28px; } .stats .stat-item .number { font-size:20px; } .bottom-nav .nav-item { min-width:40px; font-size:9px; } .bottom-nav .nav-item .icon { font-size:18px; } }
         .empty-state { background:var(--bg-secondary); border-radius:16px; padding:30px; text-align:center; border:1px solid var(--border-color); }
         .empty-state .icon { font-size:40px; margin-bottom:10px; }
@@ -201,27 +230,57 @@
         <img id="imgModalSrc" src="" alt="preuve" />
     </div>
 
+    <!-- RECEIPT MODAL -->
+    <div class="receipt-modal" id="receiptModal">
+        <div class="receipt-card">
+            <button class="close-modal-x" onclick="closeReceiptModal()">✕</button>
+            <div class="r-check">✅</div>
+            <h3>Achat réussi !</h3>
+            <div class="r-sub" id="receiptDate">--</div>
+            <div class="r-divider"></div>
+            <div class="r-row"><span>N° Commande</span><span id="rOrderId">--</span></div>
+            <div class="r-row"><span>Service</span><span id="rCategory">--</span></div>
+            <div class="r-row"><span>Pays</span><span id="rCountry">--</span></div>
+            <div class="r-row"><span>Numéro</span><span id="rNumber">--</span></div>
+            <div class="r-divider"></div>
+            <div class="r-total"><span id="rPrice">0</span> FCFA</div>
+            <button class="btn-whatsapp" id="rWaBtn">💬 Recevoir le code sur WhatsApp</button>
+        </div>
+    </div>
+
     <div class="app" id="app">
 
-        <!-- ÉCRAN DE CONNEXION -->
+        <!-- ÉCRAN DE CONNEXION / INSCRIPTION -->
         <div id="authScreen">
             <div class="auth-logo">
-                <div class="logo-main">📱 MICHAEL SCOFIELD</div>
+                <div class="logo-icon">📱</div>
+                <div class="logo-main">MICHAEL SCOFIELD</div>
                 <div class="logo-sub">✦ SMS VIRTUAL ✦</div>
             </div>
             <div class="auth-box">
-                <h2 id="authTitle">Connexion</h2>
-                <p id="authSub">Connectez-vous à votre compte</p>
-                <input type="email" id="authEmail" placeholder="Email" autocomplete="username" />
-                <input type="password" id="authPassword" placeholder="Mot de passe" autocomplete="current-password" />
-                <div class="pw-strength hidden" id="pwStrength">
-                    <span></span><span></span><span></span><span></span>
+                <div class="auth-tabs">
+                    <button id="tabLogin" class="active" onclick="setAuthMode(true)">Connexion</button>
+                    <button id="tabRegister" onclick="setAuthMode(false)">Inscription</button>
                 </div>
-                <div class="field-hint" id="pwHint"></div>
-                <button class="btn-primary" id="authSubmitBtn">Se connecter</button>
-                <button class="btn-secondary" id="authSwitchBtn">Créer un compte</button>
-                <div class="switch-link">
-                    <span id="authSwitchText">Pas encore de compte ? <span id="authSwitchLink">S'inscrire</span></span>
+                <div class="auth-inner">
+                    <h2 id="authTitle">Content de te revoir 👋</h2>
+                    <p id="authSub">Connecte-toi à ton compte</p>
+
+                    <div class="input-wrap">
+                        <span class="field-icon">📧</span>
+                        <input type="email" id="authEmail" placeholder="Email" autocomplete="username" />
+                    </div>
+                    <div class="input-wrap">
+                        <span class="field-icon">🔒</span>
+                        <input type="password" id="authPassword" placeholder="Mot de passe" autocomplete="current-password" />
+                    </div>
+                    <div class="pw-strength hidden" id="pwStrength">
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+                    <div class="field-hint" id="pwHint"></div>
+                    <button class="btn-primary" id="authSubmitBtn">Se connecter</button>
+
+                    <div class="secure-note"><span class="dot"></span> Connexion chiffrée · mots de passe hachés</div>
                 </div>
             </div>
         </div>
@@ -235,46 +294,48 @@
                 <div class="badge">SMS</div>
             </div>
 
-            <!-- GREETING -->
-            <div class="greeting">
-                <h2>Salut, <span id="userDisplayName">...</span> ! 🥰</h2>
-                <p>Bienvenue sur Michael Scofield SMS</p>
-                <div class="quick-actions">
-                    <button class="btn-nokos" onclick="navigateTo('nokos')">📱 Commander</button>
-                    <button class="btn-deposit" onclick="navigateTo('deposit')">💰 Dépôt</button>
+            <div id="dashboardWidgets">
+                <!-- GREETING -->
+                <div class="greeting">
+                    <h2>Salut, <span id="userDisplayName">...</span> ! 🥰</h2>
+                    <p>Bienvenue sur Michael Scofield SMS</p>
+                    <div class="quick-actions">
+                        <button class="btn-nokos" onclick="navigateTo('nokos')">📱 Commander</button>
+                        <button class="btn-deposit" onclick="navigateTo('deposit')">💰 Dépôt</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- BALANCE -->
-            <div class="balance-card">
-                <div class="label">Votre solde</div>
-                <div class="amount"><span id="userBalance">0</span> FCFA</div>
-                <div class="actions">
-                    <button class="btn-deposit-small" onclick="navigateTo('deposit')">💲 Dépôt</button>
-                    <button class="btn-order-small" onclick="navigateTo('nokos')">Commander</button>
+                <!-- BALANCE -->
+                <div class="balance-card">
+                    <div class="label">Votre solde</div>
+                    <div class="amount"><span id="userBalance">0</span> FCFA</div>
+                    <div class="actions">
+                        <button class="btn-deposit-small" onclick="navigateTo('deposit')">💲 Dépôt</button>
+                        <button class="btn-order-small" onclick="navigateTo('nokos')">Commander</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- STATS -->
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="number orange" id="statTotalOrders">0</div>
-                    <div class="stat-label">Commandes</div>
+                <!-- STATS -->
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="number orange" id="statTotalOrders">0</div>
+                        <div class="stat-label">Commandes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number purple" id="statPendingOrders">0</div>
+                        <div class="stat-label">En cours</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number cyan" id="statSuccessOrders">0</div>
+                        <div class="stat-label">Succès</div>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div class="number purple" id="statPendingOrders">0</div>
-                    <div class="stat-label">En cours</div>
-                </div>
-                <div class="stat-item">
-                    <div class="number cyan" id="statSuccessOrders">0</div>
-                    <div class="stat-label">Succès</div>
-                </div>
-            </div>
 
-            <!-- DAILY DEPOSIT -->
-            <div class="daily-deposit">
-                <div class="label">📊 Dépôt du jour</div>
-                <div class="value" id="dailyDeposit">0 FCFA</div>
+                <!-- DAILY DEPOSIT -->
+                <div class="daily-deposit">
+                    <div class="label">📊 Dépôt du jour</div>
+                    <div class="value" id="dailyDeposit">0 FCFA</div>
+                </div>
             </div>
 
             <!-- PAGES -->
@@ -335,7 +396,8 @@
 
                 <!-- ETAPE 3 : effectuer le paiement -->
                 <div class="deposit-step-panel hidden" id="depStep3">
-                    <label>Effectue le paiement</label>
+                    <label>Comment faire le dépôt</label>
+                    <ol class="payment-steps" id="paymentStepsList"></ol>
                     <div class="payment-info-box" id="paymentInfoBox"></div>
                     <div class="step-nav">
                         <button class="btn-ghost" onclick="depositGoStep(2)">← Retour</button>
@@ -412,9 +474,9 @@
                     <div class="admin-section">
                         <h4>💳 Infos de paiement (Wave / OM)</h4>
                         <label style="font-size:12px;color:var(--text-secondary);">Numéro Wave</label>
-                        <input type="text" id="adminWaveNumber" placeholder="Ex: 77 000 00 00" />
+                        <input type="text" id="adminWaveNumber" placeholder="Ex: 776227173" />
                         <label style="font-size:12px;color:var(--text-secondary);">Numéro Orange Money</label>
-                        <input type="text" id="adminOMNumber" placeholder="Ex: 78 000 00 00" />
+                        <input type="text" id="adminOMNumber" placeholder="Ex: 711192309" />
                         <label style="font-size:12px;color:var(--text-secondary);">Nom du bénéficiaire</label>
                         <input type="text" id="adminPaymentName" placeholder="Ex: Michael Scofield" />
                         <button class="btn-admin add" onclick="adminSavePaymentInfo()">💾 ENREGISTRER</button>
@@ -461,10 +523,11 @@
         function saveDeposits(d) { localStorage.setItem('ms_deposits', JSON.stringify(d)); }
         function getTransactions() { return JSON.parse(localStorage.getItem('ms_transactions')) || []; }
         function saveTransactions(t) { localStorage.setItem('ms_transactions', JSON.stringify(t)); }
+        const WHATSAPP_CONTACT = '221758535949'; // 758535949 avec indicatif Sénégal
         function getPaymentInfo() {
             return JSON.parse(localStorage.getItem('ms_paymentInfo')) || {
-                Wave: { number: '77 000 00 00', name: 'Michael Scofield' },
-                'Orange Money': { number: '78 000 00 00', name: 'Michael Scofield' }
+                Wave: { number: '776227173', name: 'Michael Scofield' },
+                'Orange Money': { number: '711192309', name: 'Michael Scofield' }
             };
         }
         function savePaymentInfo(p) { localStorage.setItem('ms_paymentInfo', JSON.stringify(p)); }
@@ -486,10 +549,6 @@
         // ============================================================
         // 🔐 SÉCURITÉ : hash de mot de passe (SHA-256 + sel, Web Crypto)
         // ============================================================
-        // Remarque : ceci reste une appli 100% côté navigateur (localStorage),
-        // donc pas un vrai backend sécurisé. Mais on évite au moins de stocker
-        // les mots de passe en clair, et on ajoute des protections de base
-        // contre le bruteforce et les injections HTML.
         function genSalt() {
             const arr = new Uint8Array(16);
             crypto.getRandomValues(arr);
@@ -509,10 +568,9 @@
             if (/[A-Z]/.test(pw)) score++;
             if (/[0-9]/.test(pw)) score++;
             if (/[^A-Za-z0-9]/.test(pw)) score++;
-            return score; // 0-4
+            return score;
         }
 
-        // Anti-bruteforce simple : blocage après 5 tentatives ratées / 5 min
         function getLoginAttempts() { return JSON.parse(localStorage.getItem('ms_loginAttempts')) || {}; }
         function saveLoginAttempts(a) { localStorage.setItem('ms_loginAttempts', JSON.stringify(a)); }
         function registerFailedAttempt(email) {
@@ -520,7 +578,7 @@
             const rec = attempts[email] || { count: 0, lockUntil: 0 };
             rec.count += 1;
             if (rec.count >= 5) {
-                rec.lockUntil = Date.now() + 5 * 60 * 1000; // 5 minutes
+                rec.lockUntil = Date.now() + 5 * 60 * 1000;
                 rec.count = 0;
             }
             attempts[email] = rec;
@@ -540,7 +598,7 @@
         }
 
         // ============================================================
-        // 📦 DONNÉES INITIALES (comptes de démo avec mot de passe hashé)
+        // 📦 DONNÉES INITIALES + MIGRATION
         // ============================================================
         async function ensureInitialData() {
             if (getUsers().length === 0) {
@@ -550,6 +608,37 @@
                     { id: 'admin', email: 'admin@ms.com', salt: adminSalt, passwordHash: await hashPassword('admin123', adminSalt), displayName: 'Admin', balance: 99999, role: 'admin', blocked: false },
                     { id: 'user1', email: 'user@test.com', salt: userSalt, passwordHash: await hashPassword('123456', userSalt), displayName: 'Devshadow', balance: 5000, role: 'user', blocked: false }
                 ]);
+            } else {
+                // Migration : anciens comptes avec mot de passe en clair -> hash+sel.
+                // Répare aussi les comptes de démo admin/user si leur hash est cassé.
+                let users = getUsers();
+                let changed = false;
+                for (const u of users) {
+                    if (!u.passwordHash && u.password) {
+                        const salt = genSalt();
+                        u.salt = salt;
+                        u.passwordHash = await hashPassword(u.password, salt);
+                        delete u.password;
+                        changed = true;
+                    }
+                    if (u.blocked === undefined) { u.blocked = false; changed = true; }
+                }
+                const admin = users.find(u => u.id === 'admin' || u.email === 'admin@ms.com');
+                if (admin && (!admin.passwordHash || !admin.salt)) {
+                    admin.salt = genSalt();
+                    admin.passwordHash = await hashPassword('admin123', admin.salt);
+                    admin.role = 'admin';
+                    admin.blocked = false;
+                    changed = true;
+                }
+                const demoUser = users.find(u => u.id === 'user1' || u.email === 'user@test.com');
+                if (demoUser && (!demoUser.passwordHash || !demoUser.salt)) {
+                    demoUser.salt = genSalt();
+                    demoUser.passwordHash = await hashPassword('123456', demoUser.salt);
+                    demoUser.blocked = false;
+                    changed = true;
+                }
+                if (changed) saveUsers(users);
             }
             if (getNumbers().length === 0) {
                 saveNumbers([
@@ -570,8 +659,6 @@
         let currentCountry = 'Sénégal';
         let isLoginMode = true;
 
-        document.getElementById('authSwitchLink').addEventListener('click', toggleAuthMode);
-        document.getElementById('authSwitchBtn').addEventListener('click', toggleAuthMode);
         document.getElementById('authPassword').addEventListener('input', updatePasswordStrengthUI);
 
         function updatePasswordStrengthUI() {
@@ -587,16 +674,13 @@
             hint.textContent = pw.length === 0 ? 'Min. 6 caractères (idéalement 8+, avec chiffre et majuscule)' : (pw.length < 6 ? 'Trop court (6 caractères min)' : '');
         }
 
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('authTitle').textContent = isLoginMode ? 'Connexion' : 'Inscription';
-            document.getElementById('authSub').textContent = isLoginMode ? 'Connectez-vous à votre compte' : 'Créez votre compte Michael Scofield';
-            document.getElementById('authSubmitBtn').textContent = isLoginMode ? 'Se connecter' : 'S\'inscrire';
-            document.getElementById('authSwitchBtn').textContent = isLoginMode ? 'Créer un compte' : 'Déjà un compte';
-            document.getElementById('authSwitchText').innerHTML = isLoginMode
-                ? 'Pas encore de compte ? <span id="authSwitchLink">S\'inscrire</span>'
-                : 'Déjà un compte ? <span id="authSwitchLink">Se connecter</span>';
-            document.getElementById('authSwitchLink').addEventListener('click', toggleAuthMode);
+        function setAuthMode(login) {
+            isLoginMode = login;
+            document.getElementById('tabLogin').classList.toggle('active', login);
+            document.getElementById('tabRegister').classList.toggle('active', !login);
+            document.getElementById('authTitle').textContent = login ? 'Content de te revoir 👋' : 'Créer un compte ✨';
+            document.getElementById('authSub').textContent = login ? 'Connecte-toi à ton compte' : 'Rejoins Michael Scofield SMS';
+            document.getElementById('authSubmitBtn').textContent = login ? 'Se connecter' : "S'inscrire";
             updatePasswordStrengthUI();
         }
 
@@ -659,7 +743,6 @@
             refreshAll();
         }
 
-        // Vérifier session (ne stocke que l'id, jamais le mot de passe / hash)
         async function checkSession() {
             await ensureInitialData();
             const saved = localStorage.getItem('ms_currentUser');
@@ -696,6 +779,10 @@
             document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
                 el.classList.toggle('active', el.dataset.page === page);
             });
+            // Le tableau de bord (solde/stats) ne s'affiche que sur la page "dashboard" ;
+            // les autres pages prennent tout l'écran.
+            document.getElementById('dashboardWidgets').style.display = (page === 'dashboard') ? '' : 'none';
+
             switch (page) {
                 case 'dashboard': renderDashboard(); break;
                 case 'nokos': renderCategories(); break;
@@ -707,7 +794,6 @@
             }
         }
 
-        // Boutons du menu du bas
         document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
             btn.addEventListener('click', () => navigateTo(btn.dataset.page));
         });
@@ -847,9 +933,10 @@
             saveUsers(users);
             currentUser = user;
 
+            const orderId = genId().toUpperCase();
             let transactions = getTransactions();
             transactions.push({
-                id: genId(),
+                id: orderId,
                 userId: currentUser.id,
                 numberId: num.id,
                 number: num.number,
@@ -862,7 +949,30 @@
             saveTransactions(transactions);
 
             refreshAll();
-            showToast('🎉 Achat réussi !', 'success');
+            showReceipt(num, orderId);
+        }
+
+        // ============================================================
+        // 🧾 REÇU + REDIRECTION WHATSAPP
+        // ============================================================
+        function showReceipt(num, orderId) {
+            document.getElementById('receiptDate').textContent = new Date().toLocaleString('fr-FR');
+            document.getElementById('rOrderId').textContent = orderId;
+            document.getElementById('rCategory').textContent = num.category;
+            document.getElementById('rCountry').textContent = num.country;
+            document.getElementById('rNumber').textContent = num.number;
+            document.getElementById('rPrice').textContent = formatCurrency(num.price);
+
+            const message = `Bonjour ! Je viens d'acheter un numéro ${num.category} (${num.country}) sur Michael Scofield SMS.\nN° commande : ${orderId}\nNuméro : ${num.number}\nMontant : ${formatCurrency(num.price)} FCFA\nJ'aimerais recevoir le code de vérification, merci !`;
+            const waLink = `https://wa.me/${WHATSAPP_CONTACT}?text=${encodeURIComponent(message)}`;
+            document.getElementById('rWaBtn').onclick = () => window.open(waLink, '_blank');
+
+            document.getElementById('receiptModal').classList.add('show');
+            // Ouverture automatique de WhatsApp (le reçu reste affiché en dessous)
+            window.open(waLink, '_blank');
+        }
+        function closeReceiptModal() {
+            document.getElementById('receiptModal').classList.remove('show');
         }
 
         // ============================================================
@@ -900,7 +1010,7 @@
 
         function depositGoStep(step) {
             depositStep = step;
-            if (step === 3) renderPaymentInfoBox();
+            if (step === 3) renderPaymentStep();
             renderDepositStepUI();
         }
 
@@ -918,14 +1028,22 @@
             depositGoStep(3);
         }
 
-        function renderPaymentInfoBox() {
+        function renderPaymentStep() {
             const info = getPaymentInfo()[depositData.method];
             const emoji = depositData.method === 'Wave' ? '🌊' : '🟠';
+
+            document.getElementById('paymentStepsList').innerHTML = `
+                <li><span class="num">1</span> Ouvre ton application <b>${escapeHtml(depositData.method)}</b> sur ton téléphone</li>
+                <li><span class="num">2</span> Envoie exactement <b>${formatCurrency(depositData.amount)} FCFA</b> au numéro <b>${escapeHtml(info.number)}</b></li>
+                <li><span class="num">3</span> Vérifie que le nom affiché est bien <b>${escapeHtml(info.name)}</b></li>
+                <li><span class="num">4</span> Clique sur "J'ai payé" puis envoie une capture d'écran du reçu</li>
+            `;
+
             document.getElementById('paymentInfoBox').innerHTML = `
-                <div><span>${emoji} Méthode</span><span>${escapeHtml(depositData.method)}</span></div>
-                <div><span>📱 Numéro</span><span>${escapeHtml(info.number)}</span></div>
-                <div><span>👤 Bénéficiaire</span><span>${escapeHtml(info.name)}</span></div>
-                <div><span>💰 Montant à envoyer</span><span>${formatCurrency(depositData.amount)} FCFA</span></div>
+                <div class="row"><span>${emoji} Méthode</span><span>${escapeHtml(depositData.method)}</span></div>
+                <div class="row"><span>📱 Numéro à créditer</span><span>${escapeHtml(info.number)}</span></div>
+                <div class="row"><span>👤 Bénéficiaire</span><span>${escapeHtml(info.name)}</span></div>
+                <div class="row"><span>💰 Montant à envoyer</span><span>${formatCurrency(depositData.amount)} FCFA</span></div>
             `;
         }
 
@@ -938,7 +1056,6 @@
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    // Compression simple pour ne pas saturer le localStorage
                     const maxDim = 800;
                     let { width, height } = img;
                     if (width > maxDim || height > maxDim) {
@@ -1043,6 +1160,9 @@
         }
         document.getElementById('imgModal').addEventListener('click', (e) => {
             if (e.target.id === 'imgModal') closeImageModal();
+        });
+        document.getElementById('receiptModal').addEventListener('click', (e) => {
+            if (e.target.id === 'receiptModal') closeReceiptModal();
         });
 
         // ============================================================
@@ -1190,11 +1310,6 @@
             if (!confirm(`Confirmer : ${action} ce compte ?`)) return;
             user.blocked = !user.blocked;
             saveUsers(users);
-            if (user.blocked) {
-                // si le user bloqué est connecté ailleurs, sa session locale ne changera
-                // qu'à la prochaine vérification (checkSession), mais on nettoie ici
-                // au cas où c'est la session courante d'un autre profil admin de test.
-            }
             renderAdminUsers();
             showToast(user.blocked ? '🔒 Utilisateur bloqué' : '🔓 Utilisateur débloqué', 'success');
         }
@@ -1267,7 +1382,7 @@
         // ============================================================
         // 📦 INIT
         // ============================================================
-        console.log('🦋 MICHAEL SCOFIELD SMS - Version sécurisée');
+        console.log('🦋 MICHAEL SCOFIELD SMS - Version sécurisée + stylée');
         console.log('👑 Admin: admin@ms.com / admin123');
         console.log('👤 Utilisateur: user@test.com / 123456');
     </script>
