@@ -14,6 +14,8 @@
             --accent-purple: #7c3aed;
             --accent-orange: #f59e0b;
             --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
             --border-color: #2a2a5a;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -26,10 +28,14 @@
         .auth-box { width:100%; background:var(--bg-secondary); border-radius:24px; padding:32px 24px; border:1px solid var(--border-color); }
         .auth-box h2 { font-size:20px; margin-bottom:6px; }
         .auth-box p { color:var(--text-secondary); font-size:14px; margin-bottom:24px; }
-        .auth-box input { width:100%; padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:15px; margin-bottom:14px; }
+        .auth-box input { width:100%; padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:15px; margin-bottom:8px; }
         .auth-box input:focus { outline:none; border-color:var(--accent-purple); }
+        .field-hint { font-size:11px; color:var(--text-secondary); margin-bottom:10px; padding-left:4px; }
+        .pw-strength { display:flex; gap:4px; margin-bottom:10px; }
+        .pw-strength span { height:4px; flex:1; border-radius:4px; background:var(--border-color); transition:0.3s; }
         .btn-primary { width:100%; padding:14px; border:none; border-radius:12px; background:linear-gradient(135deg,var(--accent-purple),#6d28d9); color:white; font-size:16px; font-weight:700; cursor:pointer; transition:0.3s; }
         .btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 20px rgba(124,58,237,0.3); }
+        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; box-shadow:none; }
         .btn-secondary { width:100%; padding:14px; border:1px solid var(--border-color); border-radius:12px; background:transparent; color:var(--text-primary); font-size:16px; font-weight:600; cursor:pointer; margin-top:10px; }
         .btn-secondary:hover { background:var(--bg-card); }
         .switch-link { text-align:center; margin-top:16px; color:var(--text-secondary); font-size:14px; }
@@ -81,16 +87,45 @@
         .list-item:hover { border-color:var(--accent-purple); transform:translateX(4px); }
         .list-item .left { display:flex; align-items:center; gap:12px; }
         .list-item .left .icon { font-size:22px; }
-        .list-item .left .name { font-weight:600; }
+        .list-item .left .name { font-weight:600; display:flex; align-items:center; }
         .list-item .left .sub { font-size:12px; color:var(--text-secondary); }
         .list-item .right { color:var(--text-secondary); font-size:18px; }
         .list-item .price-tag { background:var(--accent-orange); color:#000; padding:2px 12px; border-radius:20px; font-size:12px; font-weight:700; }
         .list-item .btn-buy { background:linear-gradient(135deg,var(--accent-purple),#6d28d9); color:white; border:none; padding:6px 16px; border-radius:20px; font-weight:600; font-size:12px; cursor:pointer; transition:0.3s; }
         .list-item .btn-buy:hover { transform:scale(1.05); }
+
+        .status-dot { width:8px; height:8px; border-radius:50%; background:var(--accent-green); display:inline-block; margin-right:8px; box-shadow:0 0 6px var(--accent-green); animation:blinkDot 1.4s ease-in-out infinite; flex-shrink:0; }
+        .status-dot.busy { background:var(--accent-red); box-shadow:0 0 6px var(--accent-red); }
+        @keyframes blinkDot { 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+
+        /* DEPOSIT STEPPER */
+        .step-indicator { display:flex; align-items:center; gap:6px; margin-bottom:20px; }
+        .step-indicator .step-dot { width:26px; height:26px; border-radius:50%; background:var(--bg-card); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--text-secondary); }
+        .step-indicator .step-dot.done { background:var(--accent-green); color:#000; border-color:var(--accent-green); }
+        .step-indicator .step-dot.current { background:var(--accent-purple); color:#fff; border-color:var(--accent-purple); }
+        .step-indicator .step-line { flex:1; height:2px; background:var(--border-color); }
+        .step-indicator .step-line.done { background:var(--accent-green); }
+        .deposit-step-panel { background:var(--bg-secondary); border-radius:16px; padding:18px; border:1px solid var(--border-color); margin-bottom:16px; }
+        .method-choice { display:flex; gap:12px; }
+        .method-choice .method-card { flex:1; background:var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:18px 10px; text-align:center; cursor:pointer; transition:0.3s; }
+        .method-choice .method-card:hover, .method-choice .method-card.selected { border-color:var(--accent-purple); box-shadow:0 0 16px rgba(124,58,237,0.25); }
+        .method-choice .method-card .emoji { font-size:30px; margin-bottom:6px; }
+        .method-choice .method-card .name { font-weight:700; font-size:14px; }
+        .deposit-step-panel label { font-size:14px; color:var(--text-secondary); display:block; margin-bottom:6px; }
+        .deposit-step-panel input, .deposit-step-panel select { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:15px; margin-bottom:14px; }
+        .deposit-step-panel input:focus { outline:none; border-color:var(--accent-purple); }
+        .payment-info-box { background:var(--bg-primary); border:1px dashed var(--accent-orange); border-radius:12px; padding:14px; margin-bottom:16px; }
+        .payment-info-box div { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; }
+        .payment-info-box div span:first-child { color:var(--text-secondary); }
+        .payment-info-box div span:last-child { font-weight:700; }
+        .upload-zone { border:2px dashed var(--border-color); border-radius:14px; padding:20px; text-align:center; cursor:pointer; margin-bottom:14px; transition:0.3s; }
+        .upload-zone:hover { border-color:var(--accent-purple); }
+        .upload-zone img { max-width:100%; max-height:200px; border-radius:10px; margin-top:10px; }
+        .step-nav { display:flex; gap:10px; }
+        .step-nav button { flex:1; }
+        .btn-ghost { background:transparent; border:1px solid var(--border-color); color:var(--text-primary); padding:14px; border-radius:12px; font-weight:600; cursor:pointer; }
+
         .deposit-form { background:var(--bg-secondary); border-radius:16px; padding:18px; border:1px solid var(--border-color); margin-bottom:16px; }
-        .deposit-form label { font-size:14px; color:var(--text-secondary); display:block; margin-bottom:6px; }
-        .deposit-form input, .deposit-form select { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:15px; margin-bottom:14px; }
-        .deposit-form input:focus, .deposit-form select:focus { outline:none; border-color:var(--accent-purple); }
         .pending-deposits { background:var(--bg-secondary); border-radius:16px; padding:16px; border:1px solid var(--border-color); }
         .pending-deposits .label { font-size:13px; color:var(--text-secondary); margin-bottom:10px; }
         .profile-card { background:var(--bg-secondary); border-radius:16px; padding:20px; border:1px solid var(--border-color); display:flex; align-items:center; gap:16px; margin-bottom:16px; }
@@ -114,18 +149,25 @@
         .admin-section .btn-admin.add:hover { box-shadow:0 0 20px rgba(124,58,237,0.3); }
         .admin-section .btn-admin.verify { background:var(--accent-cyan); color:#000; }
         .admin-section .btn-admin.reject { background:#ef4444; color:white; }
-        .admin-user-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-color); }
+        .admin-section .btn-admin.block { background:var(--accent-orange); color:#000; }
+        .admin-section .btn-admin.unblock { background:var(--accent-green); color:#000; }
+        .admin-section .btn-admin.delete { background:#ef4444; color:white; }
+        .admin-user-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-color); gap:8px; flex-wrap:wrap; }
         .admin-user-item:last-child { border-bottom:none; }
         .admin-user-item .info { font-size:13px; }
         .admin-user-item .info .email { color:var(--text-secondary); font-size:12px; }
         .admin-user-item .btn-add-balance { background:var(--accent-orange); color:#000; border:none; padding:4px 14px; border-radius:20px; font-weight:600; font-size:12px; cursor:pointer; }
-        .admin-deposit-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border-color); }
+        .admin-user-item .user-actions { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+        .admin-deposit-item { padding:12px 0; border-bottom:1px solid var(--border-color); }
         .admin-deposit-item:last-child { border-bottom:none; }
+        .admin-deposit-item .top-row { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
         .admin-deposit-item .info { font-size:13px; }
         .admin-deposit-item .info .user { font-weight:600; }
         .admin-deposit-item .info .amount { color:var(--accent-orange); }
-        .admin-deposit-item .actions { display:flex; gap:6px; }
+        .admin-deposit-item .actions { display:flex; gap:6px; flex-shrink:0; }
+        .admin-deposit-item .proof-thumb { width:56px; height:56px; object-fit:cover; border-radius:8px; cursor:pointer; border:1px solid var(--border-color); }
         .badge-admin { background:#ef4444; color:white; font-size:10px; padding:2px 8px; border-radius:20px; font-weight:700; margin-left:6px; }
+        .badge-blocked { background:#7f1d1d; color:#fca5a5; font-size:10px; padding:2px 8px; border-radius:20px; font-weight:700; margin-left:6px; }
         .hidden { display:none !important; }
         .bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); max-width:420px; width:100%; background:var(--bg-secondary); border-top:1px solid var(--border-color); display:flex; justify-content:space-around; padding:8px 4px 10px; z-index:100; backdrop-filter:blur(10px); }
         .bottom-nav .nav-item { display:flex; flex-direction:column; align-items:center; background:none; border:none; color:var(--text-secondary); font-size:10px; cursor:pointer; padding:4px 8px; transition:0.3s; border-radius:12px; min-width:48px; }
@@ -139,6 +181,10 @@
         .toast.error { border-color:#ef4444; }
         .toast.warning { border-color:var(--accent-orange); }
         @keyframes slideDown { from{opacity:0;transform:translateX(-50%) translateY(-20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+        .img-modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+        .img-modal.show { display:flex; }
+        .img-modal img { max-width:100%; max-height:85vh; border-radius:12px; }
+        .img-modal .close-modal { position:absolute; top:20px; right:20px; background:var(--bg-card); border:1px solid var(--border-color); color:white; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer; }
         @media (max-width:420px) { .app { padding:16px 12px 80px; } .balance-card .amount { font-size:28px; } .stats .stat-item .number { font-size:20px; } .bottom-nav .nav-item { min-width:40px; font-size:9px; } .bottom-nav .nav-item .icon { font-size:18px; } }
         .empty-state { background:var(--bg-secondary); border-radius:16px; padding:30px; text-align:center; border:1px solid var(--border-color); }
         .empty-state .icon { font-size:40px; margin-bottom:10px; }
@@ -149,6 +195,11 @@
 <body>
 
     <div id="toast" class="toast"></div>
+
+    <div class="img-modal" id="imgModal">
+        <button class="close-modal" onclick="closeImageModal()">✕</button>
+        <img id="imgModalSrc" src="" alt="preuve" />
+    </div>
 
     <div class="app" id="app">
 
@@ -161,8 +212,12 @@
             <div class="auth-box">
                 <h2 id="authTitle">Connexion</h2>
                 <p id="authSub">Connectez-vous à votre compte</p>
-                <input type="email" id="authEmail" placeholder="Email" />
-                <input type="password" id="authPassword" placeholder="Mot de passe" />
+                <input type="email" id="authEmail" placeholder="Email" autocomplete="username" />
+                <input type="password" id="authPassword" placeholder="Mot de passe" autocomplete="current-password" />
+                <div class="pw-strength hidden" id="pwStrength">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <div class="field-hint" id="pwHint"></div>
                 <button class="btn-primary" id="authSubmitBtn">Se connecter</button>
                 <button class="btn-secondary" id="authSwitchBtn">Créer un compte</button>
                 <div class="switch-link">
@@ -249,22 +304,61 @@
             <div class="page-content" id="page-deposit">
                 <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
                 <div class="page-title">💰 Dépôt</div>
-                <div class="page-subtitle">Recharge ton compte</div>
-                <div class="deposit-form">
-                    <label>Montant (FCFA)</label>
-                    <input type="number" id="depositAmount" placeholder="Ex: 10000" />
-                    <label>Méthode</label>
-                    <select id="depositMethod">
-                        <option value="QRIS">💳 QRIS</option>
-                        <option value="Banque">🏦 Banque</option>
-                        <option value="Orange Money">📱 Orange Money</option>
-                    </select>
-                    <label>Preuve (lien image)</label>
-                    <input type="text" id="depositProof" placeholder="https://... (lien vers la capture)" />
-                    <button class="btn-primary" onclick="requestDeposit()">💰 VALIDER LA DEMANDE</button>
+                <div class="page-subtitle">Recharge ton compte en 4 étapes</div>
+
+                <div class="step-indicator" id="stepIndicator"></div>
+
+                <!-- ETAPE 1 : méthode -->
+                <div class="deposit-step-panel" id="depStep1">
+                    <label>Choisis ta méthode de paiement</label>
+                    <div class="method-choice">
+                        <div class="method-card" id="methodCardWave" onclick="selectDepositMethod('Wave')">
+                            <div class="emoji">🌊</div>
+                            <div class="name">Wave</div>
+                        </div>
+                        <div class="method-card" id="methodCardOM" onclick="selectDepositMethod('Orange Money')">
+                            <div class="emoji">🟠</div>
+                            <div class="name">Orange Money</div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- ETAPE 2 : montant -->
+                <div class="deposit-step-panel hidden" id="depStep2">
+                    <label>Montant à déposer (FCFA)</label>
+                    <input type="number" id="depositAmount" placeholder="Ex: 10000" />
+                    <div class="step-nav">
+                        <button class="btn-ghost" onclick="depositGoStep(1)">← Retour</button>
+                        <button class="btn-primary" onclick="depositConfirmAmount()">Suivant →</button>
+                    </div>
+                </div>
+
+                <!-- ETAPE 3 : effectuer le paiement -->
+                <div class="deposit-step-panel hidden" id="depStep3">
+                    <label>Effectue le paiement</label>
+                    <div class="payment-info-box" id="paymentInfoBox"></div>
+                    <div class="step-nav">
+                        <button class="btn-ghost" onclick="depositGoStep(2)">← Retour</button>
+                        <button class="btn-primary" onclick="depositGoStep(4)">✅ J'ai payé</button>
+                    </div>
+                </div>
+
+                <!-- ETAPE 4 : preuve -->
+                <div class="deposit-step-panel hidden" id="depStep4">
+                    <label>Envoie la capture d'écran du paiement</label>
+                    <div class="upload-zone" onclick="document.getElementById('depositProofFile').click()">
+                        <div id="uploadZoneText">📸 Touche ici pour choisir la capture</div>
+                        <img id="proofPreview" class="hidden" />
+                    </div>
+                    <input type="file" id="depositProofFile" accept="image/*" class="hidden" onchange="handleProofUpload(event)" />
+                    <div class="step-nav">
+                        <button class="btn-ghost" onclick="depositGoStep(3)">← Retour</button>
+                        <button class="btn-primary" id="depositSubmitBtn" onclick="submitDepositFinal()" disabled>💰 Envoyer la demande</button>
+                    </div>
+                </div>
+
                 <div class="pending-deposits">
-                    <div class="label">📌 En attente de validation</div>
+                    <div class="label">📌 Mes demandes de dépôt</div>
                     <div id="pendingDepositsList"></div>
                 </div>
             </div>
@@ -299,16 +393,31 @@
 
                     <div class="admin-section">
                         <h4>➕ Ajouter un numéro</h4>
+                        <label style="font-size:12px;color:var(--text-secondary);">Catégorie</label>
                         <select id="adminNumberCategory">
                             <option value="WhatsApp">💬 WhatsApp</option>
                             <option value="Telegram">✈️ Telegram</option>
                             <option value="TikTok">🎵 TikTok</option>
                             <option value="Autre">📱 Autre</option>
                         </select>
+                        <label style="font-size:12px;color:var(--text-secondary);">Pays</label>
                         <input type="text" id="adminNumberCountry" placeholder="Pays (ex: Sénégal)" />
+                        <label style="font-size:12px;color:var(--text-secondary);">Numéro</label>
                         <input type="text" id="adminNumberValue" placeholder="Numéro (ex: +221 77 123 45 67)" />
+                        <label style="font-size:12px;color:var(--text-secondary);">Prix (FCFA)</label>
                         <input type="number" id="adminNumberPrice" placeholder="Prix (FCFA)" />
-                        <button class="btn-admin add" onclick="adminAddNumber()">➕ AJOUTER</button>
+                        <button class="btn-admin add" onclick="adminAddNumber()">➕ AJOUTER LE NUMÉRO</button>
+                    </div>
+
+                    <div class="admin-section">
+                        <h4>💳 Infos de paiement (Wave / OM)</h4>
+                        <label style="font-size:12px;color:var(--text-secondary);">Numéro Wave</label>
+                        <input type="text" id="adminWaveNumber" placeholder="Ex: 77 000 00 00" />
+                        <label style="font-size:12px;color:var(--text-secondary);">Numéro Orange Money</label>
+                        <input type="text" id="adminOMNumber" placeholder="Ex: 78 000 00 00" />
+                        <label style="font-size:12px;color:var(--text-secondary);">Nom du bénéficiaire</label>
+                        <input type="text" id="adminPaymentName" placeholder="Ex: Michael Scofield" />
+                        <button class="btn-admin add" onclick="adminSavePaymentInfo()">💾 ENREGISTRER</button>
                     </div>
 
                     <div class="admin-section">
@@ -352,6 +461,13 @@
         function saveDeposits(d) { localStorage.setItem('ms_deposits', JSON.stringify(d)); }
         function getTransactions() { return JSON.parse(localStorage.getItem('ms_transactions')) || []; }
         function saveTransactions(t) { localStorage.setItem('ms_transactions', JSON.stringify(t)); }
+        function getPaymentInfo() {
+            return JSON.parse(localStorage.getItem('ms_paymentInfo')) || {
+                Wave: { number: '77 000 00 00', name: 'Michael Scofield' },
+                'Orange Money': { number: '78 000 00 00', name: 'Michael Scofield' }
+            };
+        }
+        function savePaymentInfo(p) { localStorage.setItem('ms_paymentInfo', JSON.stringify(p)); }
         function formatCurrency(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
         function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
         function showToast(msg, type = '') {
@@ -361,24 +477,89 @@
             clearTimeout(t._timeout);
             t._timeout = setTimeout(() => t.className = 'toast', 3000);
         }
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = String(str == null ? '' : str);
+            return div.innerHTML;
+        }
 
         // ============================================================
-        // 📦 DONNÉES INITIALES
+        // 🔐 SÉCURITÉ : hash de mot de passe (SHA-256 + sel, Web Crypto)
         // ============================================================
-        if (getUsers().length === 0) {
-            saveUsers([
-                { id: 'admin', email: 'admin@ms.com', password: 'admin123', displayName: 'Admin', balance: 99999, role: 'admin' },
-                { id: 'user1', email: 'user@test.com', password: '123456', displayName: 'Devshadow', balance: 5000, role: 'user' }
-            ]);
+        // Remarque : ceci reste une appli 100% côté navigateur (localStorage),
+        // donc pas un vrai backend sécurisé. Mais on évite au moins de stocker
+        // les mots de passe en clair, et on ajoute des protections de base
+        // contre le bruteforce et les injections HTML.
+        function genSalt() {
+            const arr = new Uint8Array(16);
+            crypto.getRandomValues(arr);
+            return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
         }
-        if (getNumbers().length === 0) {
-            saveNumbers([
-                { id: 'n1', category: 'WhatsApp', country: 'Sénégal', number: '+221 77 123 45 67', price: 500, status: 'available', purchasedBy: null },
-                { id: 'n2', category: 'WhatsApp', country: 'Sénégal', number: '+221 76 987 65 43', price: 600, status: 'available', purchasedBy: null },
-                { id: 'n3', category: 'WhatsApp', country: 'France', number: '+33 6 12 34 56 78', price: 800, status: 'available', purchasedBy: null },
-                { id: 'n4', category: 'Telegram', country: 'Sénégal', number: '+221 70 111 22 33', price: 700, status: 'available', purchasedBy: null },
-                { id: 'n5', category: 'TikTok', country: 'USA', number: '+1 202 555 0199', price: 1200, status: 'available', purchasedBy: null }
-            ]);
+        async function hashPassword(password, salt) {
+            const enc = new TextEncoder().encode(salt + ':' + password);
+            const buf = await crypto.subtle.digest('SHA-256', enc);
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+        function passwordStrength(pw) {
+            let score = 0;
+            if (pw.length >= 8) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            return score; // 0-4
+        }
+
+        // Anti-bruteforce simple : blocage après 5 tentatives ratées / 5 min
+        function getLoginAttempts() { return JSON.parse(localStorage.getItem('ms_loginAttempts')) || {}; }
+        function saveLoginAttempts(a) { localStorage.setItem('ms_loginAttempts', JSON.stringify(a)); }
+        function registerFailedAttempt(email) {
+            const attempts = getLoginAttempts();
+            const rec = attempts[email] || { count: 0, lockUntil: 0 };
+            rec.count += 1;
+            if (rec.count >= 5) {
+                rec.lockUntil = Date.now() + 5 * 60 * 1000; // 5 minutes
+                rec.count = 0;
+            }
+            attempts[email] = rec;
+            saveLoginAttempts(attempts);
+        }
+        function clearFailedAttempts(email) {
+            const attempts = getLoginAttempts();
+            delete attempts[email];
+            saveLoginAttempts(attempts);
+        }
+        function isLockedOut(email) {
+            const attempts = getLoginAttempts();
+            const rec = attempts[email];
+            if (!rec) return 0;
+            if (rec.lockUntil && rec.lockUntil > Date.now()) return rec.lockUntil;
+            return 0;
+        }
+
+        // ============================================================
+        // 📦 DONNÉES INITIALES (comptes de démo avec mot de passe hashé)
+        // ============================================================
+        async function ensureInitialData() {
+            if (getUsers().length === 0) {
+                const adminSalt = genSalt();
+                const userSalt = genSalt();
+                saveUsers([
+                    { id: 'admin', email: 'admin@ms.com', salt: adminSalt, passwordHash: await hashPassword('admin123', adminSalt), displayName: 'Admin', balance: 99999, role: 'admin', blocked: false },
+                    { id: 'user1', email: 'user@test.com', salt: userSalt, passwordHash: await hashPassword('123456', userSalt), displayName: 'Devshadow', balance: 5000, role: 'user', blocked: false }
+                ]);
+            }
+            if (getNumbers().length === 0) {
+                saveNumbers([
+                    { id: 'n1', category: 'WhatsApp', country: 'Sénégal', number: '+221 77 123 45 67', price: 500, status: 'available', purchasedBy: null },
+                    { id: 'n2', category: 'WhatsApp', country: 'Sénégal', number: '+221 76 987 65 43', price: 600, status: 'available', purchasedBy: null },
+                    { id: 'n3', category: 'WhatsApp', country: 'France', number: '+33 6 12 34 56 78', price: 800, status: 'available', purchasedBy: null },
+                    { id: 'n4', category: 'Telegram', country: 'Sénégal', number: '+221 70 111 22 33', price: 700, status: 'available', purchasedBy: null },
+                    { id: 'n5', category: 'TikTok', country: 'USA', number: '+1 202 555 0199', price: 1200, status: 'available', purchasedBy: null }
+                ]);
+            }
         }
 
         // ============================================================
@@ -391,6 +572,20 @@
 
         document.getElementById('authSwitchLink').addEventListener('click', toggleAuthMode);
         document.getElementById('authSwitchBtn').addEventListener('click', toggleAuthMode);
+        document.getElementById('authPassword').addEventListener('input', updatePasswordStrengthUI);
+
+        function updatePasswordStrengthUI() {
+            const bar = document.getElementById('pwStrength');
+            const hint = document.getElementById('pwHint');
+            if (isLoginMode) { bar.classList.add('hidden'); hint.textContent = ''; return; }
+            bar.classList.remove('hidden');
+            const pw = document.getElementById('authPassword').value;
+            const score = passwordStrength(pw);
+            const colors = ['#ef4444', '#ef4444', '#f59e0b', '#10b981', '#10b981'];
+            const spans = bar.querySelectorAll('span');
+            spans.forEach((s, i) => { s.style.background = i < score ? colors[score] : 'var(--border-color)'; });
+            hint.textContent = pw.length === 0 ? 'Min. 6 caractères (idéalement 8+, avec chiffre et majuscule)' : (pw.length < 6 ? 'Trop court (6 caractères min)' : '');
+        }
 
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
@@ -402,38 +597,59 @@
                 ? 'Pas encore de compte ? <span id="authSwitchLink">S\'inscrire</span>'
                 : 'Déjà un compte ? <span id="authSwitchLink">Se connecter</span>';
             document.getElementById('authSwitchLink').addEventListener('click', toggleAuthMode);
+            updatePasswordStrengthUI();
         }
 
-        document.getElementById('authSubmitBtn').addEventListener('click', () => {
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
+        document.getElementById('authSubmitBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('authSubmitBtn');
+            const email = document.getElementById('authEmail').value.trim().toLowerCase();
+            const password = document.getElementById('authPassword').value;
             if (!email || !password) { showToast('Remplis tous les champs', 'error'); return; }
+            if (!isValidEmail(email)) { showToast('Email invalide', 'error'); return; }
 
-            let users = getUsers();
-            if (isLoginMode) {
-                const user = users.find(u => u.email === email && u.password === password);
-                if (!user) { showToast('Email ou mot de passe incorrect', 'error'); return; }
-                currentUser = user;
-                localStorage.setItem('ms_currentUser', JSON.stringify(user));
-                showToast('Bienvenue ' + user.displayName + ' !', 'success');
-                enterApp();
-            } else {
-                if (users.find(u => u.email === email)) { showToast('Email déjà utilisé', 'error'); return; }
-                if (password.length < 6) { showToast('Mot de passe : 6 caractères min', 'error'); return; }
-                const newUser = {
-                    id: genId(),
-                    email,
-                    password,
-                    displayName: email.split('@')[0],
-                    balance: 0,
-                    role: 'user'
-                };
-                users.push(newUser);
-                saveUsers(users);
-                currentUser = newUser;
-                localStorage.setItem('ms_currentUser', JSON.stringify(newUser));
-                showToast('Compte créé !', 'success');
-                enterApp();
+            btn.disabled = true;
+            try {
+                let users = getUsers();
+                if (isLoginMode) {
+                    const lockUntil = isLockedOut(email);
+                    if (lockUntil) {
+                        const mins = Math.ceil((lockUntil - Date.now()) / 60000);
+                        showToast(`Trop de tentatives. Réessaie dans ${mins} min`, 'error');
+                        return;
+                    }
+                    const user = users.find(u => u.email === email);
+                    if (!user) { registerFailedAttempt(email); showToast('Email ou mot de passe incorrect', 'error'); return; }
+                    if (user.blocked) { showToast('Ce compte a été suspendu par un administrateur', 'error'); return; }
+                    const hash = await hashPassword(password, user.salt);
+                    if (hash !== user.passwordHash) { registerFailedAttempt(email); showToast('Email ou mot de passe incorrect', 'error'); return; }
+                    clearFailedAttempts(email);
+                    currentUser = user;
+                    localStorage.setItem('ms_currentUser', JSON.stringify({ id: user.id }));
+                    showToast('Bienvenue ' + user.displayName + ' !', 'success');
+                    enterApp();
+                } else {
+                    if (users.find(u => u.email === email)) { showToast('Email déjà utilisé', 'error'); return; }
+                    if (password.length < 6) { showToast('Mot de passe : 6 caractères min', 'error'); return; }
+                    const salt = genSalt();
+                    const newUser = {
+                        id: genId(),
+                        email,
+                        salt,
+                        passwordHash: await hashPassword(password, salt),
+                        displayName: email.split('@')[0],
+                        balance: 0,
+                        role: 'user',
+                        blocked: false
+                    };
+                    users.push(newUser);
+                    saveUsers(users);
+                    currentUser = newUser;
+                    localStorage.setItem('ms_currentUser', JSON.stringify({ id: newUser.id }));
+                    showToast('Compte créé !', 'success');
+                    enterApp();
+                }
+            } finally {
+                btn.disabled = false;
             }
         });
 
@@ -443,18 +659,22 @@
             refreshAll();
         }
 
-        // Vérifier session
-        const saved = localStorage.getItem('ms_currentUser');
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            const exists = getUsers().find(u => u.id === parsed.id);
-            if (exists) {
-                currentUser = exists;
-                enterApp();
-            } else {
-                localStorage.removeItem('ms_currentUser');
+        // Vérifier session (ne stocke que l'id, jamais le mot de passe / hash)
+        async function checkSession() {
+            await ensureInitialData();
+            const saved = localStorage.getItem('ms_currentUser');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                const exists = getUsers().find(u => u.id === parsed.id);
+                if (exists && !exists.blocked) {
+                    currentUser = exists;
+                    enterApp();
+                } else {
+                    localStorage.removeItem('ms_currentUser');
+                }
             }
         }
+        checkSession();
 
         // ============================================================
         // 📊 NAVIGATION ET RENDU
@@ -481,15 +701,13 @@
                 case 'nokos': renderCategories(); break;
                 case 'countries': if (data) currentCategory = data; renderCountries(); break;
                 case 'numbers': if (data) currentCountry = data; renderNumbers(); break;
-                case 'deposit': renderDeposits(); break;
+                case 'deposit': resetDepositFlow(); renderDeposits(); break;
                 case 'history': renderHistory(); break;
                 case 'profile': renderDashboard(); break;
             }
         }
 
-        // FIX: les boutons du menu du bas n'avaient aucun gestionnaire de clic
-        // (seulement un attribut data-page, sans onclick ni addEventListener).
-        // C'est pourquoi rien ne se passait en cliquant dessus.
+        // Boutons du menu du bas
         document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
             btn.addEventListener('click', () => navigateTo(btn.dataset.page));
         });
@@ -527,25 +745,27 @@
         }
 
         // ============================================================
-        // 📱 CATÉGORIES
+        // 📱 CATÉGORIES (services)
         // ============================================================
         function renderCategories() {
             const container = document.getElementById('categoriesList');
             const cats = ['WhatsApp', 'Telegram', 'TikTok', 'Autre'];
             const icons = { 'WhatsApp': '💬', 'Telegram': '✈️', 'TikTok': '🎵', 'Autre': '📱' };
             const numbers = getNumbers();
-            container.innerHTML = cats.map(cat => `
+            container.innerHTML = cats.map(cat => {
+                const dispo = numbers.filter(n => n.category === cat && n.status === 'available').length;
+                return `
                 <div class="list-item" onclick="navigateTo('countries','${cat}')">
                     <div class="left">
                         <span class="icon">${icons[cat]}</span>
                         <div>
-                            <div class="name">${cat}</div>
-                            <div class="sub">${numbers.filter(n => n.category === cat && n.status === 'available').length} disponible(s)</div>
+                            <div class="name"><span class="status-dot ${dispo === 0 ? 'busy' : ''}"></span>${cat}</div>
+                            <div class="sub">${dispo} disponible(s)</div>
                         </div>
                     </div>
                     <div class="right">›</div>
                 </div>
-            `).join('');
+            `; }).join('');
         }
 
         // ============================================================
@@ -560,18 +780,20 @@
                 container.innerHTML = `<div class="empty-state"><div class="icon">🌍</div><div class="text">Aucun pays disponible</div><div class="sub">Ajoute des numéros depuis le panel admin</div></div>`;
                 return;
             }
-            container.innerHTML = countries.map(c => `
+            container.innerHTML = countries.map(c => {
+                const dispo = numbers.filter(n => n.category === currentCategory && n.country === c && n.status === 'available').length;
+                return `
                 <div class="list-item" onclick="navigateTo('numbers','${c}')">
                     <div class="left">
                         <span class="icon">🌍</span>
                         <div>
-                            <div class="name">${c}</div>
-                            <div class="sub">${numbers.filter(n => n.category === currentCategory && n.country === c && n.status === 'available').length} numéro(s)</div>
+                            <div class="name"><span class="status-dot ${dispo === 0 ? 'busy' : ''}"></span>${escapeHtml(c)}</div>
+                            <div class="sub">${dispo} numéro(s)</div>
                         </div>
                     </div>
                     <div class="right">›</div>
                 </div>
-            `).join('');
+            `; }).join('');
         }
 
         // ============================================================
@@ -591,8 +813,8 @@
                 <div class="list-item" style="cursor:default;">
                     <div class="left">
                         <div>
-                            <div class="name">${n.number}</div>
-                            <div class="sub">${n.category} • ${n.country}</div>
+                            <div class="name"><span class="status-dot"></span>${escapeHtml(n.number)}</div>
+                            <div class="sub">${escapeHtml(n.category)} • ${escapeHtml(n.country)}</div>
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:10px;">
@@ -624,7 +846,6 @@
             user.balance -= num.price;
             saveUsers(users);
             currentUser = user;
-            localStorage.setItem('ms_currentUser', JSON.stringify(user));
 
             let transactions = getTransactions();
             transactions.push({
@@ -645,48 +866,137 @@
         }
 
         // ============================================================
-        // 💰 DÉPÔT
+        // 💰 DÉPÔT EN 4 ÉTAPES (Wave / Orange Money)
         // ============================================================
+        let depositStep = 1;
+        let depositData = { method: null, amount: 0, proofImage: null };
+
+        function resetDepositFlow() {
+            depositStep = 1;
+            depositData = { method: null, amount: 0, proofImage: null };
+            document.getElementById('depositAmount').value = '';
+            document.getElementById('proofPreview').classList.add('hidden');
+            document.getElementById('proofPreview').src = '';
+            document.getElementById('uploadZoneText').textContent = "📸 Touche ici pour choisir la capture";
+            document.getElementById('depositSubmitBtn').disabled = true;
+            document.getElementById('methodCardWave').classList.remove('selected');
+            document.getElementById('methodCardOM').classList.remove('selected');
+            renderDepositStepUI();
+        }
+
+        function renderDepositStepUI() {
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('depStep' + i).classList.toggle('hidden', i !== depositStep);
+            }
+            const indicator = document.getElementById('stepIndicator');
+            let html = '';
+            for (let i = 1; i <= 4; i++) {
+                const cls = i < depositStep ? 'done' : (i === depositStep ? 'current' : '');
+                html += `<div class="step-dot ${cls}">${i < depositStep ? '✓' : i}</div>`;
+                if (i < 4) html += `<div class="step-line ${i < depositStep ? 'done' : ''}"></div>`;
+            }
+            indicator.innerHTML = html;
+        }
+
+        function depositGoStep(step) {
+            depositStep = step;
+            if (step === 3) renderPaymentInfoBox();
+            renderDepositStepUI();
+        }
+
+        function selectDepositMethod(method) {
+            depositData.method = method;
+            document.getElementById('methodCardWave').classList.toggle('selected', method === 'Wave');
+            document.getElementById('methodCardOM').classList.toggle('selected', method === 'Orange Money');
+            depositGoStep(2);
+        }
+
+        function depositConfirmAmount() {
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            if (!amount || amount < 1000) { showToast('Montant minimum : 1000 FCFA', 'error'); return; }
+            depositData.amount = amount;
+            depositGoStep(3);
+        }
+
+        function renderPaymentInfoBox() {
+            const info = getPaymentInfo()[depositData.method];
+            const emoji = depositData.method === 'Wave' ? '🌊' : '🟠';
+            document.getElementById('paymentInfoBox').innerHTML = `
+                <div><span>${emoji} Méthode</span><span>${escapeHtml(depositData.method)}</span></div>
+                <div><span>📱 Numéro</span><span>${escapeHtml(info.number)}</span></div>
+                <div><span>👤 Bénéficiaire</span><span>${escapeHtml(info.name)}</span></div>
+                <div><span>💰 Montant à envoyer</span><span>${formatCurrency(depositData.amount)} FCFA</span></div>
+            `;
+        }
+
+        function handleProofUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { showToast('Choisis une image', 'error'); return; }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Compression simple pour ne pas saturer le localStorage
+                    const maxDim = 800;
+                    let { width, height } = img;
+                    if (width > maxDim || height > maxDim) {
+                        const ratio = Math.min(maxDim / width, maxDim / height);
+                        width = Math.round(width * ratio);
+                        height = Math.round(height * ratio);
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width; canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    depositData.proofImage = dataUrl;
+                    const preview = document.getElementById('proofPreview');
+                    preview.src = dataUrl;
+                    preview.classList.remove('hidden');
+                    document.getElementById('uploadZoneText').textContent = '✅ Capture sélectionnée (touche pour changer)';
+                    document.getElementById('depositSubmitBtn').disabled = false;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function submitDepositFinal() {
+            if (!depositData.proofImage) { showToast('Ajoute la capture d\'écran', 'error'); return; }
+            let deposits = getDeposits();
+            deposits.push({
+                id: genId(),
+                userId: currentUser.id,
+                amount: depositData.amount,
+                method: depositData.method,
+                proofImage: depositData.proofImage,
+                status: 'pending',
+                date: new Date().toISOString()
+            });
+            saveDeposits(deposits);
+            showToast('Demande envoyée ! En attente de validation', 'success');
+            resetDepositFlow();
+            renderDeposits();
+        }
+
         function renderDeposits() {
             const container = document.getElementById('pendingDepositsList');
             if (!currentUser) return;
             const deposits = getDeposits();
-            const userDeposits = deposits.filter(d => d.userId === currentUser.id).slice(0, 10);
+            const userDeposits = deposits.filter(d => d.userId === currentUser.id).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
             if (userDeposits.length === 0) {
                 container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucune demande</div>';
                 return;
             }
             const statusMap = { 'pending': '⏳ En attente', 'verified': '✅ Validé', 'rejected': '❌ Rejeté' };
+            const methodEmoji = { 'Wave': '🌊', 'Orange Money': '🟠' };
             container.innerHTML = userDeposits.map(d => `
                 <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
-                    <span>${formatCurrency(d.amount)} FCFA - ${d.method}</span>
+                    <span>${methodEmoji[d.method] || ''} ${formatCurrency(d.amount)} FCFA - ${escapeHtml(d.method)}</span>
                     <span>${statusMap[d.status] || d.status}</span>
                 </div>
             `).join('');
-        }
-
-        function requestDeposit() {
-            const amount = parseInt(document.getElementById('depositAmount').value);
-            const method = document.getElementById('depositMethod').value;
-            const proof = document.getElementById('depositProof').value.trim();
-            if (!amount || amount < 1000) { showToast('Montant minimum : 1000 FCFA', 'error'); return; }
-            if (!proof) { showToast('Veuillez fournir un lien de preuve', 'error'); return; }
-
-            let deposits = getDeposits();
-            deposits.push({
-                id: genId(),
-                userId: currentUser.id,
-                amount: amount,
-                method: method,
-                proof: proof,
-                status: 'pending',
-                date: new Date().toISOString()
-            });
-            saveDeposits(deposits);
-            showToast('Demande envoyée !', 'success');
-            document.getElementById('depositAmount').value = '';
-            document.getElementById('depositProof').value = '';
-            renderDeposits();
         }
 
         // ============================================================
@@ -705,14 +1015,14 @@
                 const sign = isDeposit ? '+' : '';
                 const emoji = isDeposit ? '✅' : '❌';
                 let detail = '';
-                if (t.number) detail = `<div style="font-size:12px;color:var(--text-secondary);">📱 ${t.number}</div>`;
+                if (t.number) detail = `<div style="font-size:12px;color:var(--text-secondary);">📱 ${escapeHtml(t.number)}</div>`;
                 return `
                     <div style="background:var(--bg-secondary);border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border-color);">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
                                 <div style="font-weight:600;">${emoji} ${sign}${formatCurrency(Math.abs(t.amount))} FCFA</div>
                                 ${detail}
-                                <div style="font-size:11px;color:var(--text-secondary);">${t.category || ''} ${t.country || ''}</div>
+                                <div style="font-size:11px;color:var(--text-secondary);">${escapeHtml(t.category || '')} ${escapeHtml(t.country || '')}</div>
                             </div>
                             <div style="font-size:11px;color:var(--text-secondary);">${new Date(t.date).toLocaleDateString()}</div>
                         </div>
@@ -722,35 +1032,72 @@
         }
 
         // ============================================================
+        // 🖼️ MODAL IMAGE (preuve de paiement)
+        // ============================================================
+        function openImageModal(src) {
+            document.getElementById('imgModalSrc').src = src;
+            document.getElementById('imgModal').classList.add('show');
+        }
+        function closeImageModal() {
+            document.getElementById('imgModal').classList.remove('show');
+        }
+        document.getElementById('imgModal').addEventListener('click', (e) => {
+            if (e.target.id === 'imgModal') closeImageModal();
+        });
+
+        // ============================================================
         // ⚙️ ADMIN
         // ============================================================
         function renderAdminPanel() {
+            const info = getPaymentInfo();
+            document.getElementById('adminWaveNumber').value = info.Wave.number;
+            document.getElementById('adminOMNumber').value = info['Orange Money'].number;
+            document.getElementById('adminPaymentName').value = info.Wave.name;
             renderAdminDeposits();
             renderAdminUsers();
             renderAdminNumbers();
         }
 
+        function adminSavePaymentInfo() {
+            const waveNumber = document.getElementById('adminWaveNumber').value.trim();
+            const omNumber = document.getElementById('adminOMNumber').value.trim();
+            const name = document.getElementById('adminPaymentName').value.trim();
+            if (!waveNumber || !omNumber || !name) { showToast('Remplis tous les champs', 'error'); return; }
+            savePaymentInfo({
+                Wave: { number: waveNumber, name },
+                'Orange Money': { number: omNumber, name }
+            });
+            showToast('✅ Infos de paiement enregistrées', 'success');
+        }
+
         function renderAdminDeposits() {
             const container = document.getElementById('adminDepositsList');
-            const deposits = getDeposits();
-            const pending = deposits.filter(d => d.status === 'pending');
-            if (pending.length === 0) {
+            const deposits = getDeposits().filter(d => d.status === 'pending').sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (deposits.length === 0) {
                 container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucun dépôt en attente</div>';
                 return;
             }
-            container.innerHTML = pending.map(d => `
+            const users = getUsers();
+            const methodEmoji = { 'Wave': '🌊', 'Orange Money': '🟠' };
+            container.innerHTML = deposits.map(d => {
+                const u = users.find(x => x.id === d.userId);
+                const label = u ? (u.displayName + ' · ' + u.email) : d.userId.slice(0, 8);
+                return `
                 <div class="admin-deposit-item">
-                    <div class="info">
-                        <div class="user">${d.userId.slice(0,8)}</div>
-                        <div class="amount">${formatCurrency(d.amount)} FCFA</div>
-                        <div style="font-size:11px;color:var(--text-secondary);">${d.method} • 📸 Preuve</div>
-                    </div>
-                    <div class="actions">
-                        <button class="btn-admin verify" onclick="adminVerifyDeposit('${d.id}')">✅</button>
-                        <button class="btn-admin reject" onclick="adminRejectDeposit('${d.id}')">❌</button>
+                    <div class="top-row">
+                        ${d.proofImage ? `<img class="proof-thumb" src="${d.proofImage}" onclick="openImageModal('${d.proofImage}')" />` : ''}
+                        <div class="info" style="flex:1;">
+                            <div class="user">${escapeHtml(label)}</div>
+                            <div class="amount">${methodEmoji[d.method] || ''} ${formatCurrency(d.amount)} FCFA • ${escapeHtml(d.method)}</div>
+                            <div style="font-size:11px;color:var(--text-secondary);">${new Date(d.date).toLocaleString()}</div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-admin verify" onclick="adminVerifyDeposit('${d.id}')">✅</button>
+                            <button class="btn-admin reject" onclick="adminRejectDeposit('${d.id}')">❌</button>
+                        </div>
                     </div>
                 </div>
-            `).join('');
+            `; }).join('');
         }
 
         function adminVerifyDeposit(depositId) {
@@ -765,10 +1112,14 @@
             if (user) {
                 user.balance = (user.balance || 0) + dep.amount;
                 saveUsers(users);
-                if (currentUser && currentUser.id === user.id) {
-                    currentUser = user;
-                    localStorage.setItem('ms_currentUser', JSON.stringify(user));
-                }
+                if (currentUser && currentUser.id === user.id) currentUser = user;
+
+                let transactions = getTransactions();
+                transactions.push({
+                    id: genId(), userId: user.id, amount: dep.amount,
+                    status: 'success', type: 'deposit', date: new Date().toISOString()
+                });
+                saveTransactions(transactions);
             }
             saveDeposits(deposits);
             refreshAll();
@@ -789,17 +1140,18 @@
 
         function renderAdminUsers() {
             const container = document.getElementById('adminUsersList');
-            const users = getUsers().slice(0, 20);
+            const users = getUsers().slice(0, 30);
             container.innerHTML = users.map(u => `
                 <div class="admin-user-item">
                     <div class="info">
-                        <div>${u.displayName} ${u.role === 'admin' ? '<span class="badge-admin">ADMIN</span>' : ''}</div>
-                        <div class="email">${u.email}</div>
+                        <div>${escapeHtml(u.displayName)} ${u.role === 'admin' ? '<span class="badge-admin">ADMIN</span>' : ''} ${u.blocked ? '<span class="badge-blocked">BLOQUÉ</span>' : ''}</div>
+                        <div class="email">${escapeHtml(u.email)}</div>
                         <div style="font-size:12px;color:var(--accent-orange);">Solde: ${formatCurrency(u.balance || 0)} FCFA</div>
                     </div>
-                    <div>
-                        <input type="number" id="addBalance_${u.id}" placeholder="FCFA" style="width:80px;padding:4px 6px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:12px;" />
+                    <div class="user-actions">
+                        <input type="number" id="addBalance_${u.id}" placeholder="FCFA" style="width:70px;padding:4px 6px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:12px;" />
                         <button class="btn-add-balance" onclick="adminAddBalance('${u.id}')">+</button>
+                        ${u.role !== 'admin' ? `<button class="btn-admin ${u.blocked ? 'unblock' : 'block'}" onclick="adminToggleBlock('${u.id}')">${u.blocked ? '🔓 Débloquer' : '🔒 Bloquer'}</button>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -816,18 +1168,11 @@
             if (user) {
                 user.balance = (user.balance || 0) + amount;
                 saveUsers(users);
-                if (currentUser && currentUser.id === user.id) {
-                    currentUser = user;
-                    localStorage.setItem('ms_currentUser', JSON.stringify(user));
-                }
+                if (currentUser && currentUser.id === user.id) currentUser = user;
                 let transactions = getTransactions();
                 transactions.push({
-                    id: genId(),
-                    userId: userId,
-                    amount: amount,
-                    status: 'success',
-                    type: 'admin_add',
-                    date: new Date().toISOString()
+                    id: genId(), userId: userId, amount: amount,
+                    status: 'success', type: 'admin_add', date: new Date().toISOString()
                 });
                 saveTransactions(transactions);
                 refreshAll();
@@ -836,20 +1181,48 @@
             }
         }
 
+        function adminToggleBlock(userId) {
+            let users = getUsers();
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            if (user.role === 'admin') { showToast('Impossible de bloquer un admin', 'error'); return; }
+            const action = user.blocked ? 'débloquer' : 'bloquer';
+            if (!confirm(`Confirmer : ${action} ce compte ?`)) return;
+            user.blocked = !user.blocked;
+            saveUsers(users);
+            if (user.blocked) {
+                // si le user bloqué est connecté ailleurs, sa session locale ne changera
+                // qu'à la prochaine vérification (checkSession), mais on nettoie ici
+                // au cas où c'est la session courante d'un autre profil admin de test.
+            }
+            renderAdminUsers();
+            showToast(user.blocked ? '🔒 Utilisateur bloqué' : '🔓 Utilisateur débloqué', 'success');
+        }
+
         function renderAdminNumbers() {
             const container = document.getElementById('adminNumbersList');
-            const numbers = getNumbers().slice(0, 20);
+            const numbers = getNumbers().slice(0, 50);
             if (numbers.length === 0) {
                 container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucun numéro</div>';
                 return;
             }
             container.innerHTML = numbers.map(n => `
-                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
-                    <span>${n.category} - ${n.country || '?'}</span>
-                    <span>${n.number}</span>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:12px;">
+                    <span style="flex:1;">${escapeHtml(n.category)} - ${escapeHtml(n.country || '?')}</span>
+                    <span style="flex:1;">${escapeHtml(n.number)}</span>
                     <span style="color:${n.status === 'available' ? 'var(--accent-cyan)' : '#ef4444'}">${n.status}</span>
+                    <button class="btn-admin delete" onclick="adminDeleteNumber('${n.id}')">🗑️</button>
                 </div>
             `).join('');
+        }
+
+        function adminDeleteNumber(numberId) {
+            if (!confirm('Supprimer ce numéro définitivement ?')) return;
+            let numbers = getNumbers();
+            numbers = numbers.filter(n => n.id !== numberId);
+            saveNumbers(numbers);
+            refreshAll();
+            showToast('🗑️ Numéro supprimé', 'warning');
         }
 
         function adminAddNumber() {
@@ -894,7 +1267,7 @@
         // ============================================================
         // 📦 INIT
         // ============================================================
-        console.log('🦋 MICHAEL SCOFIELD SMS - Version fonctionnelle');
+        console.log('🦋 MICHAEL SCOFIELD SMS - Version sécurisée');
         console.log('👑 Admin: admin@ms.com / admin123');
         console.log('👤 Utilisateur: user@test.com / 123456');
     </script>
