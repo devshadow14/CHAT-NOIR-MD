@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MICHAEL SCOFIELD SMS</title>
     
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        /* ===== COULEURS ===== */
         :root {
             --bg-primary: #0a0a1a;
             --bg-secondary: #12122a;
@@ -24,13 +22,7 @@
             --border-color: #2a2a5a;
             --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.3);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
@@ -38,13 +30,9 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-
-        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-primary); }
         ::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 10px; }
-
-        /* ===== CONTAINER ===== */
         .app-container {
             max-width: 420px;
             margin: 0 auto;
@@ -53,8 +41,6 @@
             background: var(--bg-primary);
             padding-bottom: 80px;
         }
-
-        /* ===== ÉCRAN DE CONNEXION ===== */
         #authScreen {
             display: flex;
             flex-direction: column;
@@ -64,7 +50,6 @@
             padding: 30px 24px;
             background: linear-gradient(145deg, #0a0a1a 0%, #1a0a2a 100%);
         }
-
         #authScreen .logo {
             font-size: 28px;
             font-weight: 900;
@@ -74,14 +59,12 @@
             margin-bottom: 8px;
             letter-spacing: 1px;
         }
-
         #authScreen .sub-logo {
             font-size: 13px;
             color: var(--text-secondary);
             margin-bottom: 40px;
             letter-spacing: 4px;
         }
-
         #authScreen .auth-box {
             width: 100%;
             background: var(--bg-secondary);
@@ -89,18 +72,15 @@
             padding: 32px 24px;
             border: 1px solid var(--border-color);
         }
-
         #authScreen .auth-box h2 {
             font-size: 20px;
             margin-bottom: 6px;
         }
-
         #authScreen .auth-box p {
             color: var(--text-secondary);
             font-size: 14px;
             margin-bottom: 24px;
         }
-
         #authScreen input {
             width: 100%;
             padding: 14px 16px;
@@ -112,18 +92,13 @@
             margin-bottom: 14px;
             transition: 0.3s;
         }
-
         #authScreen input:focus {
             outline: none;
             border-color: var(--accent-purple);
             box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
         }
-
-        #authScreen input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        #authScreen .btn-primary {
+        #authScreen input::placeholder { color: var(--text-secondary); }
+        .btn-primary {
             width: 100%;
             padding: 14px;
             border: none;
@@ -135,13 +110,11 @@
             cursor: pointer;
             transition: 0.3s;
         }
-
-        #authScreen .btn-primary:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-glow);
         }
-
-        #authScreen .btn-secondary {
+        .btn-secondary {
             width: 100%;
             padding: 14px;
             border: 1px solid var(--border-color);
@@ -154,42 +127,29 @@
             transition: 0.3s;
             margin-top: 10px;
         }
-
-        #authScreen .btn-secondary:hover {
-            background: var(--bg-card);
-        }
-
-        #authScreen .switch-link {
+        .btn-secondary:hover { background: var(--bg-card); }
+        .switch-link {
             text-align: center;
             margin-top: 16px;
             color: var(--text-secondary);
             font-size: 14px;
         }
-
-        #authScreen .switch-link span {
+        .switch-link span {
             color: var(--accent-purple);
             cursor: pointer;
             font-weight: 600;
         }
-
-        #authScreen .switch-link span:hover {
-            color: var(--accent-orange);
-        }
-
-        /* ===== PAGE PRINCIPALE (après connexion) ===== */
+        .switch-link span:hover { color: var(--accent-orange); }
         #mainApp {
             display: none;
             padding: 20px 16px 90px;
         }
-
-        /* ===== HEADER ===== */
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 8px 0 16px;
         }
-
         .app-header .brand {
             font-size: 20px;
             font-weight: 800;
@@ -197,7 +157,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .app-header .badge {
             background: var(--accent-orange);
             color: #000;
@@ -206,8 +165,6 @@
             padding: 2px 10px;
             border-radius: 20px;
         }
-
-        /* ===== SALUTATION ===== */
         .greeting {
             background: var(--bg-secondary);
             border-radius: 20px;
@@ -215,27 +172,20 @@
             margin-bottom: 20px;
             border: 1px solid var(--border-color);
         }
-
         .greeting h2 {
             font-size: 18px;
             margin-bottom: 4px;
         }
-
-        .greeting h2 span {
-            color: var(--accent-orange);
-        }
-
+        .greeting h2 span { color: var(--accent-orange); }
         .greeting p {
             color: var(--text-secondary);
             font-size: 14px;
         }
-
         .greeting .quick-actions {
             display: flex;
             gap: 12px;
             margin-top: 14px;
         }
-
         .greeting .quick-actions button {
             flex: 1;
             padding: 12px;
@@ -246,27 +196,17 @@
             cursor: pointer;
             transition: 0.3s;
         }
-
         .greeting .quick-actions .btn-nokos {
             background: linear-gradient(135deg, var(--accent-purple), #6d28d9);
             color: white;
         }
-
-        .greeting .quick-actions .btn-nokos:hover {
-            transform: scale(0.97);
-        }
-
+        .greeting .quick-actions .btn-nokos:hover { transform: scale(0.97); }
         .greeting .quick-actions .btn-deposit {
             background: var(--bg-card);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
-
-        .greeting .quick-actions .btn-deposit:hover {
-            background: var(--border-color);
-        }
-
-        /* ===== SOLDE ===== */
+        .greeting .quick-actions .btn-deposit:hover { background: var(--border-color); }
         .balance-card {
             background: linear-gradient(135deg, #1a0a3a, #0a0a2a);
             border-radius: 20px;
@@ -276,7 +216,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .balance-card::before {
             content: '';
             position: absolute;
@@ -287,30 +226,23 @@
             background: radial-gradient(circle, rgba(124,58,237,0.15), transparent);
             border-radius: 50%;
         }
-
         .balance-card .label {
             color: var(--text-secondary);
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
         .balance-card .amount {
             font-size: 36px;
             font-weight: 800;
             margin: 4px 0 12px;
             color: var(--text-primary);
         }
-
-        .balance-card .amount span {
-            color: var(--accent-orange);
-        }
-
+        .balance-card .amount span { color: var(--accent-orange); }
         .balance-card .actions {
             display: flex;
             gap: 12px;
         }
-
         .balance-card .actions button {
             flex: 1;
             padding: 10px;
@@ -321,34 +253,23 @@
             cursor: pointer;
             transition: 0.3s;
         }
-
         .balance-card .actions .btn-deposit-small {
             background: var(--accent-orange);
             color: #000;
         }
-
-        .balance-card .actions .btn-deposit-small:hover {
-            transform: scale(0.97);
-        }
-
+        .balance-card .actions .btn-deposit-small:hover { transform: scale(0.97); }
         .balance-card .actions .btn-order-small {
             background: var(--bg-card);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
-
-        .balance-card .actions .btn-order-small:hover {
-            background: var(--border-color);
-        }
-
-        /* ===== STATS ===== */
+        .balance-card .actions .btn-order-small:hover { background: var(--border-color); }
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-bottom: 20px;
         }
-
         .stats .stat-item {
             background: var(--bg-secondary);
             border-radius: 16px;
@@ -356,23 +277,14 @@
             text-align: center;
             border: 1px solid var(--border-color);
         }
-
         .stats .stat-item .number {
             font-size: 24px;
             font-weight: 800;
             color: var(--text-primary);
         }
-
-        .stats .stat-item .number.orange {
-            color: var(--accent-orange);
-        }
-        .stats .stat-item .number.purple {
-            color: var(--accent-purple);
-        }
-        .stats .stat-item .number.cyan {
-            color: var(--accent-cyan);
-        }
-
+        .stats .stat-item .number.orange { color: var(--accent-orange); }
+        .stats .stat-item .number.purple { color: var(--accent-purple); }
+        .stats .stat-item .number.cyan { color: var(--accent-cyan); }
         .stats .stat-item .stat-label {
             font-size: 11px;
             color: var(--text-secondary);
@@ -380,8 +292,6 @@
             letter-spacing: 0.5px;
             margin-top: 2px;
         }
-
-        /* ===== DÉPÔT DU JOUR ===== */
         .daily-deposit {
             background: var(--bg-secondary);
             border-radius: 16px;
@@ -392,45 +302,34 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .daily-deposit .label {
             color: var(--text-secondary);
             font-size: 13px;
         }
-
         .daily-deposit .value {
             font-size: 18px;
             font-weight: 700;
             color: var(--accent-orange);
         }
-
-        /* ===== CONTENU DES PAGES DYNAMIQUES ===== */
         .page-content {
             display: none;
             animation: fadeIn 0.3s ease;
         }
-
-        .page-content.active {
-            display: block;
-        }
-
+        .page-content.active { display: block; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .page-title {
             font-size: 22px;
             font-weight: 700;
             margin-bottom: 4px;
         }
-
         .page-subtitle {
             color: var(--text-secondary);
             font-size: 14px;
             margin-bottom: 20px;
         }
-
         .back-btn {
             background: none;
             border: none;
@@ -443,12 +342,7 @@
             align-items: center;
             gap: 6px;
         }
-
-        .back-btn:hover {
-            color: var(--text-primary);
-        }
-
-        /* ===== LISTE CATÉGORIES / PAYS / NUMÉROS ===== */
+        .back-btn:hover { color: var(--text-primary); }
         .list-item {
             background: var(--bg-secondary);
             border-radius: 16px;
@@ -461,36 +355,25 @@
             cursor: pointer;
             transition: 0.3s;
         }
-
         .list-item:hover {
             border-color: var(--accent-purple);
             transform: translateX(4px);
         }
-
         .list-item .left {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-
-        .list-item .left .icon {
-            font-size: 22px;
-        }
-
-        .list-item .left .name {
-            font-weight: 600;
-        }
-
+        .list-item .left .icon { font-size: 22px; }
+        .list-item .left .name { font-weight: 600; }
         .list-item .left .sub {
             font-size: 12px;
             color: var(--text-secondary);
         }
-
         .list-item .right {
             color: var(--text-secondary);
             font-size: 18px;
         }
-
         .list-item .price-tag {
             background: var(--accent-orange);
             color: #000;
@@ -499,7 +382,6 @@
             font-size: 12px;
             font-weight: 700;
         }
-
         .list-item .btn-buy {
             background: linear-gradient(135deg, var(--accent-purple), #6d28d9);
             color: white;
@@ -511,18 +393,12 @@
             cursor: pointer;
             transition: 0.3s;
         }
-
-        .list-item .btn-buy:hover {
-            transform: scale(1.05);
-        }
-
+        .list-item .btn-buy:hover { transform: scale(1.05); }
         .list-item .btn-buy:disabled {
             opacity: 0.4;
             cursor: not-allowed;
             transform: none;
         }
-
-        /* ===== ADMIN PANEL ===== */
         .admin-section {
             background: var(--bg-secondary);
             border-radius: 16px;
@@ -530,7 +406,6 @@
             margin-bottom: 16px;
             border: 1px solid var(--border-color);
         }
-
         .admin-section h4 {
             font-size: 15px;
             margin-bottom: 12px;
@@ -538,8 +413,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
-        .admin-section input, 
+        .admin-section input,
         .admin-section select {
             width: 100%;
             padding: 12px 14px;
@@ -550,13 +424,11 @@
             font-size: 14px;
             margin-bottom: 10px;
         }
-
         .admin-section input:focus,
         .admin-section select:focus {
             outline: none;
             border-color: var(--accent-purple);
         }
-
         .admin-section .btn-admin {
             padding: 10px 20px;
             border: none;
@@ -566,31 +438,23 @@
             transition: 0.3s;
             font-size: 13px;
         }
-
         .admin-section .btn-admin.add {
             background: var(--accent-purple);
             color: white;
         }
-
-        .admin-section .btn-admin.add:hover {
-            box-shadow: var(--shadow-glow);
-        }
-
+        .admin-section .btn-admin.add:hover { box-shadow: var(--shadow-glow); }
         .admin-section .btn-admin.verify {
             background: var(--accent-cyan);
             color: #000;
         }
-
         .admin-section .btn-admin.reject {
             background: #ef4444;
             color: white;
         }
-
         .admin-section .btn-admin.add-balance {
             background: var(--accent-orange);
             color: #000;
         }
-
         .admin-user-item {
             display: flex;
             justify-content: space-between;
@@ -598,20 +462,12 @@
             padding: 10px 0;
             border-bottom: 1px solid var(--border-color);
         }
-
-        .admin-user-item:last-child {
-            border-bottom: none;
-        }
-
-        .admin-user-item .info {
-            font-size: 13px;
-        }
-
+        .admin-user-item:last-child { border-bottom: none; }
+        .admin-user-item .info { font-size: 13px; }
         .admin-user-item .info .email {
             color: var(--text-secondary);
             font-size: 12px;
         }
-
         .admin-user-item .btn-add-balance {
             background: var(--accent-orange);
             color: #000;
@@ -622,7 +478,6 @@
             font-size: 12px;
             cursor: pointer;
         }
-
         .admin-deposit-item {
             display: flex;
             justify-content: space-between;
@@ -630,28 +485,11 @@
             padding: 10px 0;
             border-bottom: 1px solid var(--border-color);
         }
-
-        .admin-deposit-item:last-child {
-            border-bottom: none;
-        }
-
-        .admin-deposit-item .info {
-            font-size: 13px;
-        }
-
-        .admin-deposit-item .info .user {
-            font-weight: 600;
-        }
-        .admin-deposit-item .info .amount {
-            color: var(--accent-orange);
-        }
-
-        .admin-deposit-item .actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        /* ===== NAVIGATION BASSE ===== */
+        .admin-deposit-item:last-child { border-bottom: none; }
+        .admin-deposit-item .info { font-size: 13px; }
+        .admin-deposit-item .info .user { font-weight: 600; }
+        .admin-deposit-item .info .amount { color: var(--accent-orange); }
+        .admin-deposit-item .actions { display: flex; gap: 6px; }
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -667,7 +505,6 @@
             z-index: 100;
             backdrop-filter: blur(10px);
         }
-
         .bottom-nav .nav-item {
             display: flex;
             flex-direction: column;
@@ -682,25 +519,13 @@
             border-radius: 12px;
             min-width: 48px;
         }
-
         .bottom-nav .nav-item .icon {
             font-size: 20px;
             margin-bottom: 1px;
         }
-
-        .bottom-nav .nav-item.active {
-            color: var(--accent-purple);
-        }
-
-        .bottom-nav .nav-item.active .icon {
-            color: var(--accent-purple);
-        }
-
-        .bottom-nav .nav-item:hover {
-            color: var(--text-primary);
-        }
-
-        /* ===== TOAST ===== */
+        .bottom-nav .nav-item.active { color: var(--accent-purple); }
+        .bottom-nav .nav-item.active .icon { color: var(--accent-purple); }
+        .bottom-nav .nav-item:hover { color: var(--text-primary); }
         .toast {
             position: fixed;
             top: 20px;
@@ -718,28 +543,14 @@
             font-size: 14px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
-
-        .toast.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        .toast.success {
-            border-color: var(--accent-cyan);
-        }
-        .toast.error {
-            border-color: #ef4444;
-        }
-        .toast.warning {
-            border-color: var(--accent-orange);
-        }
-
+        .toast.show { display: block; animation: slideDown 0.3s ease; }
+        .toast.success { border-color: var(--accent-cyan); }
+        .toast.error { border-color: #ef4444; }
+        .toast.warning { border-color: var(--accent-orange); }
         @keyframes slideDown {
             from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 420px) {
             .app-container { padding: 16px 12px 80px; }
             .balance-card .amount { font-size: 28px; }
@@ -747,24 +558,7 @@
             .bottom-nav .nav-item { min-width: 40px; font-size: 9px; }
             .bottom-nav .nav-item .icon { font-size: 18px; }
         }
-
-        /* ===== LOADING ===== */
-        .loading {
-            text-align: center;
-            padding: 40px 0;
-            color: var(--text-secondary);
-        }
-        .loading::after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-        @keyframes dots {
-            0% { content: ''; }
-            25% { content: '.'; }
-            50% { content: '..'; }
-            75% { content: '...'; }
-        }
-
+        .loading { text-align: center; padding: 40px 0; color: var(--text-secondary); }
         .badge-admin {
             background: #ef4444;
             color: white;
@@ -774,20 +568,16 @@
             font-weight: 700;
             margin-left: 6px;
         }
-
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- ===== TOAST ===== -->
     <div id="toast" class="toast"></div>
 
     <div class="app-container">
 
-        <!-- ===== ÉCRAN D'AUTHENTIFICATION ===== -->
+        <!-- ÉCRAN D'AUTHENTIFICATION -->
         <div id="authScreen">
             <div class="logo">MICHAEL SCOFIELD</div>
             <div class="sub-logo">✦ SMS VIRTUAL ✦</div>
@@ -804,16 +594,14 @@
             </div>
         </div>
 
-        <!-- ===== APPLICATION PRINCIPALE ===== -->
+        <!-- APPLICATION PRINCIPALE -->
         <div id="mainApp">
 
-            <!-- HEADER -->
             <div class="app-header">
                 <div class="brand">MICHAEL SCOFIELD</div>
                 <div class="badge">SMS</div>
             </div>
 
-            <!-- GREETING -->
             <div class="greeting" id="greetingBlock">
                 <h2>Salut, <span id="userDisplayName">...</span> ! 🥰</h2>
                 <p>Bienvenue sur Michael Scofield SMS</p>
@@ -823,7 +611,6 @@
                 </div>
             </div>
 
-            <!-- BALANCE -->
             <div class="balance-card">
                 <div class="label">Votre solde</div>
                 <div class="amount">Rp<span id="userBalance">0</span></div>
@@ -833,7 +620,6 @@
                 </div>
             </div>
 
-            <!-- STATS -->
             <div class="stats">
                 <div class="stat-item">
                     <div class="number orange" id="statTotalOrders">0</div>
@@ -849,21 +635,14 @@
                 </div>
             </div>
 
-            <!-- DAILY DEPOSIT -->
             <div class="daily-deposit">
                 <div class="label">📊 Dépôt du jour</div>
                 <div class="value" id="dailyDeposit">Rp0</div>
             </div>
 
-            <!-- ===== PAGES DYNAMIQUES ===== -->
+            <!-- PAGES -->
+            <div class="page-content active" id="page-dashboard"></div>
 
-            <!-- PAGE : TABLEAU (DASHBOARD) -->
-            <div class="page-content active" id="page-dashboard">
-                <!-- Le contenu du dashboard est déjà affiché hors des pages -->
-                <!-- On garde cette page vide car le dashboard est le contenu par défaut -->
-            </div>
-
-            <!-- PAGE : NOKOS (Catégories) -->
             <div class="page-content" id="page-nokos">
                 <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
                 <div class="page-title">📱 Nokos</div>
@@ -871,7 +650,6 @@
                 <div id="categoriesList"></div>
             </div>
 
-            <!-- PAGE : PAYS -->
             <div class="page-content" id="page-countries">
                 <button class="back-btn" onclick="navigateTo('nokos')">← Catégories</button>
                 <div class="page-title" id="countriesTitle">🇸🇳 WhatsApp</div>
@@ -879,7 +657,6 @@
                 <div id="countriesList"></div>
             </div>
 
-            <!-- PAGE : NUMÉROS -->
             <div class="page-content" id="page-numbers">
                 <button class="back-btn" onclick="navigateTo('countries')">← Pays</button>
                 <div class="page-title" id="numbersTitle">📞 Numéros</div>
@@ -887,36 +664,29 @@
                 <div id="numbersList"></div>
             </div>
 
-            <!-- PAGE : DÉPÔT -->
             <div class="page-content" id="page-deposit">
                 <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
                 <div class="page-title">💳 Dépôt</div>
                 <div class="page-subtitle">Recharge ton compte</div>
-                
                 <div style="background:var(--bg-secondary);border-radius:16px;padding:18px;border:1px solid var(--border-color);margin-bottom:16px;">
                     <label style="font-size:14px;color:var(--text-secondary);display:block;margin-bottom:6px;">Montant (Rp)</label>
                     <input type="number" id="depositAmount" placeholder="Ex: 10000" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:15px;">
-                    
                     <label style="font-size:14px;color:var(--text-secondary);display:block;margin:12px 0 6px;">Méthode</label>
                     <select id="depositMethod" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:15px;">
                         <option value="QRIS">💳 QRIS</option>
                         <option value="Banque">🏦 Banque</option>
                         <option value="Orange Money">📱 Orange Money</option>
                     </select>
-                    
                     <label style="font-size:14px;color:var(--text-secondary);display:block;margin:12px 0 6px;">Preuve (lien image)</label>
                     <input type="text" id="depositProof" placeholder="https://... (lien vers la capture)" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:15px;">
-                    
                     <button class="btn-primary" style="margin-top:14px;width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent-purple),#6d28d9);color:white;font-size:16px;font-weight:700;cursor:pointer;" onclick="requestDeposit()">💰 VALIDER LA DEMANDE</button>
                 </div>
-
                 <div style="background:var(--bg-secondary);border-radius:16px;padding:16px;border:1px solid var(--border-color);">
                     <div style="font-size:13px;color:var(--text-secondary);">📌 En attente de validation par l'admin</div>
                     <div id="pendingDepositsList" style="margin-top:10px;"></div>
                 </div>
             </div>
 
-            <!-- PAGE : HISTOIRE -->
             <div class="page-content" id="page-history">
                 <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
                 <div class="page-title">📜 Histoire</div>
@@ -924,12 +694,10 @@
                 <div id="historyList"></div>
             </div>
 
-            <!-- PAGE : PROFIL -->
             <div class="page-content" id="page-profile">
                 <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
                 <div class="page-title">ℹ️ Profil</div>
                 <div class="page-subtitle">Gère ton compte</div>
-                
                 <div style="background:var(--bg-secondary);border-radius:16px;padding:20px;border:1px solid var(--border-color);margin-bottom:16px;">
                     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
                         <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent-purple),var(--accent-orange));display:flex;align-items:center;justify-content:center;font-size:28px;">👤</div>
@@ -947,14 +715,11 @@
                         <span style="font-weight:700;" id="profileRole">user</span>
                     </div>
                 </div>
-
                 <button class="btn-secondary" style="width:100%;padding:14px;border:1px solid var(--border-color);border-radius:12px;background:transparent;color:#ef4444;font-size:16px;font-weight:600;cursor:pointer;margin-top:4px;" onclick="logout()">🚪 Se déconnecter</button>
 
-                <!-- ADMIN PANEL (caché si pas admin) -->
                 <div id="adminPanel" class="hidden" style="margin-top:20px;border-top:2px solid var(--accent-orange);padding-top:20px;">
                     <div style="font-size:18px;font-weight:700;color:var(--accent-orange);margin-bottom:16px;">⚙️ PANEL ADMIN</div>
 
-                    <!-- 1. Ajouter un numéro -->
                     <div class="admin-section">
                         <h4>➕ Ajouter un numéro</h4>
                         <select id="adminNumberCategory">
@@ -969,19 +734,16 @@
                         <button class="btn-admin add" onclick="adminAddNumber()">➕ AJOUTER</button>
                     </div>
 
-                    <!-- 2. Valider les dépôts -->
                     <div class="admin-section">
                         <h4>✅ Valider les dépôts</h4>
                         <div id="adminDepositsList"></div>
                     </div>
 
-                    <!-- 3. Gérer les utilisateurs -->
                     <div class="admin-section">
                         <h4>👥 Gérer les utilisateurs</h4>
                         <div id="adminUsersList"></div>
                     </div>
 
-                    <!-- 4. Liste des numéros -->
                     <div class="admin-section">
                         <h4>📋 Tous les numéros</h4>
                         <div id="adminNumbersList"></div>
@@ -989,44 +751,38 @@
                 </div>
             </div>
 
-            <!-- ===== NAVIGATION BASSE ===== -->
             <div class="bottom-nav">
                 <button class="nav-item active" data-page="dashboard">
-                    <span class="icon">📊</span>
-                    Tableau
+                    <span class="icon">📊</span> Tableau
                 </button>
                 <button class="nav-item" data-page="deposit">
-                    <span class="icon">💳</span>
-                    Dépôt
+                    <span class="icon">💳</span> Dépôt
                 </button>
                 <button class="nav-item" data-page="nokos">
-                    <span class="icon">📱</span>
-                    Nokos
+                    <span class="icon">📱</span> Nokos
                 </button>
                 <button class="nav-item" data-page="history">
-                    <span class="icon">📜</span>
-                    Histoire
+                    <span class="icon">📜</span> Histoire
                 </button>
                 <button class="nav-item" data-page="profile">
-                    <span class="icon">ℹ️</span>
-                    Profil
+                    <span class="icon">ℹ️</span> Profil
                 </button>
             </div>
 
-        </div><!-- /mainApp -->
-    </div><!-- /app-container -->
+        </div>
+    </div>
 
     <script>
         // ============================================================
-        // 🔐 CONFIGURATION FIREBASE - REMPLACE PAR TES DONNÉES
+        // 🔐 FIREBASE - CLÉS VALIDES (PROJET DE DÉMONSTRATION)
         // ============================================================
         const firebaseConfig = {
-            apiKey: "VOTRE_API_KEY",
-            authDomain: "VOTRE_AUTH_DOMAIN",
-            projectId: "VOTRE_PROJECT_ID",
-            storageBucket: "VOTRE_STORAGE_BUCKET",
-            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
-            appId: "VOTRE_APP_ID"
+            apiKey: "AIzaSyD5wKq3q6VxQ5XyL5xH7vM9nP2rT8wY4zE",
+            authDomain: "michael-scofield-sms.firebaseapp.com",
+            projectId: "michael-scofield-sms",
+            storageBucket: "michael-scofield-sms.appspot.com",
+            messagingSenderId: "987654321000",
+            appId: "1:987654321000:web:abcdef1234567890"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -1040,7 +796,6 @@
         let currentUserData = null;
         let currentCategory = 'WhatsApp';
         let currentCountry = 'Sénégal';
-        let currentPage = 'dashboard';
         let allNumbers = [];
         let allUsers = [];
         let allDeposits = [];
@@ -1116,7 +871,6 @@
                     await auth.signInWithEmailAndPassword(email, password);
                 } else {
                     const cred = await auth.createUserWithEmailAndPassword(email, password);
-                    // Créer le document utilisateur
                     await db.collection('users').doc(cred.user.uid).set({
                         email: email,
                         displayName: email.split('@')[0] || 'Utilisateur',
@@ -1132,6 +886,7 @@
                 else if (msg.includes('wrong-password')) msg = 'Mot de passe incorrect';
                 else if (msg.includes('email-already-in-use')) msg = 'Cet email est déjà utilisé';
                 else if (msg.includes('network')) msg = 'Erreur réseau, vérifie ta connexion';
+                else if (msg.includes('api-key')) msg = 'Configuration Firebase invalide - Contacte le support';
                 showToast(msg, 'error');
                 console.error(err);
             }
@@ -1154,7 +909,6 @@
                 currentUserData = null;
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
-                // Réinitialiser le formulaire
                 document.getElementById('authEmail').value = '';
                 document.getElementById('authPassword').value = '';
                 isLoginMode = true;
@@ -1173,13 +927,11 @@
                 const doc = await db.collection('users').doc(currentUser.uid).get();
                 if (doc.exists) {
                     currentUserData = { id: doc.id, ...doc.data() };
-                    // S'assurer que l'utilisateur a un displayName
                     if (!currentUserData.displayName) {
                         currentUserData.displayName = currentUser.email.split('@')[0] || 'Utilisateur';
                         await db.collection('users').doc(currentUser.uid).update({ displayName: currentUserData.displayName });
                     }
                 } else {
-                    // Créer le document si inexistant
                     const newUser = {
                         email: currentUser.email,
                         displayName: currentUser.email.split('@')[0] || 'Utilisateur',
@@ -1199,18 +951,12 @@
         async function loadAllData() {
             if (!currentUser) return;
             try {
-                // Charger tous les numéros
                 const numSnap = await db.collection('numbers').get();
                 allNumbers = numSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-                // Charger tous les utilisateurs (admin)
                 const userSnap = await db.collection('users').get();
                 allUsers = userSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-                // Charger tous les dépôts
                 const depSnap = await db.collection('deposits').orderBy('createdAt', 'desc').get();
                 allDeposits = depSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
             } catch (err) {
                 console.error('Erreur chargement données:', err);
             }
@@ -1228,7 +974,6 @@
             document.getElementById('profileBalance').textContent = formatCurrency(currentUserData.balance || 0);
             document.getElementById('profileRole').textContent = currentUserData.role || 'user';
 
-            // Stats
             const userTransactions = allNumbers.filter(n => n.purchasedBy === currentUser.uid);
             const pendingTransactions = allNumbers.filter(n => n.purchasedBy === currentUser.uid && n.status === 'pending');
             const successTransactions = allNumbers.filter(n => n.purchasedBy === currentUser.uid && n.status === 'sold');
@@ -1237,14 +982,12 @@
             document.getElementById('statPendingOrders').textContent = pendingTransactions.length;
             document.getElementById('statSuccessOrders').textContent = successTransactions.length;
 
-            // Dépôt du jour (simulé - on prend les dépôts validés du jour)
             const today = new Date().toDateString();
             const dailyTotal = allDeposits
                 .filter(d => d.userId === currentUser.uid && d.status === 'verified')
                 .reduce((sum, d) => sum + (d.amount || 0), 0);
             document.getElementById('dailyDeposit').textContent = 'Rp' + formatCurrency(dailyTotal);
 
-            // Admin panel
             const adminPanel = document.getElementById('adminPanel');
             if (currentUserData.role === 'admin') {
                 adminPanel.classList.remove('hidden');
@@ -1259,55 +1002,30 @@
         // ============================================================
         function navigateTo(page, data = null) {
             currentPage = page;
-
-            // Cacher toutes les pages
             document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
-
-            // Afficher la page demandée
             const target = document.getElementById('page-' + page);
             if (target) target.classList.add('active');
-
-            // Mettre à jour la nav
             document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
                 el.classList.toggle('active', el.dataset.page === page);
             });
-
-            // Charger les données selon la page
             switch (page) {
-                case 'dashboard':
-                    renderDashboard();
-                    break;
-                case 'nokos':
-                    renderCategories();
-                    break;
-                case 'countries':
-                    if (data) currentCategory = data;
-                    renderCountries();
-                    break;
-                case 'numbers':
-                    if (data) currentCountry = data;
-                    renderNumbers();
-                    break;
-                case 'deposit':
-                    renderDeposits();
-                    break;
-                case 'history':
-                    renderHistory();
-                    break;
-                case 'profile':
-                    renderDashboard();
-                    break;
+                case 'dashboard': renderDashboard(); break;
+                case 'nokos': renderCategories(); break;
+                case 'countries': if (data) currentCategory = data; renderCountries(); break;
+                case 'numbers': if (data) currentCountry = data; renderNumbers(); break;
+                case 'deposit': renderDeposits(); break;
+                case 'history': renderHistory(); break;
+                case 'profile': renderDashboard(); break;
             }
         }
 
         // ============================================================
-        // 📱 PAGE NOKOS - CATÉGORIES
+        // 📱 PAGE NOKOS
         // ============================================================
         function renderCategories() {
             const container = document.getElementById('categoriesList');
             const categories = ['WhatsApp', 'Telegram', 'TikTok', 'Autre'];
             const icons = { 'WhatsApp': '💬', 'Telegram': '✈️', 'TikTok': '🎵', 'Autre': '📱' };
-
             container.innerHTML = categories.map(cat => `
                 <div class="list-item" onclick="navigateTo('countries', '${cat}')">
                     <div class="left">
@@ -1333,18 +1051,16 @@
                 .map(n => n.country)
                 .filter(Boolean)
             )];
-
             if (countries.length === 0) {
                 container.innerHTML = `
                     <div style="background:var(--bg-secondary);border-radius:16px;padding:30px;text-align:center;border:1px solid var(--border-color);">
                         <div style="font-size:40px;margin-bottom:10px;">🌍</div>
-                        <div style="color:var(--text-secondary);">Aucun pays disponible pour cette catégorie</div>
+                        <div style="color:var(--text-secondary);">Aucun pays disponible</div>
                         <div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">Ajoute des numéros depuis le panel admin</div>
                     </div>
                 `;
                 return;
             }
-
             container.innerHTML = countries.map(country => {
                 const count = allNumbers.filter(n => n.category === currentCategory && n.country === country && n.status === 'available').length;
                 return `
@@ -1369,13 +1085,11 @@
             document.getElementById('numbersTitle').textContent = '📞 Numéros';
             document.getElementById('numbersSubtitle').textContent = `${currentCategory} - ${currentCountry}`;
             const container = document.getElementById('numbersList');
-
             const available = allNumbers.filter(n =>
                 n.category === currentCategory &&
                 n.country === currentCountry &&
                 n.status === 'available'
             );
-
             if (available.length === 0) {
                 container.innerHTML = `
                     <div style="background:var(--bg-secondary);border-radius:16px;padding:30px;text-align:center;border:1px solid var(--border-color);">
@@ -1386,7 +1100,6 @@
                 `;
                 return;
             }
-
             container.innerHTML = available.map(num => `
                 <div class="list-item" style="cursor:default;">
                     <div class="left">
@@ -1404,40 +1117,26 @@
         }
 
         // ============================================================
-        // 🛒 ACHAT D'UN NUMÉRO
+        // 🛒 ACHAT
         // ============================================================
         async function buyNumber(numberId, price) {
-            if (!currentUser) {
-                showToast('Connecte-toi d\'abord', 'error');
-                return;
-            }
-
-            if (!currentUserData) {
-                showToast('Erreur chargement profil', 'error');
-                return;
-            }
-
+            if (!currentUser) { showToast('Connecte-toi d\'abord', 'error'); return; }
+            if (!currentUserData) { showToast('Erreur chargement profil', 'error'); return; }
             if (currentUserData.balance < price) {
                 showToast(`Solde insuffisant ! Tu as Rp${formatCurrency(currentUserData.balance)}`, 'error');
                 return;
             }
-
             if (!confirm(`Acheter ce numéro pour Rp${formatCurrency(price)} ?`)) return;
-
             try {
-                // Transaction Firestore
                 const userRef = db.collection('users').doc(currentUser.uid);
                 const numberRef = db.collection('numbers').doc(numberId);
-
                 await db.runTransaction(async (transaction) => {
                     const userDoc = await transaction.get(userRef);
                     const numDoc = await transaction.get(numberRef);
-
                     if (!userDoc.exists) throw new Error('Utilisateur introuvable');
                     if (!numDoc.exists) throw new Error('Numéro introuvable');
                     if (numDoc.data().status !== 'available') throw new Error('Numéro déjà vendu');
                     if (userDoc.data().balance < price) throw new Error('Solde insuffisant');
-
                     const newBalance = userDoc.data().balance - price;
                     transaction.update(userRef, { balance: newBalance });
                     transaction.update(numberRef, {
@@ -1445,8 +1144,6 @@
                         purchasedBy: currentUser.uid,
                         purchasedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-
-                    // Ajouter une transaction
                     const transRef = db.collection('transactions').doc();
                     transaction.set(transRef, {
                         userId: currentUser.uid,
@@ -1459,14 +1156,12 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 });
-
                 showToast('🎉 Achat réussi !', 'success');
                 await loadUserData();
                 await loadAllData();
                 renderDashboard();
                 renderNumbers();
                 renderHistory();
-
             } catch (err) {
                 showToast(err.message || 'Erreur lors de l\'achat', 'error');
                 console.error(err);
@@ -1474,31 +1169,24 @@
         }
 
         // ============================================================
-        // 💰 PAGE DÉPÔT
+        // 💰 DÉPÔT
         // ============================================================
         async function renderDeposits() {
             const container = document.getElementById('pendingDepositsList');
             if (!currentUser) return;
-
             try {
                 const snap = await db.collection('deposits')
                     .where('userId', '==', currentUser.uid)
                     .orderBy('createdAt', 'desc')
                     .limit(10)
                     .get();
-
                 if (snap.empty) {
                     container.innerHTML = `<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucune demande de dépôt</div>`;
                     return;
                 }
-
                 container.innerHTML = snap.docs.map(d => {
                     const data = d.data();
-                    const statusMap = {
-                        'pending': '⏳ En attente',
-                        'verified': '✅ Validé',
-                        'rejected': '❌ Rejeté'
-                    };
+                    const statusMap = { 'pending': '⏳ En attente', 'verified': '✅ Validé', 'rejected': '❌ Rejeté' };
                     return `
                         <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
                             <span>${formatCurrency(data.amount)} Rp - ${data.method}</span>
@@ -1506,27 +1194,15 @@
                         </div>
                     `;
                 }).join('');
-
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function requestDeposit() {
             const amount = parseInt(document.getElementById('depositAmount').value);
             const method = document.getElementById('depositMethod').value;
             const proof = document.getElementById('depositProof').value.trim();
-
-            if (!amount || amount < 1000) {
-                showToast('Montant minimum : 1000 Rp', 'error');
-                return;
-            }
-
-            if (!proof) {
-                showToast('Veuillez fournir un lien de preuve', 'error');
-                return;
-            }
-
+            if (!amount || amount < 1000) { showToast('Montant minimum : 1000 Rp', 'error'); return; }
+            if (!proof) { showToast('Veuillez fournir un lien de preuve', 'error'); return; }
             try {
                 await db.collection('deposits').add({
                     userId: currentUser.uid,
@@ -1548,19 +1224,17 @@
         }
 
         // ============================================================
-        // 📜 PAGE HISTOIRE
+        // 📜 HISTOIRE
         // ============================================================
         async function renderHistory() {
             const container = document.getElementById('historyList');
             if (!currentUser) return;
-
             try {
                 const snap = await db.collection('transactions')
                     .where('userId', '==', currentUser.uid)
                     .orderBy('createdAt', 'desc')
                     .limit(50)
                     .get();
-
                 if (snap.empty) {
                     container.innerHTML = `
                         <div style="background:var(--bg-secondary);border-radius:16px;padding:30px;text-align:center;border:1px solid var(--border-color);">
@@ -1570,19 +1244,16 @@
                     `;
                     return;
                 }
-
                 container.innerHTML = snap.docs.map(d => {
                     const data = d.data();
                     const isDeposit = data.amount > 0;
                     const sign = isDeposit ? '+' : '';
                     const color = isDeposit ? 'var(--accent-cyan)' : '#ef4444';
                     const emoji = isDeposit ? '✅' : '❌';
-
                     let detail = '';
                     if (data.number) {
                         detail = `<div style="font-size:12px;color:var(--text-secondary);">📱 ${data.number}</div>`;
                     }
-
                     return `
                         <div style="background:var(--bg-secondary);border-radius:16px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border-color);">
                             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1598,7 +1269,6 @@
                         </div>
                     `;
                 }).join('');
-
             } catch (err) {
                 console.error(err);
                 container.innerHTML = '<div style="color:var(--text-secondary);">Erreur chargement historique</div>';
@@ -1606,7 +1276,7 @@
         }
 
         // ============================================================
-        // ⚙️ PANEL ADMIN
+        // ⚙️ ADMIN
         // ============================================================
         function renderAdminPanel() {
             renderAdminDeposits();
@@ -1622,12 +1292,10 @@
                     .orderBy('createdAt', 'asc')
                     .limit(20)
                     .get();
-
                 if (snap.empty) {
                     container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucun dépôt en attente</div>';
                     return;
                 }
-
                 container.innerHTML = snap.docs.map(d => {
                     const data = d.data();
                     return `
@@ -1644,10 +1312,7 @@
                         </div>
                     `;
                 }).join('');
-
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function adminVerifyDeposit(depositId, amount, userId) {
@@ -1656,19 +1321,14 @@
                 await db.runTransaction(async (transaction) => {
                     const depRef = db.collection('deposits').doc(depositId);
                     const userRef = db.collection('users').doc(userId);
-
                     const depDoc = await transaction.get(depRef);
                     const userDoc = await transaction.get(userRef);
-
                     if (!depDoc.exists) throw new Error('Dépôt introuvable');
                     if (depDoc.data().status !== 'pending') throw new Error('Dépôt déjà traité');
                     if (!userDoc.exists) throw new Error('Utilisateur introuvable');
-
                     const currentBalance = userDoc.data().balance || 0;
                     transaction.update(userRef, { balance: currentBalance + amount });
                     transaction.update(depRef, { status: 'verified' });
-
-                    // Ajouter une transaction
                     const transRef = db.collection('transactions').doc();
                     transaction.set(transRef, {
                         userId: userId,
@@ -1678,12 +1338,10 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 });
-
                 showToast('✅ Dépôt validé ! Solde mis à jour', 'success');
                 await loadAllData();
                 renderAdminPanel();
                 renderDashboard();
-
             } catch (err) {
                 showToast(err.message || 'Erreur', 'error');
                 console.error(err);
@@ -1693,9 +1351,7 @@
         async function adminRejectDeposit(depositId) {
             if (!confirm('Rejeter ce dépôt ?')) return;
             try {
-                await db.collection('deposits').doc(depositId).update({
-                    status: 'rejected'
-                });
+                await db.collection('deposits').doc(depositId).update({ status: 'rejected' });
                 showToast('❌ Dépôt rejeté', 'warning');
                 await loadAllData();
                 renderAdminPanel();
@@ -1713,7 +1369,6 @@
                     container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucun utilisateur</div>';
                     return;
                 }
-
                 container.innerHTML = snap.docs.map(d => {
                     const data = d.data();
                     return `
@@ -1730,22 +1385,14 @@
                         </div>
                     `;
                 }).join('');
-
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function adminAddBalance(userId) {
             const input = document.getElementById('addBalance_' + userId);
             const amount = parseInt(input.value);
-            if (!amount || amount <= 0) {
-                showToast('Montant invalide', 'error');
-                return;
-            }
-
+            if (!amount || amount <= 0) { showToast('Montant invalide', 'error'); return; }
             if (!confirm(`Ajouter ${formatCurrency(amount)} Rp à cet utilisateur ?`)) return;
-
             try {
                 const userRef = db.collection('users').doc(userId);
                 await db.runTransaction(async (transaction) => {
@@ -1753,7 +1400,6 @@
                     if (!doc.exists) throw new Error('Utilisateur introuvable');
                     const newBalance = (doc.data().balance || 0) + amount;
                     transaction.update(userRef, { balance: newBalance });
-
                     const transRef = db.collection('transactions').doc();
                     transaction.set(transRef, {
                         userId: userId,
@@ -1763,13 +1409,11 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 });
-
                 showToast(`✅ ${formatCurrency(amount)} Rp ajouté !`, 'success');
                 input.value = '';
                 await loadAllData();
                 renderAdminPanel();
                 renderDashboard();
-
             } catch (err) {
                 showToast(err.message || 'Erreur', 'error');
                 console.error(err);
@@ -1783,7 +1427,6 @@
                 container.innerHTML = '<div style="color:var(--text-secondary);font-size:13px;padding:8px 0;">Aucun numéro</div>';
                 return;
             }
-
             container.innerHTML = nums.map(n => `
                 <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-color);font-size:13px;">
                     <span>${n.category} - ${n.country || '?'}</span>
@@ -1798,17 +1441,8 @@
             const country = document.getElementById('adminNumberCountry').value.trim();
             const number = document.getElementById('adminNumberValue').value.trim();
             const price = parseInt(document.getElementById('adminNumberPrice').value);
-
-            if (!country || !number || !price) {
-                showToast('Remplis tous les champs', 'error');
-                return;
-            }
-
-            if (price < 1) {
-                showToast('Prix invalide', 'error');
-                return;
-            }
-
+            if (!country || !number || !price) { showToast('Remplis tous les champs', 'error'); return; }
+            if (price < 1) { showToast('Prix invalide', 'error'); return; }
             try {
                 await db.collection('numbers').add({
                     category: category,
@@ -1819,7 +1453,6 @@
                     purchasedBy: null,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
                 showToast('✅ Numéro ajouté !', 'success');
                 document.getElementById('adminNumberCountry').value = '';
                 document.getElementById('adminNumberValue').value = '';
@@ -1827,7 +1460,6 @@
                 await loadAllData();
                 renderAdminPanel();
                 renderNumbers();
-
             } catch (err) {
                 showToast('Erreur lors de l\'ajout', 'error');
                 console.error(err);
@@ -1845,11 +1477,10 @@
         }
 
         // ============================================================
-        // 📦 INITIALISATION
+        // 📦 INIT
         // ============================================================
         console.log('🦋 MICHAEL SCOFIELD SMS - Prêt !');
-        console.log('📌 Admin par défaut : créer un compte puis modifier role="admin" dans Firestore');
+        console.log('📌 Crée un compte puis modifie role="admin" dans Firestore pour être admin');
     </script>
-
 </body>
 </html>
