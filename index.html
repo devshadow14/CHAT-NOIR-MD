@@ -1,303 +1,797 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MICHAEL SCOFIELD SMS</title>
-    <link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Noir Crash Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: linear-gradient(135deg, #ff0000, #8b0000, #ff3b3b);
+      --secondary: linear-gradient(135deg, #ff1a1a, #4b0000);
+      --bg: #0a0000;
+      --glass: rgba(255, 0, 0, 0.06);
+      --glass-dark: rgba(0, 0, 0, 0.5);
+      --text: #ffffff;
+      --muted: #c08080;
+      --highlight: #ff3b3b;
+      --highlight-glow: 0 0 20px rgba(255, 59, 59, 0.7);
+      --radius: 20px;
+      --blur: 15px;
+      --transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow-x: hidden;
+      color: var(--text);
+      background: var(--bg);
+      padding: 100px 20px 150px;
+    }
+
+    /* Animated Background */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -3;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(255, 0, 0, 0.18) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.18) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 59, 59, 0.12) 0%, transparent 50%);
+      animation: bgPulse 15s ease-in-out infinite;
+    }
+
+    @keyframes bgPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 0.85; }
+    }
+
+    /* Particle Background */
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+
+    /* Header with logo */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 2.5rem;
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur));
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 0, 0, 0.15);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .logo-img {
+      height: 50px;
+      width: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid transparent;
+      background: var(--primary);
+      padding: 2px;
+      box-shadow: var(--highlight-glow);
+      animation: logoSpin 10s linear infinite;
+    }
+
+    @keyframes logoSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .logo-text {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: var(--primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+      letter-spacing: 1px;
+    }
+
+    /* Battery indicator */
+    .battery-container {
+      background: var(--glass-dark);
+      border-radius: 50px;
+      padding: 0.7rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1rem;
+      border: 1px solid rgba(255, 0, 0, 0.15);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .battery-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.7s ease;
+    }
+
+    .battery-container:hover::before {
+      left: 100%;
+    }
+
+    .battery-icon {
+      color: var(--highlight);
+      font-size: 1.5rem;
+      filter: drop-shadow(0 0 5px var(--highlight));
+    }
+
+    /* Main container */
+    .main-content {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Pairing box */
+    .box {
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur));
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 0, 0, 0.15);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary);
+    }
+
+    .box:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), var(--highlight-glow);
+    }
+
+    .box h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      background: var(--primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+      letter-spacing: 1px;
+    }
+
+    .box h5 {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-weight: normal;
+      font-size: 1.1rem;
+    }
+
+    /* Input styling */
+    .input-container {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .input-container input {
+      flex: 1;
+      padding: 1.2rem;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 0, 0, 0.15);
+      background: var(--glass-dark);
+      color: var(--text);
+      font-family: inherit;
+      transition: var(--transition);
+      font-size: 1.1rem;
+    }
+
+    .input-container input:focus {
+      outline: none;
+      border-color: var(--highlight);
+      box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.3);
+    }
+
+    .input-container button {
+      padding: 1.2rem 2rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .input-container button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), var(--highlight-glow);
+    }
+
+    /* Result display */
+    #pair-result {
+      margin-top: 1.8rem;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      background: var(--glass-dark);
+      border: 1px solid rgba(255, 0, 0, 0.15);
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    #copy-code {
+      background: var(--glass);
+      border: 2px solid var(--highlight);
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      transition: var(--transition);
+      margin-top: 1.5rem;
+      display: none;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 0 15px rgba(255, 59, 59, 0.3);
+    }
+
+    #copy-code:hover {
+      background: rgba(255, 59, 59, 0.1);
+      box-shadow: 0 0 25px rgba(255, 59, 59, 0.5);
+      transform: translateY(-3px);
+    }
+
+    /* Music player */
+    .music-player {
+      width: 100%;
+      max-width: 600px;
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur));
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 0, 0, 0.15);
+      z-index: 90;
+      text-align: center;
+      margin-top: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .music-player::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--secondary);
+    }
+
+    .music-player h3 {
+      color: var(--highlight);
+      margin-bottom: 0.8rem;
+      font-size: 1.5rem;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);
+    }
+
+    .music-title {
+      font-weight: bold;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      background: var(--secondary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .music-subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .play-btn {
+      background: var(--secondary);
+      border: none;
+      border-radius: 50%;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .play-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    .play-btn:hover::before {
+      transform: translateX(100%);
+    }
+
+    .play-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 0, 0, 0.5);
+    }
+
+    .play-btn i {
+      color: white;
+      font-size: 1.8rem;
+    }
+
+    .time-display {
+      margin-top: 1.2rem;
+      font-size: 1rem;
+      color: var(--muted);
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    /* Progress bar */
+    .progress-container {
+      width: 100%;
+      height: 6px;
+      background: var(--glass-dark);
+      border-radius: 3px;
+      margin-top: 1rem;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--secondary);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    /* Visualizer */
+    .visualizer {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      height: 60px;
+      margin-top: 1.5rem;
+      gap: 4px;
+    }
+
+    .bar {
+      width: 6px;
+      background: var(--highlight);
+      border-radius: 3px;
+      transition: height 0.2s ease;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem 1.5rem;
+      }
+      
+      .logo-text {
+        font-size: 1.4rem;
+      }
+      
+      body {
+        padding: 90px 15px 120px;
+      }
+      
+      .input-container {
+        flex-direction: column;
+      }
+      
+      .input-container button {
+        width: 100%;
+      }
+      
+      .music-player {
+        padding: 1.5rem;
+      }
+      
+      .box, .music-player {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo-text {
+        font-size: 1.2rem;
+      }
+      
+      .box h2 {
+        font-size: 1.8rem;
+      }
+      
+      .input-container input {
+        padding: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <!-- Animated Background -->
+  <div class="animated-bg"></div>
+  
+  <!-- Particle Background -->
+  <div id="particles-js"></div>
 
-    <div id="toast" class="toast"></div>
+  <!-- Header with Logo -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="https://files.catbox.moe/3cvx9z.jpg" alt="Chat Noir Crash Logo" class="logo-img">
+      <div class="logo-text">CHAT NOIR CRASH</div>
+    </div>
+    
+    <!-- Battery Indicator -->
+    <div class="battery-container">
+      <i class="fas fa-battery-full battery-icon" id="battery-icon"></i>
+      <span id="battery-level">--%</span>
+    </div>
+  </header>
 
-    <div class="img-modal" id="imgModal">
-        <button class="close-modal" onclick="closeImageModal()">✕</button>
-        <img id="imgModalSrc" src="" alt="preuve" />
+  <!-- Main Content Container -->
+  <div class="main-content">
+    <!-- Pairing Box -->
+    <div class="box">
+      <h2>SYSTÈME DE PAIRING</h2>
+      <h5>CHAT NOIR CRASH — ÉDITION DÉMONIAQUE</h5>
+      <p>Entre ton numéro avec l'indicatif pays pour un pairing instantané</p>
+      
+      <div class="input-container">
+        <input type="text" id="number" placeholder="Ex: 221776227173" required>
+        <button id="submit">INVOQUER LE CODE</button>
+      </div>
+      
+      <div id="pair-result">
+        <p id="waiting-message" style="display: none;">Traitement de ta demande...</p>
+      </div>
+      
+      <button id="copy-code" onclick="copyCode()">COPIER LE CODE</button>
     </div>
 
-    <!-- RECEIPT MODAL -->
-    <div class="receipt-modal" id="receiptModal">
-        <div class="receipt-card">
-            <button class="close-modal-x" onclick="closeReceiptModal()">✕</button>
-            <div class="r-check">✅</div>
-            <h3>Achat réussi !</h3>
-            <div class="r-sub" id="receiptDate">--</div>
-            <div class="r-divider"></div>
-            <div class="r-row"><span>N° Commande</span><span id="rOrderId">--</span></div>
-            <div class="r-row"><span>Service</span><span id="rCategory">--</span></div>
-            <div class="r-row"><span>Pays</span><span id="rCountry">--</span></div>
-            <div class="r-row"><span>Numéro</span><span id="rNumber">--</span></div>
-            <div class="r-divider"></div>
-            <div class="r-total"><span id="rPrice">0</span> FCFA</div>
-            <button class="btn-whatsapp" id="rWaBtn">💬 Recevoir le code sur WhatsApp</button>
-        </div>
+    <!-- Music Player -->
+    <div class="music-player">
+      <h3>LECTEUR AMBIANCE</h3>
+      <div class="music-title">CHAT NOIR CRASH THEME</div>
+      <div class="music-subtitle">ÉDITION DÉMONIAQUE</div>
+      
+      <button class="play-btn" onclick="togglePlay()">
+        <i class="fas fa-pause" id="play-icon"></i>
+      </button>
+      
+      <div class="time-display" id="time1">0:00</div>
+      
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      
+      <div class="visualizer" id="visualizer"></div>
+      
+      <audio id="audio1" src="https://files.catbox.moe/zf8z97.opus" loop></audio>
     </div>
+  </div>
 
-    <div class="app" id="app">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    // ⚙️ Adresse de ton serveur KataBump — à ajuster si le port change
+    const API_URL = "http://51.83.6.7:20185/api/pair";
 
-        <!-- ÉCRAN DE CONNEXION / INSCRIPTION -->
-        <div id="authScreen">
-            <div class="auth-logo">
-                <div class="logo-icon">📱</div>
-                <div class="logo-main">MICHAEL SCOFIELD</div>
-                <div class="logo-sub">✦ SMS VIRTUAL ✦</div>
-            </div>
-            <div class="auth-box">
-                <div class="auth-tabs">
-                    <button id="tabLogin" class="active" onclick="setAuthMode(true)">Connexion</button>
-                    <button id="tabRegister" onclick="setAuthMode(false)">Inscription</button>
-                </div>
-                <div class="auth-inner">
-                    <h2 id="authTitle">Content de te revoir 👋</h2>
-                    <p id="authSub">Connecte-toi à ton compte</p>
+    // Initialize particles
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: ["#ff0000", "#8b0000", "#ff3b3b", "#4b0000"] },
+        shape: { type: "circle" },
+        opacity: { 
+          value: 0.5, 
+          random: true,
+          anim: { enable: true, speed: 1, opacity_min: 0.1, sync: false }
+        },
+        size: { 
+          value: 3, 
+          random: true,
+          anim: { enable: true, speed: 4, size_min: 0.3, sync: false }
+        },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: "#ff3b3b",
+          opacity: 0.2,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 2,
+          direction: "none",
+          random: true,
+          straight: false,
+          out_mode: "out",
+          bounce: false,
+          attract: { enable: false, rotateX: 600, rotateY: 1200 }
+        }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: { enable: true, mode: "repulse" },
+          onclick: { enable: true, mode: "push" },
+          resize: true
+        }
+      },
+      retina_detect: true
+    });
 
-                    <div class="input-wrap">
-                        <span class="field-icon">📧</span>
-                        <input type="email" id="authEmail" placeholder="Email" autocomplete="username" />
-                    </div>
-                    <div class="input-wrap">
-                        <span class="field-icon">🔒</span>
-                        <input type="password" id="authPassword" placeholder="Mot de passe" autocomplete="current-password" />
-                    </div>
-                    <div class="pw-strength hidden" id="pwStrength">
-                        <span></span><span></span><span></span><span></span>
-                    </div>
-                    <div class="field-hint" id="pwHint"></div>
-                    <button class="btn-primary" id="authSubmitBtn">Se connecter</button>
+    // DOM elements
+    const pairResult = document.getElementById("pair-result");
+    const submitBtn = document.getElementById("submit");
+    const numberInput = document.getElementById("number");
+    const copyCodeBtn = document.getElementById("copy-code");
+    const waitingMessage = document.getElementById("waiting-message");
+    const batteryLevel = document.getElementById("battery-level");
+    const batteryIcon = document.getElementById("battery-icon");
 
-                    <div class="secure-note"><span class="dot"></span> Connexion chiffrée · mots de passe hachés</div>
-                </div>
-            </div>
-        </div>
+    // Copy code function
+    async function copyCode() {
+      const code = pairResult.innerText.replace('CODE: ', '');
+      try {
+        await navigator.clipboard.writeText(code);
+        copyCodeBtn.innerText = "COPIÉ !";
+        copyCodeBtn.style.background = "linear-gradient(135deg, #00ff00, #00cc00)";
+        copyCodeBtn.style.color = "#000";
+        setTimeout(() => {
+          copyCodeBtn.innerText = "COPIER LE CODE";
+          copyCodeBtn.style.background = "";
+          copyCodeBtn.style.color = "";
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
+    }
 
-        <!-- APPLICATION PRINCIPALE -->
-        <div id="mainApp">
+    // Submit handler
+    submitBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      
+      if (!numberInput.value) {
+        pairResult.innerHTML = '<p style="color:var(--highlight); font-weight:bold;">Entre ton numéro WhatsApp</p>';
+        return;
+      }
+      
+      const cleanNumber = numberInput.value.replace(/[^0-9]/g, "");
+      
+      if (cleanNumber.length < 8) {
+        pairResult.innerHTML = '<p style="color:#ff5555; font-weight:bold;">Format de numéro invalide</p>';
+        return;
+      }
+      
+      waitingMessage.style.display = "block";
+      pairResult.innerHTML = "";
+      copyCodeBtn.style.display = "none";
+      
+      let dots = 0;
+      const loadingInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        waitingMessage.textContent = "Invocation en cours" + ".".repeat(dots);
+      }, 500);
+      
+      try {
+        const { data } = await axios.post(API_URL, { number: cleanNumber }, {
+          headers: { "Content-Type": "application/json" }
+        });
+        const code = (data.success && data.code) ? data.code : null;
 
-            <!-- HEADER -->
-            <div class="app-header">
-                <div class="logo-main">📱 MICHAEL SCOFIELD</div>
-                <div class="badge">SMS</div>
-            </div>
+        clearInterval(loadingInterval);
+        waitingMessage.style.display = "none";
 
-            <div id="dashboardWidgets">
-                <!-- GREETING -->
-                <div class="greeting">
-                    <h2>Salut, <span id="userDisplayName">...</span> ! 🥰</h2>
-                    <p>Bienvenue sur Michael Scofield SMS</p>
-                    <div class="quick-actions">
-                        <button class="btn-nokos" onclick="navigateTo('nokos')">📱 Commander</button>
-                        <button class="btn-deposit" onclick="navigateTo('deposit')">💰 Dépôt</button>
-                    </div>
-                </div>
+        if (code) {
+          pairResult.innerHTML = `
+            <p style="color:var(--highlight); font-weight:bold; font-size:1.4rem;">
+              CODE: <span style="color:white; text-shadow: 0 0 10px white;">${code}</span>
+            </p>
+          `;
+          copyCodeBtn.style.display = "inline-block";
 
-                <!-- BALANCE -->
-                <div class="balance-card">
-                    <div class="label">Votre solde</div>
-                    <div class="amount"><span id="userBalance">0</span> FCFA</div>
-                    <div class="actions">
-                        <button class="btn-deposit-small" onclick="navigateTo('deposit')">💲 Dépôt</button>
-                        <button class="btn-order-small" onclick="navigateTo('nokos')">Commander</button>
-                    </div>
-                </div>
+          pairResult.style.animation = "pulse 0.5s ease";
+          setTimeout(() => { pairResult.style.animation = ""; }, 500);
+        } else {
+          pairResult.innerHTML = `<p style="color:#ff5555; font-weight:bold;">${data.message || "Erreur lors de la génération du code"}</p>`;
+        }
+      } catch (error) {
+        clearInterval(loadingInterval);
+        waitingMessage.style.display = "none";
+        pairResult.innerHTML = '<p style="color:#ff5555; font-weight:bold;">Impossible de contacter le serveur</p>';
+      }
+    });
 
-                <!-- STATS -->
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="number orange" id="statTotalOrders">0</div>
-                        <div class="stat-label">Commandes</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number purple" id="statPendingOrders">0</div>
-                        <div class="stat-label">En cours</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number cyan" id="statSuccessOrders">0</div>
-                        <div class="stat-label">Succès</div>
-                    </div>
-                </div>
+    // Music player controls
+    const audio = document.getElementById('audio1');
+    const playBtn = document.querySelector('.play-btn');
+    const playIcon = document.getElementById('play-icon');
+    const timeDisplay = document.getElementById('time1');
+    const progressBar = document.getElementById('progress-bar');
+    const visualizer = document.getElementById('visualizer');
 
-                <!-- DAILY DEPOSIT -->
-                <div class="daily-deposit">
-                    <div class="label">📊 Dépôt du jour</div>
-                    <div class="value" id="dailyDeposit">0 FCFA</div>
-                </div>
-            </div>
+    // Create visualizer bars
+    for (let i = 0; i < 30; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      bar.style.height = `${Math.random() * 40 + 10}px`;
+      visualizer.appendChild(bar);
+    }
 
-            <!-- PAGES -->
-            <div class="page-content active" id="page-dashboard"></div>
+    const bars = document.querySelectorAll('.bar');
 
-            <div class="page-content" id="page-nokos">
-                <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
-                <div class="page-title">📱 Commandes</div>
-                <div class="page-subtitle">Choisis une catégorie</div>
-                <div id="categoriesList"></div>
-            </div>
+    // Auto-play music when page loads (with user interaction)
+    document.addEventListener('click', function initAudio() {
+      audio.play().then(() => {
+        playIcon.classList.replace('fa-play', 'fa-pause');
+        updateTimeDisplay();
+        animateVisualizer();
+      }).catch(error => {
+        console.log('Auto-play prevented:', error);
+      });
+      document.removeEventListener('click', initAudio);
+    }, { once: true });
 
-            <div class="page-content" id="page-countries">
-                <button class="back-btn" onclick="navigateTo('nokos')">← Catégories</button>
-                <div class="page-title" id="countriesTitle">🌍 WhatsApp</div>
-                <div class="page-subtitle">Choisis un pays</div>
-                <div id="countriesList"></div>
-            </div>
+    function togglePlay() {
+      if (audio.paused) {
+        audio.play();
+        playIcon.classList.replace('fa-play', 'fa-pause');
+        animateVisualizer();
+      } else {
+        audio.pause();
+        playIcon.classList.replace('fa-pause', 'fa-play');
+      }
+    }
 
-            <div class="page-content" id="page-numbers">
-                <button class="back-btn" onclick="navigateTo('countries')">← Pays</button>
-                <div class="page-title" id="numbersTitle">📞 Numéros</div>
-                <div class="page-subtitle" id="numbersSubtitle">Sénégal</div>
-                <div id="numbersList"></div>
-            </div>
+    function updateTimeDisplay() {
+      const minutes = Math.floor(audio.currentTime / 60);
+      const seconds = Math.floor(audio.currentTime % 60);
+      timeDisplay.textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
+      
+      const progress = (audio.currentTime / audio.duration) * 100;
+      progressBar.style.width = `${progress}%`;
+      
+      if (!audio.paused) {
+        requestAnimationFrame(updateTimeDisplay);
+      }
+    }
 
-            <div class="page-content" id="page-deposit">
-                <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
-                <div class="page-title">💰 Dépôt</div>
-                <div class="page-subtitle">Recharge ton compte en 4 étapes</div>
+    function animateVisualizer() {
+      if (!audio.paused) {
+        bars.forEach(bar => {
+          bar.style.height = `${Math.random() * 50 + 10}px`;
+        });
+        requestAnimationFrame(animateVisualizer);
+      }
+    }
 
-                <div class="step-indicator" id="stepIndicator"></div>
+    audio.addEventListener('timeupdate', updateTimeDisplay);
 
-                <!-- ETAPE 1 : méthode -->
-                <div class="deposit-step-panel" id="depStep1">
-                    <label>Choisis ta méthode de paiement</label>
-                    <div class="method-choice">
-                        <div class="method-card" id="methodCardWave" onclick="selectDepositMethod('Wave')">
-                            <div class="emoji">🌊</div>
-                            <div class="name">Wave</div>
-                        </div>
-                        <div class="method-card" id="methodCardOM" onclick="selectDepositMethod('Orange Money')">
-                            <div class="emoji">🟠</div>
-                            <div class="name">Orange Money</div>
-                        </div>
-                    </div>
-                </div>
+    // Battery status indicator
+    async function updateBattery() {
+      if (navigator.getBattery) {
+        try {
+          const battery = await navigator.getBattery();
+          
+          const updateBatteryUI = () => {
+            const batteryPercent = Math.round(battery.level * 100);
+            batteryLevel.textContent = `${batteryPercent}%`;
+            
+            let iconClass = 'fa-battery-empty';
+            if (batteryPercent > 80) iconClass = 'fa-battery-full';
+            else if (batteryPercent > 60) iconClass = 'fa-battery-three-quarters';
+            else if (batteryPercent > 40) iconClass = 'fa-battery-half';
+            else if (batteryPercent > 20) iconClass = 'fa-battery-quarter';
+            
+            if (battery.charging) {
+              batteryIcon.className = `fas fa-bolt ${iconClass}`;
+              batteryIcon.style.color = '#00ff00';
+              batteryIcon.style.filter = 'drop-shadow(0 0 8px #00ff00)';
+            } else {
+              batteryIcon.className = `fas ${iconClass}`;
+              batteryIcon.style.color = 'var(--highlight)';
+              batteryIcon.style.filter = 'drop-shadow(0 0 5px var(--highlight))';
+            }
+          };
+          
+          battery.addEventListener('levelchange', updateBatteryUI);
+          battery.addEventListener('chargingchange', updateBatteryUI);
+          updateBatteryUI();
+        } catch (error) {
+          console.error('Battery API error:', error);
+        }
+      } else {
+        batteryLevel.textContent = "N/A";
+      }
+    }
 
-                <!-- ETAPE 2 : montant -->
-                <div class="deposit-step-panel hidden" id="depStep2">
-                    <label>Montant à déposer (FCFA)</label>
-                    <input type="number" id="depositAmount" placeholder="Ex: 10000" />
-                    <div class="step-nav">
-                        <button class="btn-ghost" onclick="depositGoStep(1)">← Retour</button>
-                        <button class="btn-primary" onclick="depositConfirmAmount()">Suivant →</button>
-                    </div>
-                </div>
-
-                <!-- ETAPE 3 : effectuer le paiement -->
-                <div class="deposit-step-panel hidden" id="depStep3">
-                    <label>Comment faire le dépôt</label>
-                    <ol class="payment-steps" id="paymentStepsList"></ol>
-                    <div class="payment-info-box" id="paymentInfoBox"></div>
-                    <div class="step-nav">
-                        <button class="btn-ghost" onclick="depositGoStep(2)">← Retour</button>
-                        <button class="btn-primary" onclick="depositGoStep(4)">✅ J'ai payé</button>
-                    </div>
-                </div>
-
-                <!-- ETAPE 4 : preuve -->
-                <div class="deposit-step-panel hidden" id="depStep4">
-                    <label>Envoie la capture d'écran du paiement</label>
-                    <div class="upload-zone" onclick="document.getElementById('depositProofFile').click()">
-                        <div id="uploadZoneText">📸 Touche ici pour choisir la capture</div>
-                        <img id="proofPreview" class="hidden" />
-                    </div>
-                    <input type="file" id="depositProofFile" accept="image/*" class="hidden" onchange="handleProofUpload(event)" />
-                    <div class="step-nav">
-                        <button class="btn-ghost" onclick="depositGoStep(3)">← Retour</button>
-                        <button class="btn-primary" id="depositSubmitBtn" onclick="submitDepositFinal()" disabled>💰 Envoyer la demande</button>
-                    </div>
-                </div>
-
-                <div class="pending-deposits">
-                    <div class="label">📌 Mes demandes de dépôt</div>
-                    <div id="pendingDepositsList"></div>
-                </div>
-            </div>
-
-            <div class="page-content" id="page-history">
-                <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
-                <div class="page-title">📜 Histoire</div>
-                <div class="page-subtitle">Toutes tes transactions</div>
-                <div id="historyList"></div>
-            </div>
-
-            <div class="page-content" id="page-profile">
-                <button class="back-btn" onclick="navigateTo('dashboard')">← Retour</button>
-                <div class="page-title">ℹ️ Profil</div>
-                <div class="page-subtitle">Gère ton compte</div>
-                <div class="profile-card">
-                    <div class="profile-avatar">👤</div>
-                    <div>
-                        <div class="profile-name" id="profileName">Devshadow</div>
-                        <div class="profile-email" id="profileEmail">email@exemple.com</div>
-                    </div>
-                </div>
-                <div class="profile-info">
-                    <div><span>💰 Solde</span><span id="profileBalance">0 FCFA</span></div>
-                    <div><span>👑 Rôle</span><span id="profileRole">user</span></div>
-                </div>
-                <button class="btn-logout" onclick="logout()">🚪 Se déconnecter</button>
-
-                <!-- ADMIN PANEL -->
-                <div id="adminPanel" class="hidden">
-                    <div class="admin-title">⚙️ PANEL ADMIN</div>
-
-                    <div class="admin-section">
-                        <h4>➕ Ajouter un numéro</h4>
-                        <label style="font-size:12px;color:var(--text-secondary);">Catégorie</label>
-                        <select id="adminNumberCategory">
-                            <option value="WhatsApp">💬 WhatsApp</option>
-                            <option value="Telegram">✈️ Telegram</option>
-                            <option value="TikTok">🎵 TikTok</option>
-                            <option value="Autre">📱 Autre</option>
-                        </select>
-                        <label style="font-size:12px;color:var(--text-secondary);">Pays</label>
-                        <input type="text" id="adminNumberCountry" placeholder="Pays (ex: Sénégal)" />
-                        <label style="font-size:12px;color:var(--text-secondary);">Numéro</label>
-                        <input type="text" id="adminNumberValue" placeholder="Numéro (ex: +221 77 123 45 67)" />
-                        <label style="font-size:12px;color:var(--text-secondary);">Prix (FCFA)</label>
-                        <input type="number" id="adminNumberPrice" placeholder="Prix (FCFA)" />
-                        <button class="btn-admin add" onclick="adminAddNumber()">➕ AJOUTER LE NUMÉRO</button>
-                    </div>
-
-                    <div class="admin-section">
-                        <h4>💳 Infos de paiement (Wave / OM)</h4>
-                        <label style="font-size:12px;color:var(--text-secondary);">Numéro Wave</label>
-                        <input type="text" id="adminWaveNumber" placeholder="Ex: 776227173" />
-                        <label style="font-size:12px;color:var(--text-secondary);">Numéro Orange Money</label>
-                        <input type="text" id="adminOMNumber" placeholder="Ex: 711192309" />
-                        <label style="font-size:12px;color:var(--text-secondary);">Nom du bénéficiaire</label>
-                        <input type="text" id="adminPaymentName" placeholder="Ex: Michael Scofield" />
-                        <button class="btn-admin add" onclick="adminSavePaymentInfo()">💾 ENREGISTRER</button>
-                    </div>
-
-                    <div class="admin-section">
-                        <h4>✅ Valider les dépôts</h4>
-                        <div id="adminDepositsList"></div>
-                    </div>
-
-                    <div class="admin-section">
-                        <h4>👥 Gérer les utilisateurs</h4>
-                        <div id="adminUsersList"></div>
-                    </div>
-
-                    <div class="admin-section">
-                        <h4>📋 Tous les numéros</h4>
-                        <div id="adminNumbersList"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BOTTOM NAV -->
-            <div class="bottom-nav">
-                <button class="nav-item active" data-page="dashboard"><span class="icon">📊</span> Tableau</button>
-                <button class="nav-item" data-page="deposit"><span class="icon">💰</span> Dépôt</button>
-                <button class="nav-item" data-page="nokos"><span class="icon">📱</span> Commandes</button>
-                <button class="nav-item" data-page="history"><span class="icon">📜</span> Histoire</button>
-                <button class="nav-item" data-page="profile"><span class="icon">ℹ️</span> Profil</button>
-            </div>
-
-        </div>
-    </div>
-
-    <script src="js/app.js"></script>
-
+    // Initialize
+    window.addEventListener('load', () => {
+      copyCodeBtn.style.display = "none";
+      updateBattery();
+      
+      document.body.style.opacity = '0';
+      document.body.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        document.body.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        document.body.style.opacity = '1';
+        document.body.style.transform = 'translateY(0)';
+      }, 100);
+    });
+  </script>
 </body>
 </html>
