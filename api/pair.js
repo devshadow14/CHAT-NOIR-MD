@@ -1,25 +1,56 @@
 // api/pair.js
-// Proxy HTTPS -> HTTP vers l'API KataBump. Répond quasi instantanément
-// (la génération du code se fait en tâche de fond côté serveur, voir /api/code).
+// Proxy HTTPS -> HTTP vers l'API KataBump, écrit avec le module http natif de Node
+// (évite toute dépendance à fetch(), disponible seulement sur Node 18+).
 
-const KATABUMP_API = 'http://51.75.118.151:20269';
+const http = require('http');
 
-export default async function handler(req, res) {
+const KATABUMP_HOST = '51.75.118.151';
+const KATABUMP_PORT = 20269;
+
+module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Méthode non autorisée.' });
     }
 
-    try {
-        const response = await fetch(`${KATABUMP_API}/api/pair`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(req.body),
-        });
+    const bodyString = JSON.stringify(req.body || {});
 
-        const data = await response.json();
-        res.status(response.status).json(data);
-    } catch (err) {
+    const options = {
+        hostname: KATABUMP_HOST,
+        port: KATABUMP_PORT,
+        path: '/api/pair',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(bodyString),
+        },
+        timeout: 8000,
+    };
+
+    const proxyReq = http.request(options, (proxyRes) => {
+        let data = '';
+        proxyRes.on('data', (chunk) => { data += chunk; });
+        proxyRes.on('end', () => {
+            try {
+                const parsed = JSON.parse(data);
+                res.status(proxyRes.statusCode || 200).json(parsed);
+            } catch (err) {
+                console.error('Réponse KataBump non-JSON :', data);
+                res.status(502).json({ success: false, message: 'Réponse invalide du serveur de pairing.' });
+            }
+        });
+    });
+
+    proxyReq.on('timeout', () => {
+        proxyReq.destroy();
+        console.error('Timeout en contactant KataBump (api/pair)');
+        res.status(504).json({ success: false, message: 'Le serveur de pairing met trop de temps à répondre.' });
+    });
+
+    proxyReq.on('error', (err) => {
         console.error('Erreur proxy vers KataBump :', err.message);
-        res.status(502).json({ success: false, message: 'Le serveur de pairing est injoignable pour le moment.' });
-    }
-}
+        res.status(502).json({ success: false, message: `Le serveur de pairing est injoignable : ${err.message}` });
+    });
+
+    proxyReq.write(bodyString);
+    proxyReq.end();
+};
