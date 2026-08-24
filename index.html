@@ -40,13 +40,8 @@
     position: relative;
     overflow-x: hidden;
 
-    /* Fond : photo fournie, assombrie pour la lisibilité */
-    background-image:
-      linear-gradient(180deg, rgba(4,4,4,0.75), rgba(4,4,4,0.9)),
-      url('https://files.catbox.moe/pnl7iq.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    /* Fond sombre uni (photo retirée) */
+    background: #030303;
   }
 
   /* Halo néon discret par-dessus le fond */
@@ -56,9 +51,16 @@
     inset: 0;
     background:
       radial-gradient(circle at 15% 10%, rgba(57,255,20,0.10), transparent 45%),
-      radial-gradient(circle at 85% 90%, rgba(57,255,20,0.08), transparent 45%);
+      radial-gradient(circle at 85% 90%, rgba(139,0,255,0.08), transparent 45%);
     pointer-events: none;
     z-index: 0;
+  }
+
+  #cataclysm-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
   }
 
   /* ===== Bouton son (thème chat noir) ===== */
@@ -249,6 +251,40 @@
 
   .error-msg { display: none; font-size: 13px; color: var(--danger); margin-top: 12px; font-family: var(--mono); text-align: center; }
 
+  .disconnect-link {
+    text-align: center;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+  .disconnect-link:hover { color: #b98cff; }
+  .disconnect-box {
+    display: none;
+    margin-top: 10px;
+    gap: 8px;
+    flex-direction: column;
+  }
+  .disconnect-box.open { display: flex; }
+  .disconnect-box input {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(139,0,255,0.25);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    outline: none;
+  }
+  .disconnect-box .btn-secondary {
+    border-color: rgba(139,0,255,0.3);
+    color: #d9b8ff;
+  }
+  .disconnect-box .btn-secondary:hover { background: rgba(139,0,255,0.1); border-color: #8b00ff; }
+
   .toast {
     position: fixed;
     bottom: 26px;
@@ -283,6 +319,8 @@
 </head>
 <body>
 
+  <canvas id="cataclysm-canvas"></canvas>
+
   <!-- Bouton son, silhouette de chat noir avec yeux néon -->
   <div class="sound-toggle on" id="soundToggle" role="button" tabindex="0" aria-label="Activer/couper le son">
     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
@@ -313,6 +351,11 @@
         <div class="hint">Sans + ni espaces. Ex : <span>221776227173</span></div>
         <div class="error-msg" id="errorMsg"></div>
         <div class="history" id="historyContainer"></div>
+        <div class="disconnect-link" id="disconnectLink">🔌 Déconnecter une session</div>
+        <div class="disconnect-box" id="disconnectBox">
+          <input type="text" id="disconnectPhone" placeholder="Numéro à déconnecter" inputmode="numeric" autocomplete="off">
+          <button class="btn-secondary" id="disconnectBtn">Déconnecter</button>
+        </div>
       </div>
 
       <div class="state" id="loadingState">
@@ -350,6 +393,70 @@
   </main>
 
 <script>
+  // ===== Effet "Cataclysme" (façon pouvoir de Chat Noir : craquelures noires/violettes) =====
+  (function cataclysm() {
+    const canvas = document.getElementById('cataclysm-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let cracks = [];
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function spawnCrack() {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      const branches = [];
+      let angle = Math.random() * Math.PI * 2;
+      let cx = x, cy = y;
+      const segments = 10 + Math.floor(Math.random() * 10);
+      for (let i = 0; i < segments; i++) {
+        angle += (Math.random() - 0.5) * 1.1;
+        const len = 8 + Math.random() * 14;
+        const nx = cx + Math.cos(angle) * len;
+        const ny = cy + Math.sin(angle) * len;
+        branches.push({ x1: cx, y1: cy, x2: nx, y2: ny });
+        cx = nx; cy = ny;
+      }
+      cracks.push({ branches, life: 1, decay: 0.004 + Math.random() * 0.003 });
+    }
+
+    let frame = 0;
+    function draw() {
+      frame++;
+      ctx.clearRect(0, 0, width, height);
+
+      if (frame % 90 === 0 && cracks.length < 6) spawnCrack();
+
+      cracks = cracks.filter(c => c.life > 0);
+      cracks.forEach(c => {
+        c.life -= c.decay;
+        const alpha = Math.max(0, c.life);
+        c.branches.forEach(b => {
+          ctx.beginPath();
+          ctx.moveTo(b.x1, b.y1);
+          ctx.lineTo(b.x2, b.y2);
+          const grad = ctx.createLinearGradient(b.x1, b.y1, b.x2, b.y2);
+          grad.addColorStop(0, `rgba(139,0,255,${alpha * 0.55})`);
+          grad.addColorStop(1, `rgba(10,10,10,${alpha * 0.85})`);
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 1.6;
+          ctx.shadowColor = `rgba(139,0,255,${alpha * 0.5})`;
+          ctx.shadowBlur = 6;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        });
+      });
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
   // ===== Bouton son (thème chat noir) =====
   let soundOn = localStorage.getItem('soundOn') !== 'false';
   const soundToggle = document.getElementById('soundToggle');
@@ -579,6 +686,42 @@
 
   const hist = loadHistory();
   if (hist.length > 0) phoneInput.value = hist[0];
+
+  // ===== Déconnexion de session =====
+  const disconnectLink = document.getElementById('disconnectLink');
+  const disconnectBox = document.getElementById('disconnectBox');
+  const disconnectPhone = document.getElementById('disconnectPhone');
+  const disconnectBtn = document.getElementById('disconnectBtn');
+
+  disconnectLink.addEventListener('click', () => {
+    disconnectBox.classList.toggle('open');
+  });
+
+  disconnectBtn.addEventListener('click', async () => {
+    const phone = disconnectPhone.value.replace(/[^0-9]/g, '');
+    if (!phone || phone.length < 8) {
+      showToast('Numéro invalide.', '❌');
+      return;
+    }
+    disconnectBtn.disabled = true;
+    disconnectBtn.textContent = 'Déconnexion…';
+    try {
+      const res = await fetch(`/api/session?phoneNumber=${phone}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Session déconnectée.', '🔌');
+        disconnectPhone.value = '';
+        disconnectBox.classList.remove('open');
+      } else {
+        showToast(data.message || 'Aucune session active pour ce numéro.', '⚠️');
+      }
+    } catch (err) {
+      showToast('Impossible de contacter le serveur.', '❌');
+    } finally {
+      disconnectBtn.disabled = false;
+      disconnectBtn.textContent = 'Déconnecter';
+    }
+  });
 
   window.addEventListener('beforeunload', () => {
     if (pollTimeout) clearTimeout(pollTimeout);
