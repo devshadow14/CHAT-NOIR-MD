@@ -318,29 +318,64 @@
     loadingState.style.display = 'flex';
 
     try {
-      const res = await fetch('/api/pair', {
+      const startRes = await fetch('/api/pair', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phoneNumber: phone })
       });
-      const data = await res.json();
+      const startData = await startRes.json();
 
-      loadingState.style.display = 'none';
-
-      if (!data.success) {
+      if (!startData.success) {
+        loadingState.style.display = 'none';
         formStep.style.display = 'block';
-        showError(data.message || 'Une erreur est survenue. Réessayez.');
+        showError(startData.message || 'Une erreur est survenue. Réessayez.');
         return;
       }
 
-      codeValue.textContent = data.code;
-      codeState.style.display = 'block';
+      pollForCode(phone);
     } catch (err) {
       loadingState.style.display = 'none';
       formStep.style.display = 'block';
       showError('Impossible de contacter le serveur. Réessayez plus tard.');
     }
   });
+
+  function pollForCode(phone, attempt = 0) {
+    const MAX_ATTEMPTS = 20; // ~40s max (20 x 2s)
+
+    if (attempt >= MAX_ATTEMPTS) {
+      loadingState.style.display = 'none';
+      formStep.style.display = 'block';
+      showError('Ça prend trop de temps. Réessayez.');
+      return;
+    }
+
+    setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/code?phoneNumber=${phone}`);
+        const data = await res.json();
+
+        if (data.status === 'ready') {
+          loadingState.style.display = 'none';
+          codeValue.textContent = data.code;
+          codeState.style.display = 'block';
+          return;
+        }
+
+        if (data.status === 'error') {
+          loadingState.style.display = 'none';
+          formStep.style.display = 'block';
+          showError(data.message || 'Erreur lors de la génération du code.');
+          return;
+        }
+
+        // status === 'pending' -> on continue à interroger
+        pollForCode(phone, attempt + 1);
+      } catch (err) {
+        pollForCode(phone, attempt + 1);
+      }
+    }, 2000);
+  }
 
   copyBtn.addEventListener('click', () => {
     navigator.clipboard.writeText(codeValue.textContent.replace(/-/g, ''));
