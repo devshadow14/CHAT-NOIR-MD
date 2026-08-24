@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AURA PRIMME-MD — Connexion WhatsApp</title>
+<title>AURA PRIMME-MD 鈥� Connexion WhatsApp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -37,7 +37,7 @@
     overflow-x: hidden;
   }
 
-  /* --- Signature : yeux de chat néon en fond --- */
+  /* --- Signature : yeux de chat n茅on en fond --- */
   .eyes {
     position: fixed;
     top: 12%;
@@ -151,7 +151,7 @@
 
   .hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
 
-  /* --- Etat : génération --- */
+  /* --- Etat : g茅n茅ration --- */
   .loading {
     display: none;
     align-items: center;
@@ -167,7 +167,7 @@
   .dot:nth-child(3) { animation-delay: 0.3s; }
   @keyframes pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
 
-  /* --- Etat : code affiché --- */
+  /* --- Etat : code affich茅 --- */
   .code-block {
     display: none;
     text-align: center;
@@ -249,23 +249,23 @@
     <div class="brand">
       <div class="eyebrow">Pairing portal</div>
       <h1>AURA PRIMME-MD</h1>
-      <p>Connectez votre numéro WhatsApp en quelques secondes</p>
+      <p>Connectez votre num茅ro WhatsApp en quelques secondes</p>
     </div>
 
     <div class="card">
       <div id="formStep">
-        <label for="phone">Numéro WhatsApp (avec indicatif pays)</label>
+        <label for="phone">Num茅ro WhatsApp (avec indicatif pays)</label>
         <div class="phone-row">
           <input type="text" id="phone" placeholder="221776227173" inputmode="numeric" autocomplete="off">
         </div>
-        <button id="submitBtn">Générer mon code</button>
-        <div class="hint">Sans le signe + ni espaces. Exemple : indicatif + numéro.</div>
+        <button id="submitBtn">G茅n茅rer mon code</button>
+        <div class="hint">Sans le signe + ni espaces. Exemple : indicatif + num茅ro.</div>
         <div class="error" id="errorMsg"></div>
       </div>
 
       <div class="loading" id="loadingState">
         <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-        &nbsp;génération du code…
+        &nbsp;g茅n茅ration du code鈥�
       </div>
 
       <div class="code-block" id="codeState">
@@ -275,20 +275,20 @@
 
         <div class="steps">
           <ol>
-            <li>Ouvrez WhatsApp → Paramètres</li>
-            <li>Appareils liés → Lier un appareil</li>
-            <li>Lier avec un numéro de téléphone</li>
+            <li>Ouvrez WhatsApp 鈫� Param猫tres</li>
+            <li>Appareils li茅s 鈫� Lier un appareil</li>
+            <li>Lier avec un num茅ro de t茅l茅phone</li>
             <li>Entrez le code ci-dessus</li>
           </ol>
         </div>
       </div>
     </div>
 
-    <footer>ᴄʀᴇᴀᴛᴇᴅ ʙʏ 𝐃𝐄𝐕 𝐌𝐈𝐂𝐇𝐀𝐄𝐋 𝐒𝐂𝐎𝐅𝐈𝐄𝐋𝐃</footer>
+    <footer>岽勈€岽囜磤岽涐磭岽� 蕶蕪 饾悆饾悇饾悤 饾悓饾悎饾悅饾悋饾悁饾悇饾悑 饾悞饾悅饾悗饾悈饾悎饾悇饾悑饾悆</footer>
   </main>
 
 <script>
-  // Adapte cette URL à l'adresse de ton API (panel KataBump)
+  // Adapte cette URL 脿 l'adresse de ton API (panel KataBump)
   const API_BASE = 'http://51.75.118.151:20269';
 
   const phoneInput = document.getElementById('phone');
@@ -310,7 +310,7 @@
     errorMsg.style.display = 'none';
 
     if (!phone || phone.length < 8) {
-      showError('Numéro invalide. Vérifie le format (indicatif + numéro, sans +).');
+      showError('Num茅ro invalide. V茅rifie le format (indicatif + num茅ro, sans +).');
       return;
     }
 
@@ -329,7 +329,7 @@
 
       if (!data.success) {
         formStep.style.display = 'block';
-        showError(data.message || 'Une erreur est survenue. Réessayez.');
+        showError(data.message || 'Une erreur est survenue. R茅essayez.');
         return;
       }
 
@@ -338,13 +338,13 @@
     } catch (err) {
       loadingState.style.display = 'none';
       formStep.style.display = 'block';
-      showError('Impossible de contacter le serveur. Réessayez plus tard.');
+      showError('Impossible de contacter le serveur. R茅essayez plus tard.');
     }
   });
 
   copyBtn.addEventListener('click', () => {
     navigator.clipboard.writeText(codeValue.textContent.replace(/-/g, ''));
-    copyBtn.textContent = 'Copié ✓';
+    copyBtn.textContent = 'Copi茅 鉁�';
     setTimeout(() => { copyBtn.textContent = 'Copier le code'; }, 1500);
   });
 
