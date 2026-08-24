@@ -1,391 +1,1075 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AURA PRIMME-MD — Connexion WhatsApp</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #060606;
-    --panel: #0d0d0d;
-    --panel-border: #1a1a1a;
-    --neon: #39FF14;
-    --neon-dim: #1c7a0b;
-    --danger: #FF2965;
-    --text: #EAEAEA;
-    --muted: #6b6b6b;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AURA PRIMME-MD — Connexion WhatsApp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+  <!-- QRCode.js pour générer le QR -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    /* ===== RESET & VARIABLES ===== */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  * { box-sizing: border-box; }
+    :root {
+      --bg: #060606;
+      --panel: #0d0d0d;
+      --panel-border: #1a1a1a;
+      --neon: #39FF14;
+      --neon-dim: #1c7a0b;
+      --neon-glow: rgba(57, 255, 20, 0.25);
+      --danger: #FF2965;
+      --text: #EAEAEA;
+      --text-secondary: #8a8a8a;
+      --muted: #5a5a5a;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      --radius: 20px;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      --font: 'Inter', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: var(--bg);
-    background-image:
-      radial-gradient(circle at 20% 15%, rgba(57,255,20,0.05), transparent 40%),
-      radial-gradient(circle at 80% 85%, rgba(57,255,20,0.04), transparent 40%);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    overflow-x: hidden;
-  }
+    [data-theme="light"] {
+      --bg: #f0f2f5;
+      --panel: #ffffff;
+      --panel-border: #d0d7de;
+      --neon: #2b8c1a;
+      --neon-dim: #1f6e12;
+      --neon-glow: rgba(43, 140, 26, 0.2);
+      --text: #1a1a1a;
+      --text-secondary: #3d3d3d;
+      --muted: #6e6e6e;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
 
-  /* --- Signature : yeux de chat néon en fond --- */
-  .eyes {
-    position: fixed;
-    top: 12%;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 60px;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.5;
-  }
-  .eye {
-    width: 46px;
-    height: 22px;
-    background: var(--neon);
-    border-radius: 50%;
-    filter: blur(1px);
-    box-shadow: 0 0 20px 4px rgba(57,255,20,0.6), 0 0 60px 10px rgba(57,255,20,0.15);
-    animation: blink 5.5s infinite ease-in-out;
-  }
-  .eye:nth-child(2) { animation-delay: 0.15s; }
-  @keyframes blink {
-    0%, 92%, 100% { transform: scaleY(1); }
-    95% { transform: scaleY(0.08); }
-  }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  main {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 420px;
-  }
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: background var(--transition), color var(--transition);
+      position: relative;
+      overflow-x: hidden;
+    }
 
-  .brand {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-  .brand .eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.25em;
-    color: var(--neon);
-    text-transform: uppercase;
-  }
-  .brand h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 30px;
-    font-weight: 700;
-    margin: 6px 0 8px;
-    letter-spacing: -0.01em;
-  }
-  .brand p {
-    font-size: 14px;
-    color: var(--muted);
-    margin: 0;
-  }
+    /* ===== CANVAS ÉTOILES ===== */
+    #stars-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
 
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 16px;
-    padding: 28px 24px;
-  }
+    /* ===== BOUTON THEME ===== */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 20;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 60px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--mono);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      transition: all var(--transition);
+    }
+    .theme-toggle:hover {
+      border-color: var(--neon-dim);
+      transform: scale(1.02);
+    }
+    .theme-toggle .icon {
+      font-size: 18px;
+      line-height: 1;
+    }
 
-  label {
-    display: block;
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.05em;
-  }
+    /* ===== CARTE PRINCIPALE ===== */
+    main {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 460px;
+      perspective: 800px;
+    }
 
-  .phone-row {
-    display: flex;
-    gap: 10px;
-  }
+    .card-wrapper {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(4px);
+      transition: background var(--transition), border var(--transition), box-shadow var(--transition);
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
 
-  input[type="text"] {
-    flex: 1;
-    background: #000;
-    border: 1px solid var(--panel-border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    color: var(--text);
-    font-size: 16px;
-    font-family: 'JetBrains Mono', monospace;
-    outline: none;
-    transition: border-color 0.15s ease;
-  }
-  input[type="text"]:focus { border-color: var(--neon-dim); }
-  input[type="text"]::placeholder { color: #444; }
+    /* ===== EN-TÊTE ===== */
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .brand .eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--neon);
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+    .brand h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      margin: 4px 0 6px;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--neon), #8eff80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .brand p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
 
-  button {
-    width: 100%;
-    margin-top: 16px;
-    background: var(--neon);
-    color: #060606;
-    border: none;
-    border-radius: 10px;
-    padding: 15px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.15s ease;
-  }
-  button:hover { box-shadow: 0 0 24px rgba(57,255,20,0.35); }
-  button:active { transform: scale(0.98); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+    /* ===== CHAMPS ===== */
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-family: var(--mono);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
 
-  .hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+    .phone-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .phone-row input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 16px;
+      font-family: var(--mono);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .phone-row input:focus {
+      border-color: var(--neon-dim);
+      box-shadow: 0 0 0 3px var(--neon-glow);
+    }
+    .phone-row input::placeholder {
+      color: #555;
+    }
 
-  /* --- Etat : génération --- */
-  .loading {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-    padding: 20px 0 6px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--neon);
-  }
-  .dot { width: 6px; height: 6px; background: var(--neon); border-radius: 50%; animation: pulse 1s infinite ease-in-out; }
-  .dot:nth-child(2) { animation-delay: 0.15s; }
-  .dot:nth-child(3) { animation-delay: 0.3s; }
-  @keyframes pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+    .btn-primary {
+      width: 100%;
+      margin-top: 16px;
+      background: var(--neon);
+      color: #060606;
+      border: none;
+      border-radius: 12px;
+      padding: 16px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 28px var(--neon-glow);
+      transform: translateY(-2px);
+    }
+    .btn-primary:active {
+      transform: scale(0.97);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
-  /* --- Etat : code affiché --- */
-  .code-block {
-    display: none;
-    text-align: center;
-  }
-  .code-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
-  .code-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 34px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: var(--neon);
-    text-shadow: 0 0 18px rgba(57,255,20,0.5);
-    padding: 18px 10px;
-    border: 1px dashed var(--neon-dim);
-    border-radius: 12px;
-    background: rgba(57,255,20,0.03);
-    word-break: break-all;
-  }
-  .copy-btn {
-    margin-top: 12px;
-    background: transparent;
-    border: 1px solid var(--panel-border);
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    font-weight: 400;
-    padding: 10px;
-  }
-  .copy-btn:hover { box-shadow: none; border-color: var(--neon-dim); }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+      text-align: center;
+    }
+    .hint span {
+      color: var(--neon);
+      font-weight: 500;
+    }
 
-  .steps {
-    margin-top: 20px;
-    padding-top: 18px;
-    border-top: 1px solid var(--panel-border);
-    text-align: left;
-  }
-  .steps ol {
-    margin: 0;
-    padding-left: 18px;
-    font-size: 13px;
-    color: #b4b4b4;
-    line-height: 1.9;
-  }
+    /* ===== ÉTATS ===== */
+    .state {
+      display: none;
+      transition: opacity 0.3s;
+    }
+    .state.active {
+      display: block;
+      animation: fadeUp 0.5s ease;
+    }
 
-  .error {
-    display: none;
-    font-size: 13px;
-    color: var(--danger);
-    margin-top: 12px;
-    font-family: 'JetBrains Mono', monospace;
-  }
+    @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-  footer {
-    text-align: center;
-    margin-top: 26px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: #3a3a3a;
-    letter-spacing: 0.05em;
-  }
+    /* Loading */
+    .loading-state {
+      text-align: center;
+      padding: 24px 0 12px;
+    }
+    .loading-state .dots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .loading-state .dot {
+      width: 12px;
+      height: 12px;
+      background: var(--neon);
+      border-radius: 50%;
+      animation: pulse 1.2s infinite ease-in-out;
+    }
+    .loading-state .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .loading-state .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 0.2;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+    }
+    .loading-state .label {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .loading-state .timer {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
 
-  @media (prefers-reduced-motion: reduce) {
-    .eye, .dot { animation: none; }
-  }
-</style>
+    /* Code + QR */
+    .code-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .code-display .code-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .code-value {
+      font-family: var(--mono);
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--neon);
+      text-shadow: 0 0 30px var(--neon-glow);
+      padding: 16px 24px;
+      border: 1px dashed var(--neon-dim);
+      border-radius: 14px;
+      background: rgba(57, 255, 20, 0.04);
+      word-break: break-all;
+      width: 100%;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .code-value .expiry-bar {
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      height: 3px;
+      background: var(--neon);
+      border-radius: 0 0 14px 14px;
+      transition: width 0.5s linear;
+      width: 100%;
+    }
+
+    .qr-container {
+      background: white;
+      padding: 12px;
+      border-radius: 14px;
+      display: inline-block;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    .qr-container canvas,
+    .qr-container img {
+      display: block;
+      width: 140px !important;
+      height: 140px !important;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .action-row .btn-secondary {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .action-row .btn-secondary:hover {
+      border-color: var(--neon-dim);
+      background: rgba(57, 255, 20, 0.05);
+    }
+
+    .steps {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--panel-border);
+      text-align: left;
+      width: 100%;
+    }
+    .steps ol {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 2;
+    }
+    .steps ol li::marker {
+      color: var(--neon);
+      font-weight: 600;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 50;
+      pointer-events: none;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+    .toast .toast-icon {
+      font-size: 20px;
+    }
+
+    /* ===== HISTORIQUE ===== */
+    .history {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--panel-border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .history .pill {
+      background: var(--bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 40px;
+      padding: 4px 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .history .pill:hover {
+      border-color: var(--neon-dim);
+      color: var(--neon);
+      background: rgba(57, 255, 20, 0.05);
+    }
+
+    /* ===== ERREUR ===== */
+    .error-msg {
+      display: none;
+      font-size: 13px;
+      color: var(--danger);
+      margin-top: 12px;
+      font-family: var(--mono);
+      text-align: center;
+      animation: shake 0.3s ease;
+    }
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      20% {
+        transform: translateX(-6px);
+      }
+      40% {
+        transform: translateX(6px);
+      }
+      60% {
+        transform: translateX(-4px);
+      }
+      80% {
+        transform: translateX(4px);
+      }
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      text-align: center;
+      margin-top: 24px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      opacity: 0.6;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      .card-wrapper {
+        padding: 22px 16px;
+      }
+      .brand h1 {
+        font-size: 26px;
+      }
+      .code-value {
+        font-size: 28px;
+        padding: 14px;
+      }
+      .qr-container canvas,
+      .qr-container img {
+        width: 110px !important;
+        height: 110px !important;
+      }
+      .theme-toggle {
+        top: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .action-row {
+        flex-direction: column;
+      }
+    }
+
+    /* ===== PREFERENCES REDUIT ===== */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <div class="eyes"><div class="eye"></div><div class="eye"></div></div>
+  <!-- CANVAS ÉTOILES -->
+  <canvas id="stars-canvas"></canvas>
+
+  <!-- BOUTON THEME -->
+  <div class="theme-toggle" id="themeToggle" role="button" tabindex="0" aria-label="Basculer le thème">
+    <span class="icon" id="themeIcon">🌙</span>
+    <span id="themeLabel">Sombre</span>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✅</span>
+    <span id="toastMessage">Code copié !</span>
+  </div>
 
   <main>
-    <div class="brand">
-      <div class="eyebrow">Pairing portal</div>
-      <h1>AURA PRIMME-MD</h1>
-      <p>Connectez votre numéro WhatsApp en quelques secondes</p>
-    </div>
+    <div class="card-wrapper" id="cardWrapper">
+      <!-- En-tête -->
+      <div class="brand">
+        <div class="eyebrow">✦ Pairing Portal</div>
+        <h1>AURA PRIMME-MD</h1>
+        <p>Connectez votre WhatsApp en un éclair</p>
+      </div>
 
-    <div class="card">
-      <div id="formStep">
-        <label for="phone">Numéro WhatsApp (avec indicatif pays)</label>
+      <!-- ÉTAT 1 : Formulaire -->
+      <div class="state active" id="formState">
+        <label for="phone">Numéro WhatsApp (indicatif pays)</label>
         <div class="phone-row">
-          <input type="text" id="phone" placeholder="221776227173" inputmode="numeric" autocomplete="off">
+          <input type="text" id="phone" placeholder="221776227173" inputmode="numeric" autocomplete="off" />
         </div>
-        <button id="submitBtn">Générer mon code</button>
-        <div class="hint">Sans le signe + ni espaces. Exemple : indicatif + numéro.</div>
-        <div class="error" id="errorMsg"></div>
+        <button class="btn-primary" id="submitBtn">
+          <span>🚀</span> Générer mon code
+        </button>
+        <div class="hint">Sans + ni espaces. Ex: <span>221776227173</span></div>
+        <div class="error-msg" id="errorMsg"></div>
+
+        <!-- Historique des derniers numéros -->
+        <div class="history" id="historyContainer"></div>
       </div>
 
-      <div class="loading" id="loadingState">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-        &nbsp;génération du code…
+      <!-- ÉTAT 2 : Chargement -->
+      <div class="state" id="loadingState">
+        <div class="loading-state">
+          <div class="dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <div class="label">Génération du code en cours…</div>
+          <div class="timer" id="timerDisplay">⏱ 0s</div>
+        </div>
       </div>
 
-      <div class="code-block" id="codeState">
-        <div class="code-label">Votre code de jumelage</div>
-        <div class="code-value" id="codeValue">----</div>
-        <button class="copy-btn" id="copyBtn">Copier le code</button>
+      <!-- ÉTAT 3 : Code prêt -->
+      <div class="state" id="codeState">
+        <div class="code-display">
+          <div class="code-label">🔑 Votre code de jumelage</div>
+          <div class="code-value" id="codeValue">
+            <span id="codeText">----</span>
+            <div class="expiry-bar" id="expiryBar" style="width:100%"></div>
+          </div>
 
-        <div class="steps">
-          <ol>
-            <li>Ouvrez WhatsApp → Paramètres</li>
-            <li>Appareils liés → Lier un appareil</li>
-            <li>Lier avec un numéro de téléphone</li>
-            <li>Entrez le code ci-dessus</li>
-          </ol>
+          <div class="qr-container" id="qrContainer"></div>
+
+          <div class="action-row">
+            <button class="btn-secondary" id="copyBtn">📋 Copier</button>
+            <button class="btn-secondary" id="refreshBtn">🔄 Nouveau code</button>
+          </div>
+
+          <div class="steps">
+            <ol>
+              <li>Ouvrez WhatsApp → Paramètres</li>
+              <li>Appareils liés → Lier un appareil</li>
+              <li>Lier avec un numéro de téléphone</li>
+              <li>Entrez le code ou scannez le QR</li>
+            </ol>
+          </div>
         </div>
       </div>
     </div>
-
     <footer>ᴄʀᴇᴀᴛᴇᴅ ʙʏ 𝐃𝐄𝐕 𝐌𝐈𝐂𝐇𝐀𝐄𝐋 𝐒𝐂𝐎𝐅𝐈𝐄𝐋𝐃</footer>
   </main>
 
-<script>
-  // Appelle le proxy Vercel (api/pair.js), qui relaie vers l'API KataBump côté serveur
-  const API_BASE = '';
+  <script>
+    // ============================================================
+    // 1. ÉTOILES (Canvas)
+    // ============================================================
+    (function initStars() {
+      const canvas = document.getElementById('stars-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      const stars = [];
+      const SHOOTING_STAR_INTERVAL = 80; // frames
 
-  const phoneInput = document.getElementById('phone');
-  const submitBtn = document.getElementById('submitBtn');
-  const formStep = document.getElementById('formStep');
-  const loadingState = document.getElementById('loadingState');
-  const codeState = document.getElementById('codeState');
-  const codeValue = document.getElementById('codeValue');
-  const errorMsg = document.getElementById('errorMsg');
-  const copyBtn = document.getElementById('copyBtn');
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
 
-  function showError(msg) {
-    errorMsg.textContent = msg;
-    errorMsg.style.display = 'block';
-  }
+      // Étoiles fixes
+      for (let i = 0; i < 140; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: Math.random() * 1.8 + 0.5,
+          speed: 0.02 + Math.random() * 0.03,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
 
-  submitBtn.addEventListener('click', async () => {
-    const phone = phoneInput.value.replace(/[^0-9]/g, '');
-    errorMsg.style.display = 'none';
+      // Étoiles filantes
+      let shootingStars = [];
 
-    if (!phone || phone.length < 8) {
-      showError('Numéro invalide. Vérifie le format (indicatif + numéro, sans +).');
-      return;
+      function createShootingStar() {
+        const angle = (Math.random() * 60 - 30) * (Math.PI / 180);
+        const speed = 6 + Math.random() * 8;
+        shootingStars.push({
+          x: Math.random() * width,
+          y: Math.random() * height * 0.5,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed + 1,
+          life: 1,
+          decay: 0.008 + Math.random() * 0.012,
+          len: 40 + Math.random() * 60,
+        });
+      }
+
+      let frame = 0;
+      function draw() {
+        frame++;
+        ctx.clearRect(0, 0, width, height);
+
+        // Dessiner étoiles fixes
+        stars.forEach(s => {
+          const alpha = 0.5 + 0.5 * Math.sin(frame * s.speed + s.phase);
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${alpha * 0.6})`;
+          ctx.fill();
+          // glow
+          ctx.shadowColor = 'rgba(57,255,20,0.15)';
+          ctx.shadowBlur = 8;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        });
+
+        // Étoiles filantes
+        if (frame % SHOOTING_STAR_INTERVAL === 0 && Math.random() < 0.6) {
+          createShootingStar();
+        }
+        shootingStars = shootingStars.filter(ss => ss.life > 0);
+        shootingStars.forEach(ss => {
+          ss.x += ss.vx;
+          ss.y += ss.vy;
+          ss.life -= ss.decay;
+          const alpha = Math.max(0, ss.life);
+          ctx.beginPath();
+          ctx.moveTo(ss.x, ss.y);
+          ctx.lineTo(ss.x - ss.vx * ss.len * 0.06, ss.y - ss.vy * ss.len * 0.06);
+          ctx.strokeStyle = `rgba(57,255,20,${alpha * 0.7})`;
+          ctx.lineWidth = 1.8;
+          ctx.shadowColor = 'rgba(57,255,20,0.4)';
+          ctx.shadowBlur = 16;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        });
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ============================================================
+    // 2. THÈME (Dark / Light)
+    // ============================================================
+    (function theme() {
+      const toggle = document.getElementById('themeToggle');
+      const icon = document.getElementById('themeIcon');
+      const label = document.getElementById('themeLabel');
+      const html = document.documentElement;
+
+      function setTheme(theme) {
+        html.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+        label.textContent = theme === 'dark' ? 'Sombre' : 'Clair';
+      }
+
+      const saved = localStorage.getItem('theme') || 'dark';
+      setTheme(saved);
+
+      toggle.addEventListener('click', () => {
+        const current = html.getAttribute('data-theme');
+        setTheme(current === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
+    // ============================================================
+    // 3. PARALLAXE 3D (sur la carte)
+    // ============================================================
+    (function parallax() {
+      const wrapper = document.getElementById('cardWrapper');
+      const bounds = wrapper.getBoundingClientRect();
+      let centerX = bounds.left + bounds.width / 2;
+      let centerY = bounds.top + bounds.height / 2;
+
+      function updateCenter() {
+        const rect = wrapper.getBoundingClientRect();
+        centerX = rect.left + rect.width / 2;
+        centerY = rect.top + rect.height / 2;
+      }
+      window.addEventListener('resize', updateCenter);
+
+      document.addEventListener('mousemove', (e) => {
+        const deltaX = (e.clientX - centerX) / 40;
+        const deltaY = (e.clientY - centerY) / 40;
+        wrapper.style.transform =
+          `rotateY(${deltaX}deg) rotateX(${-deltaY}deg) translateZ(2px)`;
+      });
+
+      // Reset au départ
+      document.addEventListener('mouseleave', () => {
+        wrapper.style.transform = 'rotateY(0deg) rotateX(0deg) translateZ(0)';
+      });
+    })();
+
+    // ============================================================
+    // 4. LOGIQUE PRINCIPALE
+    // ============================================================
+    const phoneInput = document.getElementById('phone');
+    const submitBtn = document.getElementById('submitBtn');
+    const formState = document.getElementById('formState');
+    const loadingState = document.getElementById('loadingState');
+    const codeState = document.getElementById('codeState');
+    const codeText = document.getElementById('codeText');
+    const errorMsg = document.getElementById('errorMsg');
+    const copyBtn = document.getElementById('copyBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const expiryBar = document.getElementById('expiryBar');
+    const qrContainer = document.getElementById('qrContainer');
+    const historyContainer = document.getElementById('historyContainer');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+
+    let currentPhone = '';
+    let pollInterval = null;
+    let startTime = null;
+    let timerInterval = null;
+    let qrInstance = null;
+
+    // Gestion de l'historique (localStorage)
+    function loadHistory() {
+      try {
+        return JSON.parse(localStorage.getItem('phoneHistory')) || [];
+      } catch { return []; }
     }
 
-    formStep.style.display = 'none';
-    loadingState.style.display = 'flex';
+    function saveHistory(phone) {
+      let hist = loadHistory();
+      hist = hist.filter(p => p !== phone);
+      hist.unshift(phone);
+      if (hist.length > 5) hist.pop();
+      localStorage.setItem('phoneHistory', JSON.stringify(hist));
+      renderHistory();
+    }
 
-    try {
-      const startRes = await fetch('/api/pair', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: phone })
+    function renderHistory() {
+      const hist = loadHistory();
+      historyContainer.innerHTML = '';
+      if (hist.length === 0) {
+        historyContainer.style.display = 'none';
+        return;
+      }
+      historyContainer.style.display = 'flex';
+      hist.forEach(p => {
+        const pill = document.createElement('span');
+        pill.className = 'pill';
+        pill.textContent = p;
+        pill.addEventListener('click', () => {
+          phoneInput.value = p;
+          submitBtn.click();
+        });
+        historyContainer.appendChild(pill);
       });
-      const startData = await startRes.json();
+    }
+    renderHistory();
 
-      if (!startData.success) {
-        loadingState.style.display = 'none';
-        formStep.style.display = 'block';
-        showError(startData.message || 'Une erreur est survenue. Réessayez.');
+    // Toast
+    function showToast(msg, icon = '✅') {
+      toastMessage.textContent = msg;
+      document.querySelector('.toast-icon').textContent = icon;
+      toast.classList.add('show');
+      clearTimeout(toast._hide);
+      toast._hide = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Jouer un son (Web Audio API)
+    function playBeep() {
+      try {
+        const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = 880;
+        osc.type = 'sine';
+        gain.gain.value = 0.08;
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch (e) { /* silencieux */ }
+    }
+
+    // Basculer les états
+    function showState(stateId) {
+      [formState, loadingState, codeState].forEach(el => el.classList.remove('active'));
+      document.getElementById(stateId).classList.add('active');
+    }
+
+    // Réinitialiser le timer
+    function resetTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+      startTime = null;
+      timerDisplay.textContent = '⏱ 0s';
+    }
+
+    function startTimer() {
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        timerDisplay.textContent = `⏱ ${elapsed}s`;
+      }, 1000);
+    }
+
+    // Gérer l'expiration (60s)
+    let expiryTimeout = null;
+
+    function startExpiry() {
+      let remaining = 60;
+      expiryBar.style.width = '100%';
+      if (expiryTimeout) clearInterval(expiryTimeout);
+      expiryTimeout = setInterval(() => {
+        remaining--;
+        const pct = (remaining / 60) * 100;
+        expiryBar.style.width = `${Math.max(0, pct)}%`;
+        if (remaining <= 0) {
+          clearInterval(expiryTimeout);
+          expiryTimeout = null;
+          showToast('Le code a expiré, générez-en un nouveau.', '⏳');
+          // On repasse en mode formulaire ?
+          // On laisse l'utilisateur cliquer sur "Nouveau code"
+        }
+      }, 1000);
+    }
+
+    // Appel API
+    async function generateCode(phone) {
+      currentPhone = phone;
+      saveHistory(phone);
+      showState('loadingState');
+      resetTimer();
+      startTimer();
+      errorMsg.style.display = 'none';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/pair', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phoneNumber: phone }),
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+          throw new Error(data.message || 'Erreur serveur');
+        }
+
+        // Polling
+        pollForCode(phone);
+      } catch (err) {
+        showState('formState');
+        submitBtn.disabled = false;
+        resetTimer();
+        errorMsg.textContent = err.message || 'Impossible de contacter le serveur.';
+        errorMsg.style.display = 'block';
+        showToast('Erreur : ' + err.message, '❌');
+      }
+    }
+
+    function pollForCode(phone, attempt = 0) {
+      const MAX_ATTEMPTS = 25; // 25 * 2s = 50s
+
+      if (attempt >= MAX_ATTEMPTS) {
+        showState('formState');
+        submitBtn.disabled = false;
+        resetTimer();
+        errorMsg.textContent = 'Délai dépassé. Réessayez.';
+        errorMsg.style.display = 'block';
+        showToast('Temps écoulé, réessayez.', '⏰');
         return;
       }
 
-      pollForCode(phone);
-    } catch (err) {
-      loadingState.style.display = 'none';
-      formStep.style.display = 'block';
-      showError('Impossible de contacter le serveur. Réessayez plus tard.');
-    }
-  });
+      if (pollInterval) clearTimeout(pollInterval);
+      pollInterval = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/code?phoneNumber=${phone}`);
+          const data = await res.json();
 
-  function pollForCode(phone, attempt = 0) {
-    const MAX_ATTEMPTS = 20; // ~40s max (20 x 2s)
+          if (data.status === 'ready') {
+            // Code prêt !
+            showState('codeState');
+            submitBtn.disabled = false;
+            resetTimer();
+            codeText.textContent = data.code;
+            playBeep();
+            showToast('Code généré avec succès !', '🎉');
 
-    if (attempt >= MAX_ATTEMPTS) {
-      loadingState.style.display = 'none';
-      formStep.style.display = 'block';
-      showError('Ça prend trop de temps. Réessayez.');
-      return;
-    }
+            // QR Code
+            if (qrInstance) {
+              qrContainer.innerHTML = '';
+              qrInstance = null;
+            }
+            qrInstance = new QRCode(qrContainer, {
+              text: data.code,
+              width: 140,
+              height: 140,
+              colorDark: '#000000',
+              colorLight: '#ffffff',
+              correctLevel: QRCode.CorrectLevel.H,
+            });
 
-    setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/code?phoneNumber=${phone}`);
-        const data = await res.json();
+            // Copie automatique
+            navigator.clipboard.writeText(data.code).then(() => {
+              showToast('Code copié automatiquement 📋', '📋');
+            }).catch(() => {});
 
-        if (data.status === 'ready') {
-          loadingState.style.display = 'none';
-          codeValue.textContent = data.code;
-          codeState.style.display = 'block';
-          return;
+            // Démarrer l'expiration
+            startExpiry();
+            return;
+          }
+
+          if (data.status === 'error') {
+            throw new Error(data.message || 'Erreur de génération');
+          }
+
+          // Sinon, on continue à interroger (status pending)
+          pollForCode(phone, attempt + 1);
+        } catch (err) {
+          // On réessaie en cas d'erreur réseau
+          pollForCode(phone, attempt + 1);
         }
+      }, 2000);
+    }
 
-        if (data.status === 'error') {
-          loadingState.style.display = 'none';
-          formStep.style.display = 'block';
-          showError(data.message || 'Erreur lors de la génération du code.');
-          return;
-        }
+    // Événements
+    submitBtn.addEventListener('click', () => {
+      const phone = phoneInput.value.replace(/[^0-9]/g, '');
+      errorMsg.style.display = 'none';
 
-        // status === 'pending' -> on continue à interroger
-        pollForCode(phone, attempt + 1);
-      } catch (err) {
-        pollForCode(phone, attempt + 1);
+      if (!phone || phone.length < 8) {
+        errorMsg.textContent = 'Numéro invalide (indicatif + numéro).';
+        errorMsg.style.display = 'block';
+        return;
       }
-    }, 2000);
-  }
 
-  copyBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(codeValue.textContent.replace(/-/g, ''));
-    copyBtn.textContent = 'Copié ✓';
-    setTimeout(() => { copyBtn.textContent = 'Copier le code'; }, 1500);
-  });
+      generateCode(phone);
+    });
 
-  phoneInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') submitBtn.click();
-  });
-</script>
+    phoneInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitBtn.click();
+    });
+
+    copyBtn.addEventListener('click', () => {
+      const code = codeText.textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('Code copié !', '📋');
+      }).catch(() => {
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = code;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+        showToast('Code copié !', '📋');
+      });
+    });
+
+    refreshBtn.addEventListener('click', () => {
+      // Annuler les polls et timers
+      if (pollInterval) clearTimeout(pollInterval);
+      if (expiryTimeout) clearInterval(expiryTimeout);
+      resetTimer();
+      showState('formState');
+      if (qrInstance) {
+        qrContainer.innerHTML = '';
+        qrInstance = null;
+      }
+      submitBtn.disabled = false;
+      // Re-remplir le numéro
+      phoneInput.value = currentPhone;
+    });
+
+    // Initialisation : pré-remplir avec le dernier numéro utilisé
+    const hist = loadHistory();
+    if (hist.length > 0) {
+      phoneInput.value = hist[0];
+    }
+
+    // Gestion de la sortie de page pour nettoyer
+    window.addEventListener('beforeunload', () => {
+      if (pollInterval) clearTimeout(pollInterval);
+      if (expiryTimeout) clearInterval(expiryTimeout);
+      if (timerInterval) clearInterval(timerInterval);
+    });
+
+    console.log('✨ AURA PRIMME-MD — Prêt !');
+  </script>
 </body>
 </html>
