@@ -285,6 +285,59 @@
   }
   .disconnect-box .btn-secondary:hover { background: rgba(139,0,255,0.1); border-color: #8b00ff; }
 
+  .connected-badge {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #7fffb0;
+    background: rgba(57,255,20,0.08);
+    border: 1px solid rgba(57,255,20,0.25);
+    border-radius: 40px;
+    padding: 7px 16px;
+  }
+  .connected-badge.show { display: flex; }
+  .badge-dot {
+    width: 8px; height: 8px;
+    background: #39FF14;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #39FF14;
+    animation: badgePulse 1.6s infinite ease-in-out;
+  }
+  @keyframes badgePulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+  .btn-danger {
+    display: none;
+    width: 100%;
+    margin-top: 6px;
+    background: transparent;
+    border: 1px solid rgba(255,41,101,0.35);
+    color: var(--danger);
+    border-radius: 10px;
+    padding: 12px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-danger.show { display: block; }
+  .btn-danger:hover { background: rgba(255,41,101,0.08); border-color: var(--danger); }
+  .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Traînée de pattes de chat au clic */
+  .paw {
+    position: fixed;
+    z-index: 100;
+    pointer-events: none;
+    font-size: 18px;
+    animation: pawFade 0.9s ease forwards;
+  }
+  @keyframes pawFade {
+    0% { opacity: 0.9; transform: scale(0.6) rotate(0deg); }
+    100% { opacity: 0; transform: scale(1.3) rotate(25deg) translateY(-18px); }
+  }
+
   .toast {
     position: fixed;
     bottom: 26px;
@@ -374,10 +427,17 @@
             <div class="expiry-bar" id="expiryBar" style="width:100%"></div>
           </div>
           <div class="qr-container" id="qrContainer"></div>
+
+          <div class="connected-badge" id="connectedBadge">
+            <span class="badge-dot"></span> WhatsApp connecté
+          </div>
+
           <div class="action-row">
             <button class="btn-secondary" id="copyBtn">📋 Copier</button>
             <button class="btn-secondary" id="refreshBtn">🔄 Nouveau code</button>
           </div>
+          <button class="btn-danger" id="quickDisconnectBtn">🔌 Déconnecter cette session</button>
+
           <div class="steps">
             <ol>
               <li>Ouvrez WhatsApp → Paramètres</li>
@@ -503,6 +563,8 @@
   const toast = document.getElementById('toast');
   const toastMessage = document.getElementById('toastMessage');
   const toastIcon = document.getElementById('toastIcon');
+  const connectedBadge = document.getElementById('connectedBadge');
+  const quickDisconnectBtn = document.getElementById('quickDisconnectBtn');
 
   let currentPhone = '';
   let pollTimeout = null;
@@ -619,26 +681,37 @@
         const res = await fetch(`/api/code?phoneNumber=${phone}`);
         const data = await res.json();
 
-        if (data.status === 'ready') {
+        if (data.status === 'ready' || data.status === 'connected') {
           showState('codeState');
           submitBtn.disabled = false;
           resetTimer();
           codeText.textContent = data.code;
-          playBeep();
-          showToast('Code généré avec succès !', '🎉');
 
-          if (qrInstance) { qrContainer.innerHTML = ''; qrInstance = null; }
-          qrInstance = new QRCode(qrContainer, {
-            text: data.code, width: 130, height: 130,
-            colorDark: '#000000', colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-          });
+          if (!qrInstance) {
+            qrInstance = new QRCode(qrContainer, {
+              text: data.code, width: 130, height: 130,
+              colorDark: '#000000', colorLight: '#ffffff',
+              correctLevel: QRCode.CorrectLevel.H
+            });
+            playBeep();
+            showToast('Code généré avec succès !', '🎉');
+            navigator.clipboard.writeText(data.code).then(() => {
+              showToast('Code copié automatiquement 📋', '📋');
+            }).catch(() => {});
+            startExpiry();
+          }
 
-          navigator.clipboard.writeText(data.code).then(() => {
-            showToast('Code copié automatiquement 📋', '📋');
-          }).catch(() => {});
+          quickDisconnectBtn.classList.add('show');
 
-          startExpiry();
+          if (data.status === 'connected') {
+            connectedBadge.classList.add('show');
+            if (expiryInterval) { clearInterval(expiryInterval); expiryInterval = null; }
+            expiryBar.style.width = '100%';
+            return; // connecté : on arrête le polling
+          }
+
+          // status 'ready' mais pas encore connecté : on surveille la connexion séparément (sans limite de tentatives)
+          pollForConnection(phone);
           return;
         }
 
@@ -648,6 +721,26 @@
         pollForCode(phone, attempt + 1);
       }
     }, 2000);
+  }
+
+  let connectionPollTimeout = null;
+  function pollForConnection(phone) {
+    if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
+    connectionPollTimeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/code?phoneNumber=${phone}`);
+        const data = await res.json();
+        if (data.status === 'connected') {
+          connectedBadge.classList.add('show');
+          if (expiryInterval) { clearInterval(expiryInterval); expiryInterval = null; }
+          expiryBar.style.width = '100%';
+          return;
+        }
+        pollForConnection(phone);
+      } catch (err) {
+        pollForConnection(phone);
+      }
+    }, 3000);
   }
 
   submitBtn.addEventListener('click', () => {
@@ -674,14 +767,50 @@
       });
   });
 
+  quickDisconnectBtn.addEventListener('click', async () => {
+    if (!currentPhone) return;
+    quickDisconnectBtn.disabled = true;
+    quickDisconnectBtn.textContent = 'Déconnexion…';
+    try {
+      const res = await fetch(`/api/session?phoneNumber=${currentPhone}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Session déconnectée.', '🔌');
+        if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
+        refreshBtn.click();
+      } else {
+        showToast(data.message || 'Erreur lors de la déconnexion.', '⚠️');
+      }
+    } catch (err) {
+      showToast('Impossible de contacter le serveur.', '❌');
+    } finally {
+      quickDisconnectBtn.disabled = false;
+      quickDisconnectBtn.textContent = '🔌 Déconnecter cette session';
+    }
+  });
+
   refreshBtn.addEventListener('click', () => {
     if (pollTimeout) clearTimeout(pollTimeout);
+    if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
     if (expiryInterval) clearInterval(expiryInterval);
     resetTimer();
     showState('formState');
     if (qrInstance) { qrContainer.innerHTML = ''; qrInstance = null; }
     submitBtn.disabled = false;
+    connectedBadge.classList.remove('show');
+    quickDisconnectBtn.classList.remove('show');
     phoneInput.value = currentPhone;
+  });
+
+  // ===== Décoration : traînée de pattes de chat au clic =====
+  document.addEventListener('click', (e) => {
+    const paw = document.createElement('div');
+    paw.className = 'paw';
+    paw.textContent = '🐾';
+    paw.style.left = `${e.clientX - 9}px`;
+    paw.style.top = `${e.clientY - 9}px`;
+    document.body.appendChild(paw);
+    setTimeout(() => paw.remove(), 900);
   });
 
   const hist = loadHistory();
@@ -725,6 +854,7 @@
 
   window.addEventListener('beforeunload', () => {
     if (pollTimeout) clearTimeout(pollTimeout);
+    if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
     if (expiryInterval) clearInterval(expiryInterval);
     if (timerInterval) clearInterval(timerInterval);
   });
