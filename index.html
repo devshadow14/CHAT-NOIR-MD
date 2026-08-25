@@ -365,6 +365,13 @@
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   footer { text-align: center; margin-top: 22px; font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.05em; opacity: 0.7; }
+  .sessions-count {
+    font-size: 11.5px;
+    color: #7fffb0;
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+  .sessions-count span { font-weight: 700; }
 
   @media (max-width: 480px) {
     .card { padding: 24px 18px; }
@@ -396,16 +403,16 @@
     <div class="card">
       <div class="brand">
         <img class="avatar" src="https://files.catbox.moe/3cvx9z.jpg" alt="CHAT NOIR-MD">
-        <div class="eyebrow">✦ 𝗕𝗼𝘁 𝗽𝗮𝗶𝗿𝗶𝗻𝗴</div>
+        <div class="eyebrow">✦ Pairing Portal</div>
         <h1>CHAT NOIR-MD</h1>
-        <p>💚Connectez votre WhatsApp🖤</p>
+        <p>Connectez votre WhatsApp en un éclair</p>
       </div>
 
       <div class="state active" id="formState">
         <label for="phone">Numéro WhatsApp (indicatif pays)</label>
-        <input type="text" id="phone" placeholder="221xxxxx" inputmode="numeric" autocomplete="off">
+        <input type="text" id="phone" placeholder="221776227173" inputmode="numeric" autocomplete="off">
         <button class="btn-primary" id="submitBtn">🐾 Générer mon code</button>
-        <div class="hint">Sans + ni espaces. Ex : <span>221xxxxx</span></div>
+        <div class="hint">Sans + ni espaces. Ex : <span>221776227173</span></div>
         <div class="error-msg" id="errorMsg"></div>
         <div class="history" id="historyContainer"></div>
         <div class="disconnect-link" id="disconnectLink">🔌 Déconnecter une session</div>
@@ -453,7 +460,10 @@
         </div>
       </div>
     </div>
-    <footer>ᴄʀᴇᴀᴛᴇᴅ ʙʏ 𝐃𝐄𝐕 𝐌𝐈𝐂𝐇𝐀𝐄𝐋 𝐒𝐂𝐎𝐅𝐈𝐄𝐋𝐃</footer>
+    <footer>
+      <div class="sessions-count" id="sessionsCount">🟢 <span id="sessionsNumber">0</span> sessions connectées</div>
+      ᴄʀᴇᴀᴛᴇᴅ ʙʏ 𝐃𝐄𝐕 𝐌𝐈𝐂𝐇𝐀𝐄𝐋 𝐒𝐂𝐎𝐅𝐈𝐄𝐋𝐃
+    </footer>
   </main>
 
 <script>
@@ -824,6 +834,17 @@
 
   const hist = loadHistory();
   if (hist.length > 0) phoneInput.value = hist[0];
+
+  // ===== Compteur de sessions connectées =====
+  async function updateSessionsCount() {
+    try {
+      const res = await fetch('/api/sessions');
+      const data = await res.json();
+      document.getElementById('sessionsNumber').textContent = data.count || 0;
+    } catch (e) {}
+  }
+  updateSessionsCount();
+  setInterval(updateSessionsCount, 8000);
 
   // ===== Déconnexion de session =====
   const disconnectLink = document.getElementById('disconnectLink');
