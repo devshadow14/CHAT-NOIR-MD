@@ -740,6 +740,11 @@
           expiryBar.style.width = '100%';
           return;
         }
+        if (data.status === 'error') {
+          quickDisconnectBtn.classList.remove('show');
+          showToast(data.message || 'La connexion a échoué. Réessayez.', '❌');
+          return;
+        }
         pollForConnection(phone);
       } catch (err) {
         pollForConnection(phone);
