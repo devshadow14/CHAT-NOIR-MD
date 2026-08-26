@@ -3,890 +3,625 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CHAT NOIR-MD — Connexion WhatsApp</title>
+<title>PERFECT CORE N.C</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --neon: #39FF14;
-    --neon-dim: #1c7a0b;
-    --neon-glow: rgba(57,255,20,0.28);
-    --danger: #FF2965;
-    --text: #F2F2F2;
-    --text-secondary: #b8b8b8;
-    --muted: #7c7c7c;
-    --panel: rgba(8,8,8,0.72);
-    --panel-border: rgba(57,255,20,0.18);
-    --radius: 22px;
-    --mono: 'JetBrains Mono', monospace;
-    --display: 'Space Grotesk', sans-serif;
+  :root{
+    --void:      #050506;
+    --panel:     #0c0c0e;
+    --panel-2:   #101013;
+    --line:      #232327;
+    --chrome-1:  #f3f3f6;
+    --chrome-2:  #b9b9c2;
+    --chrome-3:  #6b6b74;
+    --green:     #33d873;
+    --green-dim: #123321;
+    --danger:    #e2564a;
+    --text:      #ece9e4;
+    --muted:     #86868f;
   }
 
-  * { box-sizing: border-box; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
 
-  html, body {
-    min-height: 100vh;
-    margin: 0;
+  body{
+    background:var(--void);
+    color:var(--text);
+    font-family:'Rajdhani', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
   }
 
-  body {
-    font-family: 'Inter', sans-serif;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    position: relative;
-    overflow-x: hidden;
+  ::selection{ background:var(--green); color:#04120a; }
+  a{ color:inherit; text-decoration:none; }
+  :focus-visible{ outline:2px solid var(--green); outline-offset:3px; border-radius:4px; }
 
-    /* Fond sombre uni (photo retirée) */
-    background: #030303;
-  }
+  .mono{ font-family:'JetBrains Mono', monospace; }
 
-  /* Halo néon discret par-dessus le fond */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
+  /* ---------------------------------- BACKDROP ---------------------------------- */
+  .backdrop{
+    position:fixed;
+    inset:0;
+    z-index:-1;
     background:
-      radial-gradient(circle at 15% 10%, rgba(57,255,20,0.10), transparent 45%),
-      radial-gradient(circle at 85% 90%, rgba(139,0,255,0.08), transparent 45%);
-    pointer-events: none;
-    z-index: 0;
+      radial-gradient(60% 40% at 50% 0%, rgba(51,216,115,0.06) 0%, transparent 60%),
+      radial-gradient(90% 60% at 50% 100%, rgba(255,255,255,0.03) 0%, transparent 55%),
+      var(--void);
+  }
+  .backdrop::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image: repeating-linear-gradient(115deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 46px);
   }
 
-  #cataclysm-canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
+  /* ---------------------------------- LAYOUT ---------------------------------- */
+  .wrap{
+    max-width:480px;
+    margin:0 auto;
+    padding:20px 20px 48px;
   }
 
-  /* ===== Bouton son (thème chat noir) ===== */
-  .sound-toggle {
-    position: fixed;
-    top: 18px;
-    right: 18px;
-    z-index: 30;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 0 0 rgba(57,255,20,0);
-    transition: box-shadow 0.25s ease, transform 0.15s ease, border-color 0.25s ease;
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:22px;
   }
-  .sound-toggle:hover { transform: scale(1.06); border-color: var(--neon-dim); }
-  .sound-toggle.on { box-shadow: 0 0 22px var(--neon-glow); }
-  .sound-toggle svg { width: 26px; height: 26px; }
-  /* silhouette de chat, yeux qui s'allument en néon si le son est actif */
-  .cat-eye { fill: #333; transition: fill 0.25s ease, filter 0.25s ease; }
-  .sound-toggle.on .cat-eye {
-    fill: var(--neon);
-    filter: drop-shadow(0 0 4px var(--neon));
+  .rune{
+    width:9px; height:9px;
+    background:var(--chrome-1);
+    clip-path:polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    box-shadow:0 0 8px 1px rgba(243,243,246,0.5);
   }
-  .cat-body { fill: #111; stroke: #2a2a2a; stroke-width: 1; }
+  .live-pill{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    border:1px solid var(--line);
+    background:var(--panel);
+    padding:5px 10px;
+    border-radius:100px;
+  }
+  .live-dot{
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 6px 2px rgba(51,216,115,0.6);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.45; transform:scale(0.7); } }
 
-  main {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 440px;
+  /* ---------------------------------- CREST ---------------------------------- */
+  .crest{
+    position:relative;
+    width:168px;
+    margin:6px auto 18px;
   }
-
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius);
-    padding: 30px 26px;
-    backdrop-filter: blur(14px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  .crest-glow{
+    position:absolute;
+    inset:-30px;
+    background:radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 68%);
+    z-index:-1;
+    filter:blur(2px);
   }
-
-  /* ===== En-tête avec photo de profil ===== */
-  .brand {
-    text-align: center;
-    margin-bottom: 26px;
-  }
-  .avatar {
-    width: 84px;
-    height: 84px;
-    border-radius: 50%;
-    margin: 0 auto 14px;
-    object-fit: cover;
-    border: 2px solid var(--neon);
-    box-shadow: 0 0 24px var(--neon-glow);
-    display: block;
-  }
-  .brand .eyebrow {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.22em;
-    color: var(--neon);
-    text-transform: uppercase;
-    opacity: 0.9;
-  }
-  .brand h1 {
-    font-family: var(--display);
-    font-size: 30px;
-    font-weight: 700;
-    margin: 6px 0 6px;
-    letter-spacing: -0.01em;
-  }
-  .brand p {
-    font-size: 13.5px;
-    color: var(--text-secondary);
-    margin: 0;
+  .crest img{
+    width:100%;
+    display:block;
+    border-radius:18px;
+    border:1px solid var(--line);
+    box-shadow:0 20px 50px -20px rgba(0,0,0,0.85);
   }
 
-  label {
-    display: block;
-    font-size: 11.5px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-family: var(--mono);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+  .wordmark{
+    text-align:center;
+    font-size:13.5px;
+    letter-spacing:0.02em;
+    line-height:1.5;
+    background:linear-gradient(180deg, var(--chrome-1) 10%, var(--chrome-3) 90%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    font-weight:600;
+    word-break:break-word;
+  }
+  .tagline{
+    text-align:center;
+    margin-top:6px;
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--muted);
   }
 
-  input[type="text"] {
-    width: 100%;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 14px 16px;
-    color: var(--text);
-    font-size: 16px;
-    font-family: var(--mono);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  /* ---------------------------------- STATS ---------------------------------- */
+  .stats{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:14px;
+    overflow:hidden;
+    margin:22px 0;
   }
-  input[type="text"]:focus { border-color: var(--neon-dim); box-shadow: 0 0 0 3px var(--neon-glow); }
-  input[type="text"]::placeholder { color: #666; }
+  .stat{ padding:13px 8px; text-align:center; border-right:1px solid var(--line); }
+  .stat:last-child{ border-right:none; }
+  .stat-num{ font-family:'JetBrains Mono', monospace; font-weight:700; font-size:18px; }
+  .stat-num.up{ color:var(--green); }
+  .stat-num.down{ color:var(--danger); }
+  .stat-num.cap{ color:var(--chrome-2); }
+  .stat-label{ margin-top:3px; font-size:9px; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; }
 
-  button.btn-primary {
-    width: 100%;
-    margin-top: 14px;
-    background: var(--neon);
-    color: #060606;
-    border: none;
-    border-radius: 12px;
-    padding: 15px;
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 15px;
-    cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.2s ease;
-  }
-  button.btn-primary:hover { box-shadow: 0 0 26px var(--neon-glow); }
-  button.btn-primary:active { transform: scale(0.98); }
-  button.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
-
-  .hint { font-size: 12px; color: var(--muted); margin-top: 10px; text-align: center; }
-  .hint span { color: var(--neon); }
-
-  .state { display: none; }
-  .state.active { display: block; animation: fadeUp 0.4s ease; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-  .loading-state { text-align: center; padding: 22px 0 8px; }
-  .dots { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; }
-  .dot { width: 10px; height: 10px; background: var(--neon); border-radius: 50%; animation: pulse 1.1s infinite ease-in-out; }
-  .dot:nth-child(2) { animation-delay: 0.15s; }
-  .dot:nth-child(3) { animation-delay: 0.3s; }
-  @keyframes pulse { 0%,100% { opacity: 0.25; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
-  .loading-state .label { font-family: var(--mono); font-size: 13px; color: var(--text-secondary); }
-  .loading-state .timer { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 6px; }
-
-  .code-display { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-  .code-label { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; }
-  .code-value {
-    position: relative;
-    font-family: var(--mono);
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: var(--neon);
-    text-shadow: 0 0 24px var(--neon-glow);
-    padding: 16px 20px;
-    border: 1px dashed var(--neon-dim);
-    border-radius: 14px;
-    background: rgba(57,255,20,0.05);
-    width: 100%;
-    text-align: center;
-  }
-  .expiry-bar { position: absolute; bottom: -1px; left: 0; height: 3px; background: var(--neon); border-radius: 0 0 14px 14px; transition: width 0.5s linear; }
-
-  .qr-container { background: #fff; padding: 10px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-  .qr-container canvas, .qr-container img { display: block; width: 130px !important; height: 130px !important; }
-
-  .action-row { display: flex; gap: 10px; width: 100%; }
-  .btn-secondary {
-    flex: 1;
-    background: transparent;
-    border: 1px solid var(--panel-border);
-    color: var(--text);
-    border-radius: 10px;
-    padding: 11px;
-    font-family: var(--mono);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-secondary:hover { border-color: var(--neon-dim); background: rgba(57,255,20,0.06); }
-
-  .steps { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--panel-border); text-align: left; width: 100%; }
-  .steps ol { margin: 0; padding-left: 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.9; }
-  .steps ol li::marker { color: var(--neon); }
-
-  .history { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--panel-border); display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-  .pill { background: rgba(0,0,0,0.5); border: 1px solid var(--panel-border); border-radius: 40px; padding: 4px 12px; font-family: var(--mono); font-size: 11px; color: var(--text-secondary); cursor: pointer; }
-  .pill:hover { border-color: var(--neon-dim); color: var(--neon); }
-
-  .error-msg { display: none; font-size: 13px; color: var(--danger); margin-top: 12px; font-family: var(--mono); text-align: center; }
-
-  .disconnect-link {
-    text-align: center;
-    margin-top: 16px;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: #b98cff;
-    cursor: pointer;
-    letter-spacing: 0.03em;
-    animation: blinkLink 1.4s infinite ease-in-out;
-  }
-  .disconnect-link:hover { color: #d9b8ff; animation-play-state: paused; }
-  @keyframes blinkLink {
-    0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(139,0,255,0.6); }
-    50% { opacity: 0.35; text-shadow: none; }
-  }
-  .disconnect-box {
-    display: none;
-    margin-top: 10px;
-    gap: 8px;
-    flex-direction: column;
-  }
-  .disconnect-box.open { display: flex; }
-  .disconnect-box input {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(139,0,255,0.25);
-    border-radius: 10px;
-    padding: 11px 14px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 14px;
-    outline: none;
-  }
-  .disconnect-box .btn-secondary {
-    border-color: rgba(139,0,255,0.3);
-    color: #d9b8ff;
-  }
-  .disconnect-box .btn-secondary:hover { background: rgba(139,0,255,0.1); border-color: #8b00ff; }
-
-  .connected-badge {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: #7fffb0;
-    background: rgba(57,255,20,0.08);
-    border: 1px solid rgba(57,255,20,0.25);
-    border-radius: 40px;
-    padding: 7px 16px;
-  }
-  .connected-badge.show { display: flex; }
-  .badge-dot {
-    width: 8px; height: 8px;
-    background: #39FF14;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #39FF14;
-    animation: badgePulse 1.6s infinite ease-in-out;
-  }
-  @keyframes badgePulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
-
-  .btn-danger {
-    display: none;
-    width: 100%;
-    margin-top: 6px;
-    background: transparent;
-    border: 1px solid rgba(255,41,101,0.35);
-    color: var(--danger);
-    border-radius: 10px;
-    padding: 12px;
-    font-family: var(--mono);
-    font-size: 12.5px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-danger.show { display: block; }
-  .btn-danger:hover { background: rgba(255,41,101,0.08); border-color: var(--danger); }
-  .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* Traînée de pattes de chat au clic */
-  .paw {
-    position: fixed;
-    z-index: 100;
-    pointer-events: none;
-    font-size: 18px;
-    animation: pawFade 0.9s ease forwards;
-  }
-  @keyframes pawFade {
-    0% { opacity: 0.9; transform: scale(0.6) rotate(0deg); }
-    100% { opacity: 0; transform: scale(1.3) rotate(25deg) translateY(-18px); }
+  /* ---------------------------------- PANEL ---------------------------------- */
+  .panel{
+    background:linear-gradient(180deg, var(--panel-2), var(--panel));
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px;
   }
 
-  .toast {
-    position: fixed;
-    bottom: 26px;
-    left: 50%;
-    transform: translateX(-50%) translateY(70px);
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 13px 22px;
-    font-size: 13.5px;
-    color: var(--text);
-    backdrop-filter: blur(12px);
-    opacity: 0;
-    transition: all 0.35s ease;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
+  .method-switch{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    background:var(--void);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:4px;
+    gap:4px;
+    margin-bottom:16px;
   }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .method-btn{
+    appearance:none;
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-family:'Rajdhani', sans-serif;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.04em;
+    padding:9px 0;
+    border-radius:9px;
+    cursor:pointer;
+    transition:all 0.2s ease;
+  }
+  .method-btn.active{
+    background:linear-gradient(180deg, var(--chrome-1), var(--chrome-2));
+    color:#0a0a0b;
+  }
 
-  footer { text-align: center; margin-top: 22px; font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.05em; opacity: 0.7; }
-  .sessions-count {
-    font-size: 11.5px;
-    color: #7fffb0;
-    margin-bottom: 8px;
-    letter-spacing: 0.04em;
+  .field-row{ display:flex; gap:8px; }
+  .input-shell{
+    flex:1;
+    display:flex;
+    align-items:center;
+    background:var(--void);
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:0 12px;
+    transition:border-color 0.2s ease;
   }
-  .sessions-count span { font-weight: 700; }
+  .input-shell:focus-within{ border-color:var(--green); }
+  .input-shell span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color:var(--muted);
+    padding-right:7px;
+    border-right:1px solid var(--line);
+    margin-right:7px;
+  }
+  input[type="tel"]{
+    flex:1;
+    background:transparent;
+    border:none;
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:14px;
+    padding:13px 0;
+  }
+  input[type="tel"]::placeholder{ color:#4a4a52; }
+  input[type="tel"]:focus{ outline:none; }
 
-  @media (max-width: 480px) {
-    .card { padding: 24px 18px; }
-    .brand h1 { font-size: 25px; }
-    .code-value { font-size: 26px; }
+  .btn{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    font-family:'Rajdhani', sans-serif;
+    font-weight:700;
+    letter-spacing:0.04em;
+    font-size:13.5px;
+    border-radius:11px;
+    transition:transform 0.15s ease, opacity 0.2s ease;
   }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; } }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{
+    padding:0 20px;
+    background:linear-gradient(180deg, var(--chrome-1), var(--chrome-2));
+    color:#0a0a0b;
+    white-space:nowrap;
+    display:flex;
+    align-items:center;
+    gap:7px;
+  }
+  .btn-primary:disabled{ opacity:0.5; cursor:not-allowed; }
+  .btn-primary .spin{
+    width:13px; height:13px;
+    border-radius:50%;
+    border:2px solid rgba(10,10,11,0.3);
+    border-top-color:#0a0a0b;
+    animation:spin 0.7s linear infinite;
+    display:none;
+  }
+  .btn-primary.loading .spin{ display:inline-block; }
+  .btn-primary.loading .btn-txt{ display:none; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .btn-block{ width:100%; padding:13px 0; text-align:center; margin-top:14px; }
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--muted);
+  }
+  .btn-danger{
+    background:transparent;
+    border:1px solid rgba(226,86,74,0.3);
+    color:var(--danger);
+  }
+
+  .error-msg{ margin-top:9px; font-size:12px; color:var(--danger); display:none; }
+  .error-msg.show{ display:block; }
+
+  /* ---------------------------------- RESULT ---------------------------------- */
+  .result{ margin-top:18px; display:none; text-align:center; }
+  .result.show{ display:block; animation:fadein 0.4s ease both; }
+  @keyframes fadein{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:translateY(0);} }
+
+  .code-core{
+    background:var(--void);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+  }
+  .code-value{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:24px;
+    letter-spacing:0.08em;
+    color:var(--green);
+  }
+  .copy-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin-top:10px;
+  }
+  .copy-btn{
+    appearance:none;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--muted);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:6px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    letter-spacing:0.05em;
+  }
+  .copy-btn:hover{ border-color:var(--chrome-2); color:var(--chrome-1); }
+
+  .qr-box{
+    background:#fff;
+    border-radius:14px;
+    padding:14px;
+    display:inline-block;
+  }
+  .qr-box img{ width:190px; height:190px; display:block; }
+
+  .hint{ margin-top:12px; font-size:11.5px; color:var(--muted); line-height:1.5; }
+
+  .connected-badge{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    color:var(--green);
+    font-weight:700;
+    font-size:15px;
+  }
+  .connected-num{ margin-top:4px; color:var(--muted); font-family:'JetBrains Mono', monospace; font-size:12px; }
+
+  /* ---------------------------------- ACTIONS ---------------------------------- */
+  .actions{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+  .action-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 14px;
+    border-radius:13px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    transition:border-color 0.2s ease;
+  }
+  .action-card:hover{ border-color:var(--chrome-3); }
+  .action-icon{
+    flex-shrink:0;
+    width:32px; height:32px;
+    border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--void);
+    color:var(--chrome-2);
+  }
+  .action-icon svg{ width:16px; height:16px; }
+  .action-text{ font-size:13px; font-weight:600; }
+  .action-arrow{ margin-left:auto; color:var(--muted); font-size:14px; }
+
+  footer{
+    text-align:center;
+    margin-top:30px;
+    font-size:10px;
+    letter-spacing:0.08em;
+    color:var(--chrome-3);
+  }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation-duration:0.01ms !important; } }
 </style>
 </head>
 <body>
 
-  <canvas id="cataclysm-canvas"></canvas>
+<div class="backdrop"></div>
 
-  <!-- Bouton son, silhouette de chat noir avec yeux néon -->
-  <div class="sound-toggle on" id="soundToggle" role="button" tabindex="0" aria-label="Activer/couper le son">
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-      <path class="cat-body" d="M32 8 L14 2 L18 20 C10 26 6 36 8 46 C10 56 20 62 32 62 C44 62 54 56 56 46 C58 36 54 26 46 20 L50 2 Z"/>
-      <ellipse class="cat-eye" id="eyeL" cx="23" cy="34" rx="4.2" ry="6"/>
-      <ellipse class="cat-eye" id="eyeR" cx="41" cy="34" rx="4.2" ry="6"/>
-    </svg>
+<div class="wrap">
+  <div class="topbar">
+    <div class="rune"></div>
+    <div class="live-pill"><span class="live-dot"></span><span id="pillStatus">EN LIGNE</span></div>
   </div>
 
-  <div class="toast" id="toast">
-    <span id="toastIcon">✅</span>
-    <span id="toastMessage">Code copié !</span>
+  <div class="crest">
+    <div class="crest-glow"></div>
+    <img src="pc-logo.jpg" alt="PERFECT CORE N.C">
   </div>
 
-  <main>
-    <div class="card">
-      <div class="brand">
-        <img class="avatar" src="https://files.catbox.moe/3cvx9z.jpg" alt="CHAT NOIR-MD">
-        <div class="eyebrow">✦ Pairing Portal</div>
-        <h1>CHAT NOIR-MD</h1>
-        <p>Connectez votre WhatsApp en un éclair</p>
-      </div>
+  <div class="wordmark">꙳◄─©ᬼ⃟ ☠︎︎ 𖠿 𝙋𝙀𝙍𝙁𝙀𝘾𝙏 ⨯ 𝘾𝙊𝙍𝙀 ᴺ.ᶜ 𖣔⃟ ⚔︎ ᬼ⃟─►꙳꙳</div>
+  <div class="tagline">The way of Spinjitzu</div>
 
-      <div class="state active" id="formState">
-        <label for="phone">Numéro WhatsApp (indicatif pays)</label>
-        <input type="text" id="phone" placeholder="221776227173" inputmode="numeric" autocomplete="off">
-        <button class="btn-primary" id="submitBtn">🐾 Générer mon code</button>
-        <div class="hint">Sans + ni espaces. Ex : <span>221776227173</span></div>
-        <div class="error-msg" id="errorMsg"></div>
-        <div class="history" id="historyContainer"></div>
-        <div class="disconnect-link" id="disconnectLink">🔌 Déconnecter une session</div>
-        <div class="disconnect-box" id="disconnectBox">
-          <input type="text" id="disconnectPhone" placeholder="Numéro à déconnecter" inputmode="numeric" autocomplete="off">
-          <button class="btn-secondary" id="disconnectBtn">Déconnecter</button>
-        </div>
-      </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num up" id="statConnected">—</div><div class="stat-label">Actives</div></div>
+    <div class="stat"><div class="stat-num down" id="statDisconnected">—</div><div class="stat-label">Off</div></div>
+    <div class="stat"><div class="stat-num cap" id="statCapacity">/1500</div><div class="stat-label">Capacité</div></div>
+  </div>
 
-      <div class="state" id="loadingState">
-        <div class="loading-state">
-          <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <div class="label">Génération du code en cours…</div>
-          <div class="timer" id="timerDisplay">⏱ 0s</div>
-        </div>
-      </div>
-
-      <div class="state" id="codeState">
-        <div class="code-display">
-          <div class="code-label">🔑 Votre code de jumelage</div>
-          <div class="code-value" id="codeValue">
-            <span id="codeText">----</span>
-            <div class="expiry-bar" id="expiryBar" style="width:100%"></div>
-          </div>
-          <div class="qr-container" id="qrContainer"></div>
-
-          <div class="connected-badge" id="connectedBadge">
-            <span class="badge-dot"></span> WhatsApp connecté
-          </div>
-
-          <div class="action-row">
-            <button class="btn-secondary" id="copyBtn">📋 Copier</button>
-            <button class="btn-secondary" id="refreshBtn">🔄 Nouveau code</button>
-          </div>
-          <button class="btn-danger" id="quickDisconnectBtn">🔌 Déconnecter cette session</button>
-
-          <div class="steps">
-            <ol>
-              <li>Ouvrez WhatsApp → Paramètres</li>
-              <li>Appareils liés → Lier un appareil</li>
-              <li>Lier avec un numéro de téléphone</li>
-              <li>Entrez le code ou scannez le QR</li>
-            </ol>
-          </div>
-        </div>
-      </div>
+  <div class="panel">
+    <div class="method-switch">
+      <button class="method-btn active" id="tabCode" type="button">Code</button>
+      <button class="method-btn" id="tabQr" type="button">QR</button>
     </div>
-    <footer>
-      <div class="sessions-count" id="sessionsCount">🟢 <span id="sessionsNumber">0</span> sessions connectées</div>
-      ᴄʀᴇᴀᴛᴇᴅ ʙʏ 𝐃𝐄𝐕 𝐌𝐈𝐂𝐇𝐀𝐄𝐋 𝐒𝐂𝐎𝐅𝐈𝐄𝐋𝐃
-    </footer>
-  </main>
+
+    <form id="codeForm">
+      <div class="field-row">
+        <div class="input-shell">
+          <span>+</span>
+          <input type="tel" id="phone" inputmode="numeric" placeholder="228 96 98 54 31" autocomplete="tel">
+        </div>
+        <button class="btn btn-primary" type="submit" id="pairBtn">
+          <span class="spin"></span>
+          <span class="btn-txt">Connecter</span>
+        </button>
+      </div>
+      <p class="error-msg" id="errorMsg"></p>
+    </form>
+
+    <div id="qrTrigger" style="display:none;">
+      <button class="btn btn-primary btn-block" id="qrBtn" type="button">
+        <span class="spin"></span>
+        <span class="btn-txt">Générer le QR</span>
+      </button>
+      <p class="error-msg" id="errorMsgQr"></p>
+    </div>
+
+    <div class="result" id="resultCode">
+      <div class="code-core">
+        <div class="code-value mono" id="codeValue">— — — —</div>
+        <div class="copy-row">
+          <button class="copy-btn" id="copyBtn">COPIER</button>
+        </div>
+      </div>
+      <p class="hint" id="codeHint">WhatsApp → Appareils connectés → Connecter un appareil → Utiliser le numéro de téléphone</p>
+    </div>
+
+    <div class="result" id="resultQr">
+      <div class="qr-box"><img id="qrImage" src="" alt="QR code"></div>
+      <p class="hint">WhatsApp → Appareils connectés → Connecter un appareil → Scanner ce QR</p>
+    </div>
+
+    <div class="result" id="resultConnected">
+      <div class="connected-badge">✔ Connecté</div>
+      <div class="connected-num mono" id="connectedNumber"></div>
+      <button class="btn btn-danger btn-block" id="delpairBtn" type="button">Déconnecter</button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <a class="action-card" href="https://chat.whatsapp.com/GBPPBayh9oACu5HXkEFX8C?s=cl&p=a&ilr=1" target="_blank" rel="noopener">
+      <div class="action-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3C7.03 3 3 6.86 3 11.6c0 2.2.87 4.2 2.3 5.72L4.5 21l3.9-1.3A9.9 9.9 0 0 0 12 20.2c4.97 0 9-3.86 9-8.6S16.97 3 12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+      <div class="action-text">Support</div>
+      <span class="action-arrow">↗</span>
+    </a>
+    <a class="action-card" href="https://wa.me/22896985431" target="_blank" rel="noopener">
+      <div class="action-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20c1.6-3.6 4.7-5.5 8-5.5S18.4 16.4 20 20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="action-text">Créateur</div>
+      <span class="action-arrow">↗</span>
+    </a>
+  </div>
+
+  <footer>PERFECT CORE N.C · v1.0</footer>
+</div>
 
 <script>
-  // ===== Effet "Cataclysme" (façon pouvoir de Chat Noir : craquelures noires/violettes) =====
-  (function cataclysm() {
-    const canvas = document.getElementById('cataclysm-canvas');
-    const ctx = canvas.getContext('2d');
-    let width, height;
-    let cracks = [];
+  const tabCode = document.getElementById('tabCode');
+  const tabQr = document.getElementById('tabQr');
+  const codeForm = document.getElementById('codeForm');
+  const qrTrigger = document.getElementById('qrTrigger');
+  const resultCode = document.getElementById('resultCode');
+  const resultQr = document.getElementById('resultQr');
+  const resultConnected = document.getElementById('resultConnected');
+  const errorMsg = document.getElementById('errorMsg');
+  const errorMsgQr = document.getElementById('errorMsgQr');
+  const pairBtn = document.getElementById('pairBtn');
+  const qrBtn = document.getElementById('qrBtn');
+  const phoneInput = document.getElementById('phone');
+  const codeValue = document.getElementById('codeValue');
+  const qrImage = document.getElementById('qrImage');
+  const copyBtn = document.getElementById('copyBtn');
+  const delpairBtn = document.getElementById('delpairBtn');
+  const connectedNumber = document.getElementById('connectedNumber');
 
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+  let mode = 'code';
+  let statusPoll = null;
 
-    function spawnCrack() {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const branches = [];
-      let angle = Math.random() * Math.PI * 2;
-      let cx = x, cy = y;
-      const segments = 10 + Math.floor(Math.random() * 10);
-      for (let i = 0; i < segments; i++) {
-        angle += (Math.random() - 0.5) * 1.1;
-        const len = 8 + Math.random() * 14;
-        const nx = cx + Math.cos(angle) * len;
-        const ny = cy + Math.sin(angle) * len;
-        branches.push({ x1: cx, y1: cy, x2: nx, y2: ny });
-        cx = nx; cy = ny;
-      }
-      cracks.push({ branches, life: 1, decay: 0.004 + Math.random() * 0.003 });
-    }
-
-    let frame = 0;
-    function draw() {
-      frame++;
-      ctx.clearRect(0, 0, width, height);
-
-      if (frame % 90 === 0 && cracks.length < 6) spawnCrack();
-
-      cracks = cracks.filter(c => c.life > 0);
-      cracks.forEach(c => {
-        c.life -= c.decay;
-        const alpha = Math.max(0, c.life);
-        c.branches.forEach(b => {
-          ctx.beginPath();
-          ctx.moveTo(b.x1, b.y1);
-          ctx.lineTo(b.x2, b.y2);
-          const grad = ctx.createLinearGradient(b.x1, b.y1, b.x2, b.y2);
-          grad.addColorStop(0, `rgba(139,0,255,${alpha * 0.55})`);
-          grad.addColorStop(1, `rgba(10,10,10,${alpha * 0.85})`);
-          ctx.strokeStyle = grad;
-          ctx.lineWidth = 1.6;
-          ctx.shadowColor = `rgba(139,0,255,${alpha * 0.5})`;
-          ctx.shadowBlur = 6;
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-        });
-      });
-
-      requestAnimationFrame(draw);
-    }
-    draw();
-  })();
-
-  // ===== Bouton son (thème chat noir) =====
-  let soundOn = localStorage.getItem('soundOn') !== 'false';
-  const soundToggle = document.getElementById('soundToggle');
-  function applySoundState() {
-    soundToggle.classList.toggle('on', soundOn);
+  function setMode(m) {
+    mode = m;
+    tabCode.classList.toggle('active', m === 'code');
+    tabQr.classList.toggle('active', m === 'qr');
+    codeForm.style.display = m === 'code' ? '' : 'none';
+    qrTrigger.style.display = m === 'qr' ? '' : 'none';
+    resultCode.classList.remove('show');
+    resultQr.classList.remove('show');
   }
-  applySoundState();
-  soundToggle.addEventListener('click', () => {
-    soundOn = !soundOn;
-    localStorage.setItem('soundOn', soundOn);
-    applySoundState();
-  });
+  tabCode.addEventListener('click', () => setMode('code'));
+  tabQr.addEventListener('click', () => setMode('qr'));
 
-  function playBeep() {
-    if (!soundOn) return;
+  function stopPolling() { if (statusPoll) { clearInterval(statusPoll); statusPoll = null; } }
+
+  function showConnected(number) {
+    stopPolling();
+    resultCode.classList.remove('show');
+    resultQr.classList.remove('show');
+    resultConnected.classList.add('show');
+    connectedNumber.textContent = number || '';
+  }
+
+  async function loadStats() {
     try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.frequency.value = 880;
-      osc.type = 'sine';
-      gain.gain.value = 0.08;
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.15);
+      const res = await fetch('/api/stats');
+      const data = await res.json();
+      document.getElementById('statConnected').textContent = data.connected;
+      document.getElementById('statDisconnected').textContent = data.disconnected;
+      document.getElementById('statCapacity').textContent = '/' + data.capacity;
     } catch (e) {}
   }
+  loadStats();
+  setInterval(loadStats, 15000);
 
-  // ===== Éléments =====
-  const phoneInput = document.getElementById('phone');
-  const submitBtn = document.getElementById('submitBtn');
-  const formState = document.getElementById('formState');
-  const loadingState = document.getElementById('loadingState');
-  const codeState = document.getElementById('codeState');
-  const codeText = document.getElementById('codeText');
-  const errorMsg = document.getElementById('errorMsg');
-  const copyBtn = document.getElementById('copyBtn');
-  const refreshBtn = document.getElementById('refreshBtn');
-  const timerDisplay = document.getElementById('timerDisplay');
-  const expiryBar = document.getElementById('expiryBar');
-  const qrContainer = document.getElementById('qrContainer');
-  const historyContainer = document.getElementById('historyContainer');
-  const toast = document.getElementById('toast');
-  const toastMessage = document.getElementById('toastMessage');
-  const toastIcon = document.getElementById('toastIcon');
-  const connectedBadge = document.getElementById('connectedBadge');
-  const quickDisconnectBtn = document.getElementById('quickDisconnectBtn');
-
-  let currentPhone = '';
-  let pollTimeout = null;
-  let timerInterval = null;
-  let expiryInterval = null;
-  let qrInstance = null;
-
-  function loadHistory() {
-    try { return JSON.parse(localStorage.getItem('phoneHistory')) || []; } catch { return []; }
+  async function checkInitialStatus() {
+    try {
+      const res = await fetch('/api/status');
+      const data = await res.json();
+      if (data.status === 'connected') showConnected(data.number);
+    } catch (e) {}
   }
-  function saveHistory(phone) {
-    let hist = loadHistory().filter(p => p !== phone);
-    hist.unshift(phone);
-    if (hist.length > 5) hist.pop();
-    localStorage.setItem('phoneHistory', JSON.stringify(hist));
-    renderHistory();
-  }
-  function renderHistory() {
-    const hist = loadHistory();
-    historyContainer.innerHTML = '';
-    historyContainer.style.display = hist.length ? 'flex' : 'none';
-    hist.forEach(p => {
-      const pill = document.createElement('span');
-      pill.className = 'pill';
-      pill.textContent = p;
-      pill.addEventListener('click', () => { phoneInput.value = p; submitBtn.click(); });
-      historyContainer.appendChild(pill);
-    });
-  }
-  renderHistory();
+  checkInitialStatus();
 
-  function showToast(msg, icon = '✅') {
-    toastMessage.textContent = msg;
-    toastIcon.textContent = icon;
-    toast.classList.add('show');
-    clearTimeout(toast._hide);
-    toast._hide = setTimeout(() => toast.classList.remove('show'), 3000);
+  function pollStatus() {
+    stopPolling();
+    statusPoll = setInterval(async () => {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        if (data.status === 'connected') {
+          showConnected(data.number);
+          loadStats();
+        } else if (mode === 'qr' && data.qrDataUrl) {
+          qrImage.src = data.qrDataUrl;
+        }
+      } catch (e) {}
+    }, 3000);
   }
 
-  function showState(id) {
-    [formState, loadingState, codeState].forEach(el => el.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-
-  function resetTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = null;
-    timerDisplay.textContent = '⏱ 0s';
-  }
-  function startTimer() {
-    const t0 = Date.now();
-    timerInterval = setInterval(() => {
-      timerDisplay.textContent = `⏱ ${Math.floor((Date.now() - t0) / 1000)}s`;
-    }, 1000);
-  }
-
-  function startExpiry() {
-    let remaining = 60;
-    expiryBar.style.width = '100%';
-    if (expiryInterval) clearInterval(expiryInterval);
-    expiryInterval = setInterval(() => {
-      remaining--;
-      expiryBar.style.width = `${Math.max(0, (remaining / 60) * 100)}%`;
-      if (remaining <= 0) {
-        clearInterval(expiryInterval);
-        expiryInterval = null;
-        showToast('Le code a expiré, générez-en un nouveau.', '⏳');
-      }
-    }, 1000);
-  }
-
-  async function generateCode(phone) {
-    currentPhone = phone;
-    saveHistory(phone);
-    showState('loadingState');
-    resetTimer(); startTimer();
-    errorMsg.style.display = 'none';
-    submitBtn.disabled = true;
-
+  codeForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    errorMsg.classList.remove('show');
+    const number = phoneInput.value.replace(/[^0-9]/g, '');
+    if (number.length < 8) {
+      errorMsg.textContent = "Numéro invalide.";
+      errorMsg.classList.add('show');
+      return;
+    }
+    pairBtn.classList.add('loading');
+    pairBtn.disabled = true;
     try {
       const res = await fetch('/api/pair', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: phone })
+        body: JSON.stringify({ number, method: 'code' })
       });
       const data = await res.json();
-      if (!data.success) throw new Error(data.message || 'Erreur serveur');
-      pollForCode(phone);
-    } catch (err) {
-      showState('formState');
-      submitBtn.disabled = false;
-      resetTimer();
-      errorMsg.textContent = err.message || 'Impossible de contacter le serveur.';
-      errorMsg.style.display = 'block';
-      showToast('Erreur : ' + err.message, '❌');
-    }
-  }
-
-  function pollForCode(phone, attempt = 0) {
-    const MAX_ATTEMPTS = 25;
-    if (attempt >= MAX_ATTEMPTS) {
-      showState('formState');
-      submitBtn.disabled = false;
-      resetTimer();
-      errorMsg.textContent = 'Délai dépassé. Réessayez.';
-      errorMsg.style.display = 'block';
-      showToast('Temps écoulé, réessayez.', '⏰');
-      return;
-    }
-
-    if (pollTimeout) clearTimeout(pollTimeout);
-    pollTimeout = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/code?phoneNumber=${phone}`);
-        const data = await res.json();
-
-        if (data.status === 'ready' || data.status === 'connected') {
-          showState('codeState');
-          submitBtn.disabled = false;
-          resetTimer();
-          codeText.textContent = data.code;
-
-          if (!qrInstance) {
-            qrInstance = new QRCode(qrContainer, {
-              text: data.code, width: 130, height: 130,
-              colorDark: '#000000', colorLight: '#ffffff',
-              correctLevel: QRCode.CorrectLevel.H
-            });
-            playBeep();
-            showToast('Code généré avec succès !', '🎉');
-            navigator.clipboard.writeText(data.code).then(() => {
-              showToast('Code copié automatiquement 📋', '📋');
-            }).catch(() => {});
-            startExpiry();
-          }
-
-          quickDisconnectBtn.classList.add('show');
-
-          if (data.status === 'connected') {
-            connectedBadge.classList.add('show');
-            if (expiryInterval) { clearInterval(expiryInterval); expiryInterval = null; }
-            expiryBar.style.width = '100%';
-            return; // connecté : on arrête le polling
-          }
-
-          // status 'ready' mais pas encore connecté : on surveille la connexion séparément (sans limite de tentatives)
-          pollForConnection(phone);
-          return;
-        }
-
-        if (data.status === 'error') throw new Error(data.message || 'Erreur de génération');
-        pollForCode(phone, attempt + 1);
-      } catch (err) {
-        pollForCode(phone, attempt + 1);
+      if (!res.ok) {
+        errorMsg.textContent = data.error || "Échec.";
+        errorMsg.classList.add('show');
+      } else if (data.alreadyConnected) {
+        showConnected(data.number);
+      } else {
+        codeValue.textContent = data.code;
+        resultCode.classList.add('show');
+        pollStatus();
       }
-    }, 2000);
-  }
-
-  let connectionPollTimeout = null;
-  function pollForConnection(phone) {
-    if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
-    connectionPollTimeout = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/code?phoneNumber=${phone}`);
-        const data = await res.json();
-        if (data.status === 'connected') {
-          connectedBadge.classList.add('show');
-          if (expiryInterval) { clearInterval(expiryInterval); expiryInterval = null; }
-          expiryBar.style.width = '100%';
-          return;
-        }
-        if (data.status === 'error') {
-          quickDisconnectBtn.classList.remove('show');
-          showToast(data.message || 'La connexion a échoué. Réessayez.', '❌');
-          return;
-        }
-        pollForConnection(phone);
-      } catch (err) {
-        pollForConnection(phone);
-      }
-    }, 3000);
-  }
-
-  submitBtn.addEventListener('click', () => {
-    const phone = phoneInput.value.replace(/[^0-9]/g, '');
-    errorMsg.style.display = 'none';
-    if (!phone || phone.length < 8) {
-      errorMsg.textContent = 'Numéro invalide (indicatif + numéro).';
-      errorMsg.style.display = 'block';
-      return;
+    } catch (e) {
+      errorMsg.textContent = "Serveur injoignable.";
+      errorMsg.classList.add('show');
     }
-    generateCode(phone);
+    pairBtn.classList.remove('loading');
+    pairBtn.disabled = false;
   });
 
-  phoneInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitBtn.click(); });
+  qrBtn.addEventListener('click', async () => {
+    errorMsgQr.classList.remove('show');
+    qrBtn.classList.add('loading');
+    qrBtn.disabled = true;
+    try {
+      const res = await fetch('/api/pair', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: 'qr' })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        errorMsgQr.textContent = data.error || "Échec.";
+        errorMsgQr.classList.add('show');
+      } else if (data.alreadyConnected) {
+        showConnected(data.number);
+      } else {
+        resultQr.classList.add('show');
+        pollStatus();
+      }
+    } catch (e) {
+      errorMsgQr.textContent = "Serveur injoignable.";
+      errorMsgQr.classList.add('show');
+    }
+    qrBtn.classList.remove('loading');
+    qrBtn.disabled = false;
+  });
 
   copyBtn.addEventListener('click', () => {
-    const code = codeText.textContent;
-    navigator.clipboard.writeText(code).then(() => showToast('Code copié !', '📋'))
-      .catch(() => {
-        const ta = document.createElement('textarea');
-        ta.value = code; document.body.appendChild(ta); ta.select();
-        document.execCommand('copy'); ta.remove();
-        showToast('Code copié !', '📋');
-      });
+    navigator.clipboard.writeText(codeValue.textContent.replace(/\s/g, '')).then(() => {
+      copyBtn.textContent = 'COPIÉ ✓';
+      setTimeout(() => { copyBtn.textContent = 'COPIER'; }, 1500);
+    });
   });
 
-  quickDisconnectBtn.addEventListener('click', async () => {
-    if (!currentPhone) return;
-    quickDisconnectBtn.disabled = true;
-    quickDisconnectBtn.textContent = 'Déconnexion…';
+  delpairBtn.addEventListener('click', async () => {
+    delpairBtn.disabled = true;
     try {
-      const res = await fetch(`/api/session?phoneNumber=${currentPhone}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        showToast('Session déconnectée.', '🔌');
-        if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
-        refreshBtn.click();
-      } else {
-        showToast(data.message || 'Erreur lors de la déconnexion.', '⚠️');
-      }
-    } catch (err) {
-      showToast('Impossible de contacter le serveur.', '❌');
-    } finally {
-      quickDisconnectBtn.disabled = false;
-      quickDisconnectBtn.textContent = '🔌 Déconnecter cette session';
-    }
-  });
-
-  refreshBtn.addEventListener('click', () => {
-    if (pollTimeout) clearTimeout(pollTimeout);
-    if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
-    if (expiryInterval) clearInterval(expiryInterval);
-    resetTimer();
-    showState('formState');
-    if (qrInstance) { qrContainer.innerHTML = ''; qrInstance = null; }
-    submitBtn.disabled = false;
-    connectedBadge.classList.remove('show');
-    quickDisconnectBtn.classList.remove('show');
-    phoneInput.value = currentPhone;
-  });
-
-  // ===== Décoration : traînée de pattes de chat au clic =====
-  document.addEventListener('click', (e) => {
-    const paw = document.createElement('div');
-    paw.className = 'paw';
-    paw.textContent = '🐾';
-    paw.style.left = `${e.clientX - 9}px`;
-    paw.style.top = `${e.clientY - 9}px`;
-    document.body.appendChild(paw);
-    setTimeout(() => paw.remove(), 900);
-  });
-
-  const hist = loadHistory();
-  if (hist.length > 0) phoneInput.value = hist[0];
-
-  // ===== Compteur de sessions connectées =====
-  async function updateSessionsCount() {
-    try {
-      const res = await fetch('/api/sessions');
-      const data = await res.json();
-      document.getElementById('sessionsNumber').textContent = data.count || 0;
+      await fetch('/api/delpair', { method: 'POST' });
     } catch (e) {}
-  }
-  updateSessionsCount();
-  setInterval(updateSessionsCount, 8000);
-
-  // ===== Déconnexion de session =====
-  const disconnectLink = document.getElementById('disconnectLink');
-  const disconnectBox = document.getElementById('disconnectBox');
-  const disconnectPhone = document.getElementById('disconnectPhone');
-  const disconnectBtn = document.getElementById('disconnectBtn');
-
-  disconnectLink.addEventListener('click', () => {
-    disconnectBox.classList.toggle('open');
-  });
-
-  disconnectBtn.addEventListener('click', async () => {
-    const phone = disconnectPhone.value.replace(/[^0-9]/g, '');
-    if (!phone || phone.length < 8) {
-      showToast('Numéro invalide.', '❌');
-      return;
-    }
-    disconnectBtn.disabled = true;
-    disconnectBtn.textContent = 'Déconnexion…';
-    try {
-      const res = await fetch(`/api/session?phoneNumber=${phone}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        showToast('Session déconnectée.', '🔌');
-        disconnectPhone.value = '';
-        disconnectBox.classList.remove('open');
-      } else {
-        showToast(data.message || 'Aucune session active pour ce numéro.', '⚠️');
-      }
-    } catch (err) {
-      showToast('Impossible de contacter le serveur.', '❌');
-    } finally {
-      disconnectBtn.disabled = false;
-      disconnectBtn.textContent = 'Déconnecter';
-    }
-  });
-
-  window.addEventListener('beforeunload', () => {
-    if (pollTimeout) clearTimeout(pollTimeout);
-    if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
-    if (expiryInterval) clearInterval(expiryInterval);
-    if (timerInterval) clearInterval(timerInterval);
+    resultConnected.classList.remove('show');
+    setMode('code');
+    loadStats();
+    delpairBtn.disabled = false;
   });
 </script>
 </body>
