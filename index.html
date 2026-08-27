@@ -39,12 +39,9 @@
     padding: 24px;
     position: relative;
     overflow-x: hidden;
-
-    /* Fond sombre uni (photo retirée) */
     background: #030303;
   }
 
-  /* Halo néon discret par-dessus le fond */
   body::before {
     content: '';
     position: fixed;
@@ -63,7 +60,6 @@
     pointer-events: none;
   }
 
-  /* ===== Bouton son (thème chat noir) ===== */
   .sound-toggle {
     position: fixed;
     top: 18px;
@@ -85,7 +81,6 @@
   .sound-toggle:hover { transform: scale(1.06); border-color: var(--neon-dim); }
   .sound-toggle.on { box-shadow: 0 0 22px var(--neon-glow); }
   .sound-toggle svg { width: 26px; height: 26px; }
-  /* silhouette de chat, yeux qui s'allument en néon si le son est actif */
   .cat-eye { fill: #333; transition: fill 0.25s ease, filter 0.25s ease; }
   .sound-toggle.on .cat-eye {
     fill: var(--neon);
@@ -109,7 +104,6 @@
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
   }
 
-  /* ===== En-tête avec photo de profil ===== */
   .brand {
     text-align: center;
     margin-bottom: 26px;
@@ -329,7 +323,6 @@
   .btn-danger:hover { background: rgba(255,41,101,0.08); border-color: var(--danger); }
   .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* Traînée de pattes de chat au clic */
   .paw {
     position: fixed;
     z-index: 100;
@@ -385,7 +378,6 @@
 
   <canvas id="cataclysm-canvas"></canvas>
 
-  <!-- Bouton son, silhouette de chat noir avec yeux néon -->
   <div class="sound-toggle on" id="soundToggle" role="button" tabindex="0" aria-label="Activer/couper le son">
     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
       <path class="cat-body" d="M32 8 L14 2 L18 20 C10 26 6 36 8 46 C10 56 20 62 32 62 C44 62 54 56 56 46 C58 36 54 26 46 20 L50 2 Z"/>
@@ -409,6 +401,8 @@
       </div>
 
       <div class="state active" id="formState">
+        <label for="panelId">ID de panel</label>
+        <input type="text" id="panelId" placeholder="Votre ID de panel" autocomplete="off">
         <label for="phone">Numéro WhatsApp (indicatif pays)</label>
         <input type="text" id="phone" placeholder="221776227173" inputmode="numeric" autocomplete="off">
         <button class="btn-primary" id="submitBtn">🐾 Générer mon code</button>
@@ -467,7 +461,6 @@
   </main>
 
 <script>
-  // ===== Effet "Cataclysme" (façon pouvoir de Chat Noir : craquelures noires/violettes) =====
   (function cataclysm() {
     const canvas = document.getElementById('cataclysm-canvas');
     const ctx = canvas.getContext('2d');
@@ -531,7 +524,6 @@
     draw();
   })();
 
-  // ===== Bouton son (thème chat noir) =====
   let soundOn = localStorage.getItem('soundOn') !== 'false';
   const soundToggle = document.getElementById('soundToggle');
   function applySoundState() {
@@ -561,6 +553,7 @@
   }
 
   // ===== Éléments =====
+  const panelIdInput = document.getElementById('panelId');
   const phoneInput = document.getElementById('phone');
   const submitBtn = document.getElementById('submitBtn');
   const formState = document.getElementById('formState');
@@ -585,6 +578,17 @@
   let timerInterval = null;
   let expiryInterval = null;
   let qrInstance = null;
+
+  // ID de panel : mémorisé localement pour ne pas le retaper à chaque fois
+  const savedPanelId = localStorage.getItem('panelId');
+  if (savedPanelId) panelIdInput.value = savedPanelId;
+  panelIdInput.addEventListener('change', () => {
+    localStorage.setItem('panelId', panelIdInput.value.trim());
+  });
+
+  function panelHeaders(extra = {}) {
+    return Object.assign({ 'x-panel-id': panelIdInput.value.trim() }, extra);
+  }
 
   function loadHistory() {
     try { return JSON.parse(localStorage.getItem('phoneHistory')) || []; } catch { return []; }
@@ -661,7 +665,7 @@
     try {
       const res = await fetch('/api/pair', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: panelHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ phoneNumber: phone })
       });
       const data = await res.json();
@@ -692,7 +696,7 @@
     if (pollTimeout) clearTimeout(pollTimeout);
     pollTimeout = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/code?phoneNumber=${phone}`);
+        const res = await fetch(`/api/code?phoneNumber=${phone}`, { headers: panelHeaders() });
         const data = await res.json();
 
         if (data.status === 'ready' || data.status === 'connected') {
@@ -721,10 +725,9 @@
             connectedBadge.classList.add('show');
             if (expiryInterval) { clearInterval(expiryInterval); expiryInterval = null; }
             expiryBar.style.width = '100%';
-            return; // connecté : on arrête le polling
+            return;
           }
 
-          // status 'ready' mais pas encore connecté : on surveille la connexion séparément (sans limite de tentatives)
           pollForConnection(phone);
           return;
         }
@@ -742,7 +745,7 @@
     if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
     connectionPollTimeout = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/code?phoneNumber=${phone}`);
+        const res = await fetch(`/api/code?phoneNumber=${phone}`, { headers: panelHeaders() });
         const data = await res.json();
         if (data.status === 'connected') {
           connectedBadge.classList.add('show');
@@ -763,13 +766,21 @@
   }
 
   submitBtn.addEventListener('click', () => {
+    const panelId = panelIdInput.value.trim();
     const phone = phoneInput.value.replace(/[^0-9]/g, '');
     errorMsg.style.display = 'none';
+
+    if (!panelId) {
+      errorMsg.textContent = 'ID de panel requis.';
+      errorMsg.style.display = 'block';
+      return;
+    }
     if (!phone || phone.length < 8) {
       errorMsg.textContent = 'Numéro invalide (indicatif + numéro).';
       errorMsg.style.display = 'block';
       return;
     }
+    localStorage.setItem('panelId', panelId);
     generateCode(phone);
   });
 
@@ -791,7 +802,7 @@
     quickDisconnectBtn.disabled = true;
     quickDisconnectBtn.textContent = 'Déconnexion…';
     try {
-      const res = await fetch(`/api/session?phoneNumber=${currentPhone}`, { method: 'DELETE' });
+      const res = await fetch(`/api/session?phoneNumber=${currentPhone}`, { method: 'DELETE', headers: panelHeaders() });
       const data = await res.json();
       if (data.success) {
         showToast('Session déconnectée.', '🔌');
@@ -821,7 +832,6 @@
     phoneInput.value = currentPhone;
   });
 
-  // ===== Décoration : traînée de pattes de chat au clic =====
   document.addEventListener('click', (e) => {
     const paw = document.createElement('div');
     paw.className = 'paw';
@@ -835,7 +845,6 @@
   const hist = loadHistory();
   if (hist.length > 0) phoneInput.value = hist[0];
 
-  // ===== Compteur de sessions connectées =====
   async function updateSessionsCount() {
     try {
       const res = await fetch('/api/sessions');
@@ -846,7 +855,6 @@
   updateSessionsCount();
   setInterval(updateSessionsCount, 8000);
 
-  // ===== Déconnexion de session =====
   const disconnectLink = document.getElementById('disconnectLink');
   const disconnectBox = document.getElementById('disconnectBox');
   const disconnectPhone = document.getElementById('disconnectPhone');
@@ -865,7 +873,7 @@
     disconnectBtn.disabled = true;
     disconnectBtn.textContent = 'Déconnexion…';
     try {
-      const res = await fetch(`/api/session?phoneNumber=${phone}`, { method: 'DELETE' });
+      const res = await fetch(`/api/session?phoneNumber=${phone}`, { method: 'DELETE', headers: panelHeaders() });
       const data = await res.json();
       if (data.success) {
         showToast('Session déconnectée.', '🔌');
