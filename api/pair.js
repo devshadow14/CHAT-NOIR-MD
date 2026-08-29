@@ -4,8 +4,8 @@
 
 const http = require('http');
 
-const KATABUMP_HOST = '51.75.118.151';
-const KATABUMP_PORT = 20269;
+const KATABUMP_HOST = '51.75.118.149';
+const KATABUMP_PORT = 20224;
 
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') {
