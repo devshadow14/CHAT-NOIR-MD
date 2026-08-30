@@ -1,893 +1,377 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CHAT NOIR-MD — Connexion WhatsApp</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<style>
-  :root {
-    --neon: #39FF14;
-    --neon-dim: #1c7a0b;
-    --neon-glow: rgba(57,255,20,0.28);
-    --danger: #FF2965;
-    --text: #F2F2F2;
-    --text-secondary: #b8b8b8;
-    --muted: #7c7c7c;
-    --panel: rgba(8,8,8,0.72);
-    --panel-border: rgba(57,255,20,0.18);
-    --radius: 22px;
-    --mono: 'JetBrains Mono', monospace;
-    --display: 'Space Grotesk', sans-serif;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 𝐏𝐀𝐈𝐑 𝐂𝐎𝐃𝐄</title>
+    <link rel="icon" type="jpg" href="https://files.catbox.moe/nzc6xk.jpg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary-color: #000000;
+      --secondary-color: #ffffff;
+      --accent-color: #f0f0f0;
+      --text-color: #000000;
+      --background-color: #252A35;
+      --hover-color: #f5f5f5;
+      --border-color: rgba(0, 0, 0, 0.1);
+    }
 
-  * { box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  html, body {
-    min-height: 100vh;
-    margin: 0;
-  }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
 
-  body {
-    font-family: 'Inter', sans-serif;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    position: relative;
-    overflow-x: hidden;
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: var(--background-color);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 8px 16px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border-color);
+    }
 
-    /* Fond sombre uni (photo retirée) */
-    background: #030303;
-  }
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
 
-  /* Halo néon discret par-dessus le fond */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(circle at 15% 10%, rgba(57,255,20,0.10), transparent 45%),
-      radial-gradient(circle at 85% 90%, rgba(139,0,255,0.08), transparent 45%);
-    pointer-events: none;
-    z-index: 0;
-  }
+    .logo {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 16px;
+      background: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
 
-  #cataclysm-canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: white;
+    }
 
-  /* ===== Bouton son (thème chat noir) ===== */
-  .sound-toggle {
-    position: fixed;
-    top: 18px;
-    right: 18px;
-    z-index: 30;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 0 0 rgba(57,255,20,0);
-    transition: box-shadow 0.25s ease, transform 0.15s ease, border-color 0.25s ease;
-  }
-  .sound-toggle:hover { transform: scale(1.06); border-color: var(--neon-dim); }
-  .sound-toggle.on { box-shadow: 0 0 22px var(--neon-glow); }
-  .sound-toggle svg { width: 26px; height: 26px; }
-  /* silhouette de chat, yeux qui s'allument en néon si le son est actif */
-  .cat-eye { fill: #333; transition: fill 0.25s ease, filter 0.25s ease; }
-  .sound-toggle.on .cat-eye {
-    fill: var(--neon);
-    filter: drop-shadow(0 0 4px var(--neon));
-  }
-  .cat-body { fill: #111; stroke: #2a2a2a; stroke-width: 1; }
+    .subtitle {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.7);
+      margin-bottom: 20px;
+      color: white;
+    }
 
-  main {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 440px;
-  }
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
 
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius);
-    padding: 30px 26px;
-    backdrop-filter: blur(14px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
+    .social-icons a {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
 
-  /* ===== En-tête avec photo de profil ===== */
-  .brand {
-    text-align: center;
-    margin-bottom: 26px;
-  }
-  .avatar {
-    width: 84px;
-    height: 84px;
-    border-radius: 50%;
-    margin: 0 auto 14px;
-    object-fit: cover;
-    border: 2px solid var(--neon);
-    box-shadow: 0 0 24px var(--neon-glow);
-    display: block;
-  }
-  .brand .eyebrow {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.22em;
-    color: var(--neon);
-    text-transform: uppercase;
-    opacity: 0.9;
-  }
-  .brand h1 {
-    font-family: var(--display);
-    font-size: 30px;
-    font-weight: 700;
-    margin: 6px 0 6px;
-    letter-spacing: -0.01em;
-  }
-  .brand p {
-    font-size: 13.5px;
-    color: var(--text-secondary);
-    margin: 0;
-  }
+    .social-icons a.youtube { background: #FF0000; }
+    .social-icons a.telegram { background: #0088cc; }
+    .social-icons a.whatsapp { background: #0cfa10; }
+    .social-icons a.github { background: #333; }
 
-  label {
-    display: block;
-    font-size: 11.5px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-family: var(--mono);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
+    .social-icons a:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
 
-  input[type="text"] {
-    width: 100%;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 14px 16px;
-    color: var(--text);
-    font-size: 16px;
-    font-family: var(--mono);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  input[type="text"]:focus { border-color: var(--neon-dim); box-shadow: 0 0 0 3px var(--neon-glow); }
-  input[type="text"]::placeholder { color: #666; }
+    .input-group {
+      margin-bottom: 20px;
+    }
 
-  button.btn-primary {
-    width: 100%;
-    margin-top: 14px;
-    background: var(--neon);
-    color: #060606;
-    border: none;
-    border-radius: 12px;
-    padding: 15px;
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 15px;
-    cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.2s ease;
-  }
-  button.btn-primary:hover { box-shadow: 0 0 26px var(--neon-glow); }
-  button.btn-primary:active { transform: scale(0.98); }
-  button.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+    .input-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 13px;
+      color: white;
+    }
 
-  .hint { font-size: 12px; color: var(--muted); margin-top: 10px; text-align: center; }
-  .hint span { color: var(--neon); }
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--background-color);
+      color: var(--text-color);
+      font-size: 15px;
+    }
 
-  .state { display: none; }
-  .state.active { display: block; animation: fadeUp 0.4s ease; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .input-field:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    }
 
-  .loading-state { text-align: center; padding: 22px 0 8px; }
-  .dots { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; }
-  .dot { width: 10px; height: 10px; background: var(--neon); border-radius: 50%; animation: pulse 1.1s infinite ease-in-out; }
-  .dot:nth-child(2) { animation-delay: 0.15s; }
-  .dot:nth-child(3) { animation-delay: 0.3s; }
-  @keyframes pulse { 0%,100% { opacity: 0.25; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
-  .loading-state .label { font-family: var(--mono); font-size: 13px; color: var(--text-secondary); }
-  .loading-state .timer { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .generate-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary-color);
+      border: none;
+      border-radius: 12px;
+      color: var(--secondary-color);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 16px;
+    }
 
-  .code-display { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-  .code-label { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; }
-  .code-value {
-    position: relative;
-    font-family: var(--mono);
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: var(--neon);
-    text-shadow: 0 0 24px var(--neon-glow);
-    padding: 16px 20px;
-    border: 1px dashed var(--neon-dim);
-    border-radius: 14px;
-    background: rgba(57,255,20,0.05);
-    width: 100%;
-    text-align: center;
-  }
-  .expiry-bar { position: absolute; bottom: -1px; left: 0; height: 3px; background: var(--neon); border-radius: 0 0 14px 14px; transition: width 0.5s linear; }
+    .generate-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
 
-  .qr-container { background: #fff; padding: 10px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-  .qr-container canvas, .qr-container img { display: block; width: 130px !important; height: 130px !important; }
+    .code-display {
+      background: #002E39;
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--border-color);
+    }
 
-  .action-row { display: flex; gap: 10px; width: 100%; }
-  .btn-secondary {
-    flex: 1;
-    background: transparent;
-    border: 1px solid var(--panel-border);
-    color: var(--text);
-    border-radius: 10px;
-    padding: 11px;
-    font-family: var(--mono);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-secondary:hover { border-color: var(--neon-dim); background: rgba(57,255,20,0.06); }
+    .copy-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--hover-color);
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none; /* caché par défaut */
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
-  .steps { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--panel-border); text-align: left; width: 100%; }
-  .steps ol { margin: 0; padding-left: 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.9; }
-  .steps ol li::marker { color: var(--neon); }
+    .copy-btn:hover {
+      background: var(--background-color);
+      border-color: var(--primary-color);
+    }
 
-  .history { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--panel-border); display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-  .pill { background: rgba(0,0,0,0.5); border: 1px solid var(--panel-border); border-radius: 40px; padding: 4px 12px; font-family: var(--mono); font-size: 11px; color: var(--text-secondary); cursor: pointer; }
-  .pill:hover { border-color: var(--neon-dim); color: var(--neon); }
+    .success-message {
+      color: #000aff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 16px;
+    }
 
-  .error-msg { display: none; font-size: 13px; color: var(--danger); margin-top: 12px; font-family: var(--mono); text-align: center; }
+    .error-message {
+      color: #e74c3c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+    }
 
-  .disconnect-link {
-    text-align: center;
-    margin-top: 16px;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: #b98cff;
-    cursor: pointer;
-    letter-spacing: 0.03em;
-    animation: blinkLink 1.4s infinite ease-in-out;
-  }
-  .disconnect-link:hover { color: #d9b8ff; animation-play-state: paused; }
-  @keyframes blinkLink {
-    0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(139,0,255,0.6); }
-    50% { opacity: 0.35; text-shadow: none; }
-  }
-  .disconnect-box {
-    display: none;
-    margin-top: 10px;
-    gap: 8px;
-    flex-direction: column;
-  }
-  .disconnect-box.open { display: flex; }
-  .disconnect-box input {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(139,0,255,0.25);
-    border-radius: 10px;
-    padding: 11px 14px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 14px;
-    outline: none;
-  }
-  .disconnect-box .btn-secondary {
-    border-color: rgba(139,0,255,0.3);
-    color: #d9b8ff;
-  }
-  .disconnect-box .btn-secondary:hover { background: rgba(139,0,255,0.1); border-color: #8b00ff; }
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 16px 0;
+    }
 
-  .connected-badge {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: #7fffb0;
-    background: rgba(57,255,20,0.08);
-    border: 1px solid rgba(57,255,20,0.25);
-    border-radius: 40px;
-    padding: 7px 16px;
-  }
-  .connected-badge.show { display: flex; }
-  .badge-dot {
-    width: 8px; height: 8px;
-    background: #39FF14;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #39FF14;
-    animation: badgePulse 1.6s infinite ease-in-out;
-  }
-  @keyframes badgePulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .loading i {
+      font-size: 24px;
+      color: var(--primary-color);
+      animation: spin 1s linear infinite;
+    }
 
-  .btn-danger {
-    display: none;
-    width: 100%;
-    margin-top: 6px;
-    background: transparent;
-    border: 1px solid rgba(255,41,101,0.35);
-    color: var(--danger);
-    border-radius: 10px;
-    padding: 12px;
-    font-family: var(--mono);
-    font-size: 12.5px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-danger.show { display: block; }
-  .btn-danger:hover { background: rgba(255,41,101,0.08); border-color: var(--danger); }
-  .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-  /* Traînée de pattes de chat au clic */
-  .paw {
-    position: fixed;
-    z-index: 100;
-    pointer-events: none;
-    font-size: 18px;
-    animation: pawFade 0.9s ease forwards;
-  }
-  @keyframes pawFade {
-    0% { opacity: 0.9; transform: scale(0.6) rotate(0deg); }
-    100% { opacity: 0; transform: scale(1.3) rotate(25deg) translateY(-18px); }
-  }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: white;
+    }
 
-  .toast {
-    position: fixed;
-    bottom: 26px;
-    left: 50%;
-    transform: translateX(-50%) translateY(70px);
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 13px 22px;
-    font-size: 13.5px;
-    color: var(--text);
-    backdrop-filter: blur(12px);
-    opacity: 0;
-    transition: all 0.35s ease;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    /* Toast styles */
+    #toast {
+      display: none;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #000aff;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    }
 
-  footer { text-align: center; margin-top: 22px; font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.05em; opacity: 0.7; }
-  .sessions-count {
-    font-size: 11.5px;
-    color: #7fffb0;
-    margin-bottom: 8px;
-    letter-spacing: 0.04em;
-  }
-  .sessions-count span { font-weight: 700; }
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+        border-radius: 12px;
+      }
 
-  @media (max-width: 480px) {
-    .card { padding: 24px 18px; }
-    .brand h1 { font-size: 25px; }
-    .code-value { font-size: 26px; }
-  }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; } }
-</style>
+      .code-display {
+        font-size: 16px;
+        min-height: 50px;
+      }
+    }
+  </style>
 </head>
 <body>
-
-  <canvas id="cataclysm-canvas"></canvas>
-
-  <!-- Bouton son, silhouette de chat noir avec yeux néon -->
-  <div class="sound-toggle on" id="soundToggle" role="button" tabindex="0" aria-label="Activer/couper le son">
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-      <path class="cat-body" d="M32 8 L14 2 L18 20 C10 26 6 36 8 46 C10 56 20 62 32 62 C44 62 54 56 56 46 C58 36 54 26 46 20 L50 2 Z"/>
-      <ellipse class="cat-eye" id="eyeL" cx="23" cy="34" rx="4.2" ry="6"/>
-      <ellipse class="cat-eye" id="eyeR" cx="41" cy="34" rx="4.2" ry="6"/>
-    </svg>
-  </div>
-
-  <div class="toast" id="toast">
-    <span id="toastIcon">✅</span>
-    <span id="toastMessage">Code copié !</span>
-  </div>
-
-  <main>
-    <div class="card">
-      <div class="brand">
-        <img class="avatar" src="https://files.catbox.moe/3cvx9z.jpg" alt="CHAT NOIR-MD">
-        <div class="eyebrow">✦ Pairing Portal</div>
-        <h1>CHAT NOIR-MD</h1>
-        <p>Connectez votre WhatsApp en un éclair</p>
-      </div>
-
-      <div class="state active" id="formState">
-        <label for="phone">Numéro WhatsApp (indicatif pays)</label>
-        <input type="text" id="phone" placeholder="221776227173" inputmode="numeric" autocomplete="off">
-        <button class="btn-primary" id="submitBtn">🐾 Générer mon code</button>
-        <div class="hint">Sans + ni espaces. Ex : <span>221776227173</span></div>
-        <div class="error-msg" id="errorMsg"></div>
-        <div class="history" id="historyContainer"></div>
-        <div class="disconnect-link" id="disconnectLink">🔌 Déconnecter une session</div>
-        <div class="disconnect-box" id="disconnectBox">
-          <input type="text" id="disconnectPhone" placeholder="Numéro à déconnecter" inputmode="numeric" autocomplete="off">
-          <button class="btn-secondary" id="disconnectBtn">Déconnecter</button>
-        </div>
-      </div>
-
-      <div class="state" id="loadingState">
-        <div class="loading-state">
-          <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <div class="label">Génération du code en cours…</div>
-          <div class="timer" id="timerDisplay">⏱ 0s</div>
-        </div>
-      </div>
-
-      <div class="state" id="codeState">
-        <div class="code-display">
-          <div class="code-label">🔑 Votre code de jumelage</div>
-          <div class="code-value" id="codeValue">
-            <span id="codeText">----</span>
-            <div class="expiry-bar" id="expiryBar" style="width:100%"></div>
-          </div>
-          <div class="qr-container" id="qrContainer"></div>
-
-          <div class="connected-badge" id="connectedBadge">
-            <span class="badge-dot"></span> WhatsApp connecté
-          </div>
-
-          <div class="action-row">
-            <button class="btn-secondary" id="copyBtn">📋 Copier</button>
-            <button class="btn-secondary" id="refreshBtn">🔄 Nouveau code</button>
-          </div>
-          <button class="btn-danger" id="quickDisconnectBtn">🔌 Déconnecter cette session</button>
-
-          <div class="steps">
-            <ol>
-              <li>Ouvrez WhatsApp → Paramètres</li>
-              <li>Appareils liés → Lier un appareil</li>
-              <li>Lier avec un numéro de téléphone</li>
-              <li>Entrez le code ou scannez le QR</li>
-            </ol>
-          </div>
-        </div>
+  <div class="container">
+    <div class="header">
+      <div class="logo"><i class="fas fa-robot"></i></div>
+      <h1 class="title">𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃</h1>
+      <p class="subtitle">ɢᴇɴᴇʀᴀᴛᴇ ʏᴏᴜʀ ᴡʜᴀᴛsᴀᴘᴘ ᴘᴀɪʀ ᴄᴏᴅᴇ</p>
+      <div class="social-icons">
+        <a href="https://www.youtube.com/@dybytech00" target="_blank" class="youtube"><i class="fab fa-youtube"></i></a>
+        <a href="https://t.me/egdyby_tech" target="_blank" class="telegram"><i class="fab fa-telegram-plane"></i></a>
+        <a href="https://whatsapp.com/channel/0029VbAdcIXJP216dKW1253g" target="_blank" class="whatsapp"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://github.com/DybyTech/MEGALODON-MD" target="_blank" class="github"><i class="fab fa-github"></i></a>
       </div>
     </div>
-    <footer>
-      <div class="sessions-count" id="sessionsCount">🟢 <span id="sessionsNumber">0</span> sessions connectées</div>
-      ᴄʀᴇᴀᴛᴇᴅ ʙʏ 𝐃𝐄𝐕 𝐌𝐈𝐂𝐇𝐀𝐄𝐋 𝐒𝐂𝐎𝐅𝐈𝐄𝐋𝐃
-    </footer>
-  </main>
 
-<script>
-  // ===== Effet "Cataclysme" (façon pouvoir de Chat Noir : craquelures noires/violettes) =====
-  (function cataclysm() {
-    const canvas = document.getElementById('cataclysm-canvas');
-    const ctx = canvas.getContext('2d');
-    let width, height;
-    let cracks = [];
+    <div class="input-group">
+      <label class="input-label">ᴇɴᴛᴇʀ ʏᴏᴜʀ ᴡʜᴀᴛsᴀᴘᴘ ɴᴜᴍʙᴇʀ ᴡɪᴛʜ ᴄᴏᴜɴᴛʀʏ ᴄᴏᴅᴇ</label>
+      <input type="tel" id="mobileNumber" class="input-field" placeholder="EX ; 509XXXXXX" pattern="[+][0-9]{10,}" title="Please enter country code starting with + followed by number">
+    </div>
 
-    function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+    <button class="generate-btn" id="submit">
+      <i class="fas fa-key"></i> ɢᴇɴᴇʀᴀᴛᴇ ᴘᴀɪʀ ᴄᴏᴅᴇ
+    </button>
 
-    function spawnCrack() {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const branches = [];
-      let angle = Math.random() * Math.PI * 2;
-      let cx = x, cy = y;
-      const segments = 10 + Math.floor(Math.random() * 10);
-      for (let i = 0; i < segments; i++) {
-        angle += (Math.random() - 0.5) * 1.1;
-        const len = 8 + Math.random() * 14;
-        const nx = cx + Math.cos(angle) * len;
-        const ny = cy + Math.sin(angle) * len;
-        branches.push({ x1: cx, y1: cy, x2: nx, y2: ny });
-        cx = nx; cy = ny;
+    <div class="loading" id="loading">
+      <i class="fas fa-spinner"></i>
+    </div>
+
+    <div class="code-display" id="codeDisplay">
+      ʏᴏᴜʀ ᴘᴀɪʀ ᴄᴏᴅᴇ will ᴀᴘᴘᴇᴀʀ ʜᴇʀᴇ
+    </div>
+
+    <button class="copy-btn" id="copy" onclick="copyCode()">
+      <i class="fas fa-copy"></i> ᴄᴏᴘʏ ᴄᴏᴅᴇ
+    </button>
+
+    <div class="footer">
+      <p>© 2024 𝐃𝐘𝐁𝐘 𝐓𝐄𝐂𝐇 | 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃</p>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast">ᴄᴏᴅᴇ ᴄᴏᴘɪᴇᴅ ᴛᴏ ᴄʟɪᴘʙᴏᴀʀᴅ!</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+  <script>
+    document.getElementById("submit").addEventListener("click", async (e) => {
+      e.preventDefault();
+      const mobileNumberInput = document.getElementById("mobileNumber");
+      const codeDisplay = document.getElementById("codeDisplay");
+      const loadingSpinner = document.getElementById("loading");
+
+      const mobileNumber = mobileNumberInput.value.trim();
+      if (!mobileNumber) {
+        codeDisplay.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Please enter your WhatsApp number</div>';
+        document.getElementById("copy").style.display = "none";
+        return;
       }
-      cracks.push({ branches, life: 1, decay: 0.004 + Math.random() * 0.003 });
-    }
 
-    let frame = 0;
-    function draw() {
-      frame++;
-      ctx.clearRect(0, 0, width, height);
+      loadingSpinner.style.display = "block";
+      codeDisplay.innerHTML = '';
+      document.getElementById("copy").style.display = "none";
 
-      if (frame % 90 === 0 && cracks.length < 6) spawnCrack();
-
-      cracks = cracks.filter(c => c.life > 0);
-      cracks.forEach(c => {
-        c.life -= c.decay;
-        const alpha = Math.max(0, c.life);
-        c.branches.forEach(b => {
-          ctx.beginPath();
-          ctx.moveTo(b.x1, b.y1);
-          ctx.lineTo(b.x2, b.y2);
-          const grad = ctx.createLinearGradient(b.x1, b.y1, b.x2, b.y2);
-          grad.addColorStop(0, `rgba(139,0,255,${alpha * 0.55})`);
-          grad.addColorStop(1, `rgba(10,10,10,${alpha * 0.85})`);
-          ctx.strokeStyle = grad;
-          ctx.lineWidth = 1.6;
-          ctx.shadowColor = `rgba(139,0,255,${alpha * 0.5})`;
-          ctx.shadowBlur = 6;
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-        });
-      });
-
-      requestAnimationFrame(draw);
-    }
-    draw();
-  })();
-
-  // ===== Bouton son (thème chat noir) =====
-  let soundOn = localStorage.getItem('soundOn') !== 'false';
-  const soundToggle = document.getElementById('soundToggle');
-  function applySoundState() {
-    soundToggle.classList.toggle('on', soundOn);
-  }
-  applySoundState();
-  soundToggle.addEventListener('click', () => {
-    soundOn = !soundOn;
-    localStorage.setItem('soundOn', soundOn);
-    applySoundState();
-  });
-
-  function playBeep() {
-    if (!soundOn) return;
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.frequency.value = 880;
-      osc.type = 'sine';
-      gain.gain.value = 0.08;
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.15);
-    } catch (e) {}
-  }
-
-  // ===== Éléments =====
-  const phoneInput = document.getElementById('phone');
-  const submitBtn = document.getElementById('submitBtn');
-  const formState = document.getElementById('formState');
-  const loadingState = document.getElementById('loadingState');
-  const codeState = document.getElementById('codeState');
-  const codeText = document.getElementById('codeText');
-  const errorMsg = document.getElementById('errorMsg');
-  const copyBtn = document.getElementById('copyBtn');
-  const refreshBtn = document.getElementById('refreshBtn');
-  const timerDisplay = document.getElementById('timerDisplay');
-  const expiryBar = document.getElementById('expiryBar');
-  const qrContainer = document.getElementById('qrContainer');
-  const historyContainer = document.getElementById('historyContainer');
-  const toast = document.getElementById('toast');
-  const toastMessage = document.getElementById('toastMessage');
-  const toastIcon = document.getElementById('toastIcon');
-  const connectedBadge = document.getElementById('connectedBadge');
-  const quickDisconnectBtn = document.getElementById('quickDisconnectBtn');
-
-  let currentPhone = '';
-  let pollTimeout = null;
-  let timerInterval = null;
-  let expiryInterval = null;
-  let qrInstance = null;
-
-  function loadHistory() {
-    try { return JSON.parse(localStorage.getItem('phoneHistory')) || []; } catch { return []; }
-  }
-  function saveHistory(phone) {
-    let hist = loadHistory().filter(p => p !== phone);
-    hist.unshift(phone);
-    if (hist.length > 5) hist.pop();
-    localStorage.setItem('phoneHistory', JSON.stringify(hist));
-    renderHistory();
-  }
-  function renderHistory() {
-    const hist = loadHistory();
-    historyContainer.innerHTML = '';
-    historyContainer.style.display = hist.length ? 'flex' : 'none';
-    hist.forEach(p => {
-      const pill = document.createElement('span');
-      pill.className = 'pill';
-      pill.textContent = p;
-      pill.addEventListener('click', () => { phoneInput.value = p; submitBtn.click(); });
-      historyContainer.appendChild(pill);
+      try {
+        const response = await axios(`/code?number=${mobileNumber.replace(/[^0-9]/g, "")}`);
+        const code = response.data.code || "Service Unavailable";
+        if (code === "Service Unavailable") {
+          codeDisplay.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Service Unavailable</div>';
+        } else {
+          codeDisplay.innerHTML = `<div class="success-message"><i class="fas fa-check-circle"></i> CODE: ${code}</div>`;
+          document.getElementById("copy").style.display = "flex";
+        }
+      } catch (error) {
+        console.error("Error generating code:", error);
+        codeDisplay.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-circle"></i> Error generating code. Please try again.</div>';
+      } finally {
+        loadingSpinner.style.display = "none";
+      }
     });
-  }
-  renderHistory();
 
-  function showToast(msg, icon = '✅') {
-    toastMessage.textContent = msg;
-    toastIcon.textContent = icon;
-    toast.classList.add('show');
-    clearTimeout(toast._hide);
-    toast._hide = setTimeout(() => toast.classList.remove('show'), 3000);
-  }
+    function copyCode() {
+      const codeDisplay = document.getElementById("codeDisplay").innerText;
+      const code = codeDisplay.replace('CODE: ', '');
+      const copyBtn = document.getElementById("copy");
 
-  function showState(id) {
-    [formState, loadingState, codeState].forEach(el => el.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
+      navigator.clipboard.writeText(code).then(() => {
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        copyBtn.disabled = true;
+        copyBtn.style.opacity = "0.6";
+        copyBtn.style.cursor = "not-allowed";
 
-  function resetTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = null;
-    timerDisplay.textContent = '⏱ 0s';
-  }
-  function startTimer() {
-    const t0 = Date.now();
-    timerInterval = setInterval(() => {
-      timerDisplay.textContent = `⏱ ${Math.floor((Date.now() - t0) / 1000)}s`;
-    }, 1000);
-  }
+        const toast = document.getElementById("toast");
+        toast.style.display = "block";
+        toast.style.opacity = "1";
 
-  function startExpiry() {
-    let remaining = 60;
-    expiryBar.style.width = '100%';
-    if (expiryInterval) clearInterval(expiryInterval);
-    expiryInterval = setInterval(() => {
-      remaining--;
-      expiryBar.style.width = `${Math.max(0, (remaining / 60) * 100)}%`;
-      if (remaining <= 0) {
-        clearInterval(expiryInterval);
-        expiryInterval = null;
-        showToast('Le code a expiré, générez-en un nouveau.', '⏳');
-      }
-    }, 1000);
-  }
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+          copyBtn.disabled = false;
+          copyBtn.style.opacity = "1";
+          copyBtn.style.cursor = "pointer";
 
-  async function generateCode(phone) {
-    currentPhone = phone;
-    saveHistory(phone);
-    showState('loadingState');
-    resetTimer(); startTimer();
-    errorMsg.style.display = 'none';
-    submitBtn.disabled = true;
-
-    try {
-      const res = await fetch('/api/pair', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: phone })
+          toast.style.opacity = "0";
+          setTimeout(() => {
+            toast.style.display = "none";
+          }, 300);
+        }, 2000);
+      }).catch(err => {
+        console.error("Failed to copy text: ", err);
       });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message || 'Erreur serveur');
-      pollForCode(phone);
-    } catch (err) {
-      showState('formState');
-      submitBtn.disabled = false;
-      resetTimer();
-      errorMsg.textContent = err.message || 'Impossible de contacter le serveur.';
-      errorMsg.style.display = 'block';
-      showToast('Erreur : ' + err.message, '❌');
     }
-  }
-
-  function pollForCode(phone, attempt = 0) {
-    const MAX_ATTEMPTS = 25;
-    if (attempt >= MAX_ATTEMPTS) {
-      showState('formState');
-      submitBtn.disabled = false;
-      resetTimer();
-      errorMsg.textContent = 'Délai dépassé. Réessayez.';
-      errorMsg.style.display = 'block';
-      showToast('Temps écoulé, réessayez.', '⏰');
-      return;
-    }
-
-    if (pollTimeout) clearTimeout(pollTimeout);
-    pollTimeout = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/code?phoneNumber=${phone}`);
-        const data = await res.json();
-
-        if (data.status === 'ready' || data.status === 'connected') {
-          showState('codeState');
-          submitBtn.disabled = false;
-          resetTimer();
-          codeText.textContent = data.code;
-
-          if (!qrInstance) {
-            qrInstance = new QRCode(qrContainer, {
-              text: data.code, width: 130, height: 130,
-              colorDark: '#000000', colorLight: '#ffffff',
-              correctLevel: QRCode.CorrectLevel.H
-            });
-            playBeep();
-            showToast('Code généré avec succès !', '🎉');
-            navigator.clipboard.writeText(data.code).then(() => {
-              showToast('Code copié automatiquement 📋', '📋');
-            }).catch(() => {});
-            startExpiry();
-          }
-
-          quickDisconnectBtn.classList.add('show');
-
-          if (data.status === 'connected') {
-            connectedBadge.classList.add('show');
-            if (expiryInterval) { clearInterval(expiryInterval); expiryInterval = null; }
-            expiryBar.style.width = '100%';
-            return; // connecté : on arrête le polling
-          }
-
-          // status 'ready' mais pas encore connecté : on surveille la connexion séparément (sans limite de tentatives)
-          pollForConnection(phone);
-          return;
-        }
-
-        if (data.status === 'error') throw new Error(data.message || 'Erreur de génération');
-        pollForCode(phone, attempt + 1);
-      } catch (err) {
-        pollForCode(phone, attempt + 1);
-      }
-    }, 2000);
-  }
-
-  let connectionPollTimeout = null;
-  function pollForConnection(phone) {
-    if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
-    connectionPollTimeout = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/code?phoneNumber=${phone}`);
-        const data = await res.json();
-        if (data.status === 'connected') {
-          connectedBadge.classList.add('show');
-          if (expiryInterval) { clearInterval(expiryInterval); expiryInterval = null; }
-          expiryBar.style.width = '100%';
-          return;
-        }
-        if (data.status === 'error') {
-          quickDisconnectBtn.classList.remove('show');
-          showToast(data.message || 'La connexion a échoué. Réessayez.', '❌');
-          return;
-        }
-        pollForConnection(phone);
-      } catch (err) {
-        pollForConnection(phone);
-      }
-    }, 3000);
-  }
-
-  submitBtn.addEventListener('click', () => {
-    const phone = phoneInput.value.replace(/[^0-9]/g, '');
-    errorMsg.style.display = 'none';
-    if (!phone || phone.length < 8) {
-      errorMsg.textContent = 'Numéro invalide (indicatif + numéro).';
-      errorMsg.style.display = 'block';
-      return;
-    }
-    generateCode(phone);
-  });
-
-  phoneInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitBtn.click(); });
-
-  copyBtn.addEventListener('click', () => {
-    const code = codeText.textContent;
-    navigator.clipboard.writeText(code).then(() => showToast('Code copié !', '📋'))
-      .catch(() => {
-        const ta = document.createElement('textarea');
-        ta.value = code; document.body.appendChild(ta); ta.select();
-        document.execCommand('copy'); ta.remove();
-        showToast('Code copié !', '📋');
-      });
-  });
-
-  quickDisconnectBtn.addEventListener('click', async () => {
-    if (!currentPhone) return;
-    quickDisconnectBtn.disabled = true;
-    quickDisconnectBtn.textContent = 'Déconnexion…';
-    try {
-      const res = await fetch(`/api/session?phoneNumber=${currentPhone}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        showToast('Session déconnectée.', '🔌');
-        if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
-        refreshBtn.click();
-      } else {
-        showToast(data.message || 'Erreur lors de la déconnexion.', '⚠️');
-      }
-    } catch (err) {
-      showToast('Impossible de contacter le serveur.', '❌');
-    } finally {
-      quickDisconnectBtn.disabled = false;
-      quickDisconnectBtn.textContent = '🔌 Déconnecter cette session';
-    }
-  });
-
-  refreshBtn.addEventListener('click', () => {
-    if (pollTimeout) clearTimeout(pollTimeout);
-    if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
-    if (expiryInterval) clearInterval(expiryInterval);
-    resetTimer();
-    showState('formState');
-    if (qrInstance) { qrContainer.innerHTML = ''; qrInstance = null; }
-    submitBtn.disabled = false;
-    connectedBadge.classList.remove('show');
-    quickDisconnectBtn.classList.remove('show');
-    phoneInput.value = currentPhone;
-  });
-
-  // ===== Décoration : traînée de pattes de chat au clic =====
-  document.addEventListener('click', (e) => {
-    const paw = document.createElement('div');
-    paw.className = 'paw';
-    paw.textContent = '🐾';
-    paw.style.left = `${e.clientX - 9}px`;
-    paw.style.top = `${e.clientY - 9}px`;
-    document.body.appendChild(paw);
-    setTimeout(() => paw.remove(), 900);
-  });
-
-  const hist = loadHistory();
-  if (hist.length > 0) phoneInput.value = hist[0];
-
-  // ===== Compteur de sessions connectées =====
-  async function updateSessionsCount() {
-    try {
-      const res = await fetch('/api/sessions');
-      const data = await res.json();
-      document.getElementById('sessionsNumber').textContent = data.count || 0;
-    } catch (e) {}
-  }
-  updateSessionsCount();
-  setInterval(updateSessionsCount, 8000);
-
-  // ===== Déconnexion de session =====
-  const disconnectLink = document.getElementById('disconnectLink');
-  const disconnectBox = document.getElementById('disconnectBox');
-  const disconnectPhone = document.getElementById('disconnectPhone');
-  const disconnectBtn = document.getElementById('disconnectBtn');
-
-  disconnectLink.addEventListener('click', () => {
-    disconnectBox.classList.toggle('open');
-  });
-
-  disconnectBtn.addEventListener('click', async () => {
-    const phone = disconnectPhone.value.replace(/[^0-9]/g, '');
-    if (!phone || phone.length < 8) {
-      showToast('Numéro invalide.', '❌');
-      return;
-    }
-    disconnectBtn.disabled = true;
-    disconnectBtn.textContent = 'Déconnexion…';
-    try {
-      const res = await fetch(`/api/session?phoneNumber=${phone}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        showToast('Session déconnectée.', '🔌');
-        disconnectPhone.value = '';
-        disconnectBox.classList.remove('open');
-      } else {
-        showToast(data.message || 'Aucune session active pour ce numéro.', '⚠️');
-      }
-    } catch (err) {
-      showToast('Impossible de contacter le serveur.', '❌');
-    } finally {
-      disconnectBtn.disabled = false;
-      disconnectBtn.textContent = 'Déconnecter';
-    }
-  });
-
-  window.addEventListener('beforeunload', () => {
-    if (pollTimeout) clearTimeout(pollTimeout);
-    if (connectionPollTimeout) clearTimeout(connectionPollTimeout);
-    if (expiryInterval) clearInterval(expiryInterval);
-    if (timerInterval) clearInterval(timerInterval);
-  });
-</script>
+  </script>
 </body>
 </html>
