@@ -39,12 +39,9 @@
     padding: 24px;
     position: relative;
     overflow-x: hidden;
-
-    /* Fond sombre uni (photo retirée) */
     background: #030303;
   }
 
-  /* Halo néon discret par-dessus le fond */
   body::before {
     content: '';
     position: fixed;
@@ -63,7 +60,6 @@
     pointer-events: none;
   }
 
-  /* ===== Bouton son (thème chat noir) ===== */
   .sound-toggle {
     position: fixed;
     top: 18px;
@@ -85,7 +81,6 @@
   .sound-toggle:hover { transform: scale(1.06); border-color: var(--neon-dim); }
   .sound-toggle.on { box-shadow: 0 0 22px var(--neon-glow); }
   .sound-toggle svg { width: 26px; height: 26px; }
-  /* silhouette de chat, yeux qui s'allument en néon si le son est actif */
   .cat-eye { fill: #333; transition: fill 0.25s ease, filter 0.25s ease; }
   .sound-toggle.on .cat-eye {
     fill: var(--neon);
@@ -109,7 +104,6 @@
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
   }
 
-  /* ===== En-tête avec photo de profil ===== */
   .brand {
     text-align: center;
     margin-bottom: 26px;
@@ -240,6 +234,7 @@
     transition: all 0.2s;
   }
   .btn-secondary:hover { border-color: var(--neon-dim); background: rgba(57,255,20,0.06); }
+  .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .steps { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--panel-border); text-align: left; width: 100%; }
   .steps ol { margin: 0; padding-left: 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.9; }
@@ -250,6 +245,7 @@
   .pill:hover { border-color: var(--neon-dim); color: var(--neon); }
 
   .error-msg { display: none; font-size: 13px; color: var(--danger); margin-top: 12px; font-family: var(--mono); text-align: center; }
+  .error-msg.show { display: block; }
 
   .disconnect-link {
     text-align: center;
@@ -329,7 +325,6 @@
   .btn-danger:hover { background: rgba(255,41,101,0.08); border-color: var(--danger); }
   .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* Traînée de pattes de chat au clic */
   .paw {
     position: fixed;
     z-index: 100;
@@ -385,7 +380,6 @@
 
   <canvas id="cataclysm-canvas"></canvas>
 
-  <!-- Bouton son, silhouette de chat noir avec yeux néon -->
   <div class="sound-toggle on" id="soundToggle" role="button" tabindex="0" aria-label="Activer/couper le son">
     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
       <path class="cat-body" d="M32 8 L14 2 L18 20 C10 26 6 36 8 46 C10 56 20 62 32 62 C44 62 54 56 56 46 C58 36 54 26 46 20 L50 2 Z"/>
@@ -560,6 +554,17 @@
     } catch (e) {}
   }
 
+  // ===== Traînée de pattes au clic =====
+  document.addEventListener('click', (e) => {
+    const paw = document.createElement('div');
+    paw.className = 'paw';
+    paw.textContent = '🐾';
+    paw.style.left = (e.clientX - 9) + 'px';
+    paw.style.top = (e.clientY - 9) + 'px';
+    document.body.appendChild(paw);
+    setTimeout(() => paw.remove(), 900);
+  });
+
   // ===== Éléments =====
   const phoneInput = document.getElementById('phone');
   const submitBtn = document.getElementById('submitBtn');
@@ -579,15 +584,306 @@
   const toastIcon = document.getElementById('toastIcon');
   const connectedBadge = document.getElementById('connectedBadge');
   const quickDisconnectBtn = document.getElementById('quickDisconnectBtn');
+  const disconnectLink = document.getElementById('disconnectLink');
+  const disconnectBox = document.getElementById('disconnectBox');
+  const disconnectPhone = document.getElementById('disconnectPhone');
+  const disconnectBtn = document.getElementById('disconnectBtn');
+  const sessionsNumber = document.getElementById('sessionsNumber');
+
+  const CODE_EXPIRY_SECONDS = 60;
+  const POLL_INTERVAL_MS = 2500;
 
   let currentPhone = '';
-  let pollTimeout = null;
+  let pollInterval = null;
+  let connectionWatchInterval = null;
   let timerInterval = null;
   let expiryInterval = null;
-  let qrInstance = null;
+  let secondsElapsed = 0;
 
+  // ===== Historique des numéros (local, juste pour le confort) =====
   function loadHistory() {
     try { return JSON.parse(localStorage.getItem('phoneHistory')) || []; } catch { return []; }
   }
   function saveHistory(phone) {
-    let hist
+    let hist = loadHistory();
+    hist = hist.filter(p => p !== phone);
+    hist.unshift(phone);
+    hist = hist.slice(0, 5);
+    localStorage.setItem('phoneHistory', JSON.stringify(hist));
+  }
+  function renderHistory() {
+    const hist = loadHistory();
+    historyContainer.innerHTML = '';
+    hist.forEach(phone => {
+      const pill = document.createElement('div');
+      pill.className = 'pill';
+      pill.textContent = phone;
+      pill.addEventListener('click', () => { phoneInput.value = phone; });
+      historyContainer.appendChild(pill);
+    });
+  }
+  renderHistory();
+
+  // ===== Toast =====
+  function showToast(message, icon = '✅') {
+    toastMessage.textContent = message;
+    toastIcon.textContent = icon;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2400);
+  }
+
+  // ===== Gestion des états (form / loading / code) =====
+  function showState(name) {
+    formState.classList.toggle('active', name === 'form');
+    loadingState.classList.toggle('active', name === 'loading');
+    codeState.classList.toggle('active', name === 'code');
+  }
+
+  function showError(message) {
+    errorMsg.textContent = message;
+    errorMsg.classList.add('show');
+  }
+  function clearError() {
+    errorMsg.textContent = '';
+    errorMsg.classList.remove('show');
+  }
+
+  // ===== Timer pendant le chargement =====
+  function startLoadingTimer() {
+    secondsElapsed = 0;
+    timerDisplay.textContent = '⏱ 0s';
+    timerInterval = setInterval(() => {
+      secondsElapsed++;
+      timerDisplay.textContent = `⏱ ${secondsElapsed}s`;
+    }, 1000);
+  }
+  function stopLoadingTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  // ===== Barre d'expiration du code =====
+  function startExpiryBar() {
+    clearInterval(expiryInterval);
+    let remaining = CODE_EXPIRY_SECONDS;
+    expiryBar.style.width = '100%';
+    expiryInterval = setInterval(() => {
+      remaining--;
+      const pct = Math.max(0, (remaining / CODE_EXPIRY_SECONDS) * 100);
+      expiryBar.style.width = pct + '%';
+      if (remaining <= 0) {
+        clearInterval(expiryInterval);
+        showToast('Code expiré, génère-en un nouveau.', '⏱');
+      }
+    }, 1000);
+  }
+  function stopExpiryBar() {
+    clearInterval(expiryInterval);
+    expiryInterval = null;
+  }
+
+  // ===== QR code =====
+  function renderQR(code) {
+    qrContainer.innerHTML = '';
+    try {
+      new QRCode(qrContainer, {
+        text: code,
+        width: 130,
+        height: 130,
+        colorDark: '#000000',
+        colorLight: '#ffffff'
+      });
+    } catch (e) {
+      // qrcodejs peut échouer sur certains formats de code, ce n'est pas bloquant
+    }
+  }
+
+  // ===== Nettoyage des intervalles en cours (avant nouvelle génération) =====
+  function clearAllTimers() {
+    stopLoadingTimer();
+    stopExpiryBar();
+    clearInterval(pollInterval);
+    clearInterval(connectionWatchInterval);
+    pollInterval = null;
+    connectionWatchInterval = null;
+  }
+
+  // ===== Affiche le code obtenu =====
+  function displayCode(code) {
+    clearAllTimers();
+    codeText.textContent = code;
+    connectedBadge.classList.remove('show');
+    quickDisconnectBtn.classList.add('show');
+    showState('code');
+    renderQR(code);
+    startExpiryBar();
+    playBeep();
+    watchConnection(currentPhone);
+  }
+
+  // ===== Interroge /api/code/:phoneNumber jusqu'à obtenir un code =====
+  function pollForCode(phone) {
+    clearInterval(pollInterval);
+    pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/code/${phone}`);
+        const data = await res.json();
+
+        if (data.status === 'error') {
+          clearInterval(pollInterval);
+          stopLoadingTimer();
+          showState('form');
+          showError(data.message || 'Erreur lors de la génération du code.');
+          return;
+        }
+
+        const code = data.code || data.pairingCode;
+        if (code) {
+          clearInterval(pollInterval);
+          displayCode(code);
+        }
+      } catch (err) {
+        // Erreur réseau ponctuelle : on retente au prochain intervalle
+      }
+    }, POLL_INTERVAL_MS);
+  }
+
+  // ===== Vérifie périodiquement si le numéro s'est bien connecté à WhatsApp =====
+  function watchConnection(phone) {
+    clearInterval(connectionWatchInterval);
+    connectionWatchInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/code/${phone}`);
+        const data = await res.json();
+        if (data.status === 'connected') {
+          connectedBadge.classList.add('show');
+          stopExpiryBar();
+          clearInterval(connectionWatchInterval);
+          showToast('WhatsApp connecté avec succès !', '✅');
+        }
+      } catch (err) {
+        // on ignore, on retentera au prochain cycle
+      }
+    }, POLL_INTERVAL_MS);
+  }
+
+  // ===== Soumission du formulaire =====
+  async function submitPhone(phoneOverride) {
+    const raw = (phoneOverride || phoneInput.value).trim();
+    const clean = raw.replace(/[^0-9]/g, '');
+
+    clearError();
+
+    if (clean.length < 8) {
+      showError('Numéro invalide. Indicatif pays + numéro, sans + ni espaces.');
+      return;
+    }
+
+    currentPhone = clean;
+    phoneInput.value = clean;
+    submitBtn.disabled = true;
+    showState('loading');
+    startLoadingTimer();
+
+    try {
+      const res = await fetch('/api/pair', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber: clean })
+      });
+      const data = await res.json();
+
+      if (!data.success && !data.code) {
+        throw new Error(data.message || 'Le serveur de pairing est injoignable.');
+      }
+
+      saveHistory(clean);
+      renderHistory();
+
+      const code = data.code || data.pairingCode;
+      if (code) {
+        displayCode(code);
+      } else {
+        // Le code n'est pas encore prêt : on interroge /api/code en boucle
+        pollForCode(clean);
+      }
+    } catch (err) {
+      stopLoadingTimer();
+      showState('form');
+      showError(err.message || 'Erreur inconnue.');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  }
+
+  submitBtn.addEventListener('click', () => submitPhone());
+  phoneInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitPhone();
+  });
+
+  // ===== Copier le code =====
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(codeText.textContent);
+      showToast('Code copié !', '📋');
+    } catch (e) {
+      showToast('Impossible de copier automatiquement.', '⚠️');
+    }
+  });
+
+  // ===== Régénérer un nouveau code =====
+  refreshBtn.addEventListener('click', () => {
+    if (currentPhone) submitPhone(currentPhone);
+  });
+
+  // ===== Déconnexion (lien + boîte dans le formulaire) =====
+  disconnectLink.addEventListener('click', () => {
+    disconnectBox.classList.toggle('open');
+  });
+
+  async function disconnectSession(phone) {
+    const clean = phone.replace(/[^0-9]/g, '');
+    if (clean.length < 8) {
+      showToast('Numéro invalide.', '⚠️');
+      return;
+    }
+    try {
+      const res = await fetch(`/api/session/${clean}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Session déconnectée.', '🔌');
+      } else {
+        showToast(data.message || 'Échec de la déconnexion.', '⚠️');
+      }
+    } catch (err) {
+      showToast('Serveur injoignable.', '⚠️');
+    }
+  }
+
+  disconnectBtn.addEventListener('click', () => disconnectSession(disconnectPhone.value));
+
+  quickDisconnectBtn.addEventListener('click', async () => {
+    if (!currentPhone) return;
+    quickDisconnectBtn.disabled = true;
+    await disconnectSession(currentPhone);
+    quickDisconnectBtn.disabled = false;
+    clearAllTimers();
+    showState('form');
+    connectedBadge.classList.remove('show');
+  });
+
+  // ===== Compteur de sessions connectées (footer) =====
+  async function refreshSessionsCount() {
+    try {
+      const res = await fetch('/api/sessions');
+      const data = await res.json();
+      sessionsNumber.textContent = data.count ?? 0;
+    } catch (e) {
+      // silencieux : le compteur n'est pas critique
+    }
+  }
+  refreshSessionsCount();
+  setInterval(refreshSessionsCount, 15000);
+</script>
+</body>
+</html>
