@@ -726,7 +726,7 @@
     clearInterval(pollInterval);
     pollInterval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/code/${phone}`);
+        const res = await fetch(`/api/code?phoneNumber=${phone}`);
         const data = await res.json();
 
         if (data.status === 'error') {
@@ -753,7 +753,7 @@
     clearInterval(connectionWatchInterval);
     connectionWatchInterval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/code/${phone}`);
+        const res = await fetch(`/api/code?phoneNumber=${phone}`);
         const data = await res.json();
         if (data.status === 'connected') {
           connectedBadge.classList.add('show');
@@ -848,7 +848,7 @@
       return;
     }
     try {
-      const res = await fetch(`/api/session/${clean}`, { method: 'DELETE' });
+      const res = await fetch(`/api/session?phoneNumber=${clean}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         showToast('Session déconnectée.', '🔌');
