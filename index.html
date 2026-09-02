@@ -584,16 +584,14 @@
   applySoundState();
 
   // Les navigateurs bloquent le son automatique tant qu'il n'y a pas eu d'interaction :
-  // on démarre donc la musique dès le tout premier clic n'importe où sur la page.
-  function unlockMusicOnFirstInteraction() {
-    if (soundOn && bgMusic.paused) {
-      bgMusic.play().catch(() => {});
-    }
-    document.removeEventListener('click', unlockMusicOnFirstInteraction);
-    document.removeEventListener('touchstart', unlockMusicOnFirstInteraction);
-  }
-  document.addEventListener('click', unlockMusicOnFirstInteraction);
-  document.addEventListener('touchstart', unlockMusicOnFirstInteraction);
+  // à chaque clic sur la page, si la musique DEVRAIT jouer mais ne joue pas encore, on la relance.
+  // (ne touche jamais à soundOn, donc aucun conflit avec le bouton lui-même)
+  document.addEventListener('click', () => {
+    if (soundOn && bgMusic.paused) bgMusic.play().catch(() => {});
+  });
+  document.addEventListener('touchstart', () => {
+    if (soundOn && bgMusic.paused) bgMusic.play().catch(() => {});
+  });
 
   soundToggle.addEventListener('click', () => {
     soundOn = !soundOn;
