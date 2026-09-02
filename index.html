@@ -66,8 +66,8 @@
     bottom: 16px;
     right: 16px;
     z-index: 30;
-    width: 38px;
-    height: 38px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     background: linear-gradient(135deg, rgba(147,51,234,0.35), rgba(20,5,30,0.85));
     border: 1px solid var(--panel-border);
@@ -81,7 +81,7 @@
   }
   .sound-toggle:hover { transform: scale(1.08); border-color: var(--neon); }
   .sound-toggle.on { box-shadow: 0 0 14px var(--neon-glow); border-color: var(--neon); }
-  .sound-toggle svg { width: 22px; height: 22px; }
+  .sound-toggle svg { width: 28px; height: 28px; }
   .cat-body { fill: rgba(0,0,0,0.25); stroke: var(--neon); stroke-width: 2; }
   .play-icon, .pause-icon { fill: #ffffff; }
   .play-icon { display: none; }
@@ -582,6 +582,18 @@
     }
   }
   applySoundState();
+
+  // Les navigateurs bloquent le son automatique tant qu'il n'y a pas eu d'interaction :
+  // on démarre donc la musique dès le tout premier clic n'importe où sur la page.
+  function unlockMusicOnFirstInteraction() {
+    if (soundOn && bgMusic.paused) {
+      bgMusic.play().catch(() => {});
+    }
+    document.removeEventListener('click', unlockMusicOnFirstInteraction);
+    document.removeEventListener('touchstart', unlockMusicOnFirstInteraction);
+  }
+  document.addEventListener('click', unlockMusicOnFirstInteraction);
+  document.addEventListener('touchstart', unlockMusicOnFirstInteraction);
 
   soundToggle.addEventListener('click', () => {
     soundOn = !soundOn;
