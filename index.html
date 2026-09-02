@@ -63,31 +63,32 @@
 
   .sound-toggle {
     position: fixed;
-    top: 18px;
-    right: 18px;
+    bottom: 16px;
+    right: 16px;
     z-index: 30;
-    width: 52px;
-    height: 52px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: var(--panel);
+    background: linear-gradient(135deg, rgba(147,51,234,0.35), rgba(20,5,30,0.85));
     border: 1px solid var(--panel-border);
     backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 0 0 rgba(57,255,20,0);
+    box-shadow: 0 0 0 rgba(147,51,234,0);
     transition: box-shadow 0.25s ease, transform 0.15s ease, border-color 0.25s ease;
   }
-  .sound-toggle:hover { transform: scale(1.06); border-color: var(--neon-dim); }
-  .sound-toggle.on { box-shadow: 0 0 22px var(--neon-glow); }
-  .sound-toggle svg { width: 26px; height: 26px; }
-  .cat-eye { fill: #333; transition: fill 0.25s ease, filter 0.25s ease; }
-  .sound-toggle.on .cat-eye {
-    fill: var(--neon);
-    filter: drop-shadow(0 0 4px var(--neon));
-  }
-  .cat-body { fill: #111; stroke: #2a2a2a; stroke-width: 1; }
+  .sound-toggle:hover { transform: scale(1.08); border-color: var(--neon); }
+  .sound-toggle.on { box-shadow: 0 0 14px var(--neon-glow); border-color: var(--neon); }
+  .sound-toggle svg { width: 22px; height: 22px; }
+  .cat-body { fill: rgba(0,0,0,0.25); stroke: var(--neon); stroke-width: 2; }
+  .play-icon, .pause-icon { fill: #ffffff; }
+  .play-icon { display: none; }
+  .sound-toggle:not(.on) .play-icon { display: block; }
+  .sound-toggle.on .pause-icon { display: block; }
+  .sound-toggle.on .play-icon { display: none; }
+  .pause-icon { display: none; }
 
   main {
     position: relative;
@@ -383,11 +384,14 @@
 
   <audio id="bgMusic" src="https://files.catbox.moe/3cu8ep.m4a" loop preload="none"></audio>
 
-  <div class="sound-toggle on" id="soundToggle" role="button" tabindex="0" aria-label="Activer/couper le son">
+  <div class="sound-toggle on" id="soundToggle" role="button" tabindex="0" aria-label="Lecture/pause de la musique">
     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
       <path class="cat-body" d="M32 8 L14 2 L18 20 C10 26 6 36 8 46 C10 56 20 62 32 62 C44 62 54 56 56 46 C58 36 54 26 46 20 L50 2 Z"/>
-      <ellipse class="cat-eye" id="eyeL" cx="23" cy="34" rx="4.2" ry="6"/>
-      <ellipse class="cat-eye" id="eyeR" cx="41" cy="34" rx="4.2" ry="6"/>
+      <polygon class="play-icon" points="27,25 27,45 44,35"/>
+      <g class="pause-icon">
+        <rect x="24" y="25" width="6" height="20" rx="1.5"/>
+        <rect x="34" y="25" width="6" height="20" rx="1.5"/>
+      </g>
     </svg>
   </div>
 
@@ -464,12 +468,13 @@
   </main>
 
 <script>
-  // ===== Effet "Cataclysme" (façon pouvoir de Chat Noir : craquelures noires/violettes) =====
-  (function cataclysm() {
+  // ===== Effet "Éclairs" puissants (zigzag lumineux + flash violet) =====
+  (function lightning() {
     const canvas = document.getElementById('cataclysm-canvas');
     const ctx = canvas.getContext('2d');
     let width, height;
-    let cracks = [];
+    let bolts = [];
+    let flashAlpha = 0;
 
     function resize() {
       width = canvas.width = window.innerWidth;
@@ -478,22 +483,59 @@
     window.addEventListener('resize', resize);
     resize();
 
-    function spawnCrack() {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const branches = [];
-      let angle = Math.random() * Math.PI * 2;
-      let cx = x, cy = y;
-      const segments = 10 + Math.floor(Math.random() * 10);
+    // Génère un éclair en zigzag, du haut de l'écran vers le bas, avec des branches
+    function buildBoltPath(startX, startY, endY, wildness) {
+      const points = [{ x: startX, y: startY }];
+      let x = startX, y = startY;
+      const segments = 14 + Math.floor(Math.random() * 8);
+      const stepY = (endY - startY) / segments;
       for (let i = 0; i < segments; i++) {
-        angle += (Math.random() - 0.5) * 1.1;
-        const len = 8 + Math.random() * 14;
-        const nx = cx + Math.cos(angle) * len;
-        const ny = cy + Math.sin(angle) * len;
-        branches.push({ x1: cx, y1: cy, x2: nx, y2: ny });
-        cx = nx; cy = ny;
+        x += (Math.random() - 0.5) * wildness;
+        y += stepY;
+        points.push({ x, y });
       }
-      cracks.push({ branches, life: 1, decay: 0.004 + Math.random() * 0.003 });
+      return points;
+    }
+
+    function spawnBolt() {
+      const startX = width * (0.1 + Math.random() * 0.8);
+      const endY = height * (0.45 + Math.random() * 0.55);
+      const main = buildBoltPath(startX, -10, endY, 55);
+
+      // Quelques branches secondaires partant du tronc principal
+      const branches = [];
+      const branchCount = 2 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < branchCount; i++) {
+        const originIndex = 3 + Math.floor(Math.random() * (main.length - 6));
+        const origin = main[originIndex];
+        const branchLen = 4 + Math.floor(Math.random() * 4);
+        const branchEndY = origin.y + branchLen * 12;
+        branches.push(buildBoltPath(origin.x, origin.y, branchEndY, 40));
+      }
+
+      bolts.push({ main, branches, life: 1, decay: 0.05 + Math.random() * 0.03 });
+      flashAlpha = 0.16 + Math.random() * 0.1; // flash violet bref à l'impact
+    }
+
+    function drawPath(points, alpha, coreWidth) {
+      if (points.length < 2) return;
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+
+      // Halo violet large
+      ctx.strokeStyle = `rgba(147,51,234,${alpha * 0.55})`;
+      ctx.lineWidth = coreWidth * 4;
+      ctx.shadowColor = `rgba(192,38,212,${alpha})`;
+      ctx.shadowBlur = 22;
+      ctx.stroke();
+
+      // Cœur blanc éclatant
+      ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+      ctx.lineWidth = coreWidth;
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
     }
 
     let frame = 0;
@@ -501,26 +543,21 @@
       frame++;
       ctx.clearRect(0, 0, width, height);
 
-      if (frame % 90 === 0 && cracks.length < 6) spawnCrack();
+      // Flash violet plein écran au moment de l'impact
+      if (flashAlpha > 0) {
+        ctx.fillStyle = `rgba(147,51,234,${flashAlpha})`;
+        ctx.fillRect(0, 0, width, height);
+        flashAlpha -= 0.025;
+      }
 
-      cracks = cracks.filter(c => c.life > 0);
-      cracks.forEach(c => {
-        c.life -= c.decay;
-        const alpha = Math.max(0, c.life);
-        c.branches.forEach(b => {
-          ctx.beginPath();
-          ctx.moveTo(b.x1, b.y1);
-          ctx.lineTo(b.x2, b.y2);
-          const grad = ctx.createLinearGradient(b.x1, b.y1, b.x2, b.y2);
-          grad.addColorStop(0, `rgba(192,38,212,${alpha * 0.55})`);
-          grad.addColorStop(1, `rgba(20,5,30,${alpha * 0.85})`);
-          ctx.strokeStyle = grad;
-          ctx.lineWidth = 1.6;
-          ctx.shadowColor = `rgba(147,51,234,${alpha * 0.5})`;
-          ctx.shadowBlur = 6;
-          ctx.stroke();
-          ctx.shadowBlur = 0;
-        });
+      if (frame % 55 === 0 && bolts.length < 2 && Math.random() < 0.85) spawnBolt();
+
+      bolts = bolts.filter(b => b.life > 0);
+      bolts.forEach(b => {
+        b.life -= b.decay;
+        const alpha = Math.max(0, b.life);
+        drawPath(b.main, alpha, 2.4);
+        b.branches.forEach(branch => drawPath(branch, alpha * 0.7, 1.4));
       });
 
       requestAnimationFrame(draw);
