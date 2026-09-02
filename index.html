@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>𝐂𝐋𝐀𝐍 𝐈.𝐌.𝐏 — Portail du Clan</title>
+<title>CHAT NOIR-MD — Connexion WhatsApp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
   :root {
-    --neon: #C41E3A;
-    --neon-dim: #6e0f1c;
-    --neon-glow: rgba(196,30,58,0.32);
-    --gold: #D4AF37;
-    --danger: #FFB020;
+    --neon: #9333EA;
+    --neon-dim: #5b1fa3;
+    --neon-glow: rgba(147,51,234,0.35);
+    --neon2: #C026D3;
+    --danger: #FF4D6D;
     --text: #F2F2F2;
     --text-secondary: #b8b8b8;
     --muted: #7c7c7c;
@@ -48,8 +48,8 @@
     position: fixed;
     inset: 0;
     background:
-      radial-gradient(circle at 15% 10%, rgba(196,30,58,0.12), transparent 45%),
-      radial-gradient(circle at 85% 90%, rgba(212,175,55,0.07), transparent 45%);
+      radial-gradient(circle at 15% 10%, rgba(147,51,234,0.14), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(192,38,212,0.10), transparent 45%);
     pointer-events: none;
     z-index: 0;
   }
@@ -114,13 +114,10 @@
     height: 84px;
     border-radius: 50%;
     margin: 0 auto 14px;
+    object-fit: cover;
     border: 2px solid var(--neon);
     box-shadow: 0 0 24px var(--neon-glow);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    background: radial-gradient(circle, rgba(196,30,58,0.18), rgba(0,0,0,0.6));
+    display: block;
   }
   .brand .eyebrow {
     font-family: var(--mono);
@@ -137,20 +134,10 @@
     margin: 6px 0 6px;
     letter-spacing: -0.01em;
   }
-  .clan-meaning {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.18em;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin: 2px 0 10px;
-    opacity: 0.85;
-  }
   .brand p {
     font-size: 13.5px;
     color: var(--text-secondary);
     margin: 0;
-    font-style: italic;
   }
 
   label {
@@ -181,8 +168,8 @@
   button.btn-primary {
     width: 100%;
     margin-top: 14px;
-    background: var(--neon);
-    color: #060606;
+    background: linear-gradient(90deg, var(--neon), var(--neon2));
+    color: #ffffff;
     border: none;
     border-radius: 12px;
     padding: 15px;
@@ -266,14 +253,14 @@
     margin-top: 16px;
     font-family: var(--mono);
     font-size: 11.5px;
-    color: #caa24a;
+    color: #b98cff;
     cursor: pointer;
     letter-spacing: 0.03em;
     animation: blinkLink 1.4s infinite ease-in-out;
   }
-  .disconnect-link:hover { color: #f0d78c; animation-play-state: paused; }
+  .disconnect-link:hover { color: #d9b8ff; animation-play-state: paused; }
   @keyframes blinkLink {
-    0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(212,175,55,0.5); }
+    0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(139,0,255,0.6); }
     50% { opacity: 0.35; text-shadow: none; }
   }
   .disconnect-box {
@@ -285,7 +272,7 @@
   .disconnect-box.open { display: flex; }
   .disconnect-box input {
     background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(212,175,55,0.25);
+    border: 1px solid rgba(139,0,255,0.25);
     border-radius: 10px;
     padding: 11px 14px;
     color: var(--text);
@@ -294,10 +281,10 @@
     outline: none;
   }
   .disconnect-box .btn-secondary {
-    border-color: rgba(212,175,55,0.3);
-    color: #f0d78c;
+    border-color: rgba(139,0,255,0.3);
+    color: #d9b8ff;
   }
-  .disconnect-box .btn-secondary:hover { background: rgba(212,175,55,0.1); border-color: #D4AF37; }
+  .disconnect-box .btn-secondary:hover { background: rgba(139,0,255,0.1); border-color: #8b00ff; }
 
   .connected-badge {
     display: none;
@@ -376,7 +363,7 @@
   footer { text-align: center; margin-top: 22px; font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.05em; opacity: 0.7; }
   .sessions-count {
     font-size: 11.5px;
-    color: var(--gold);
+    color: #7fffb0;
     margin-bottom: 8px;
     letter-spacing: 0.04em;
   }
@@ -394,14 +381,13 @@
 
   <canvas id="cataclysm-canvas"></canvas>
 
+  <audio id="bgMusic" src="https://files.catbox.moe/3cu8ep.m4a" loop preload="none"></audio>
+
   <div class="sound-toggle on" id="soundToggle" role="button" tabindex="0" aria-label="Activer/couper le son">
     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-      <path class="cat-body" d="M32 6 C18 6 10 16 10 28 C10 34 12 38 15 42 L13 54 L22 48 C25 50 28 51 32 51 C36 51 39 50 42 48 L51 54 L49 42 C52 38 54 34 54 28 C54 16 46 6 32 6 Z"/>
-      <path class="cat-body" d="M18 30 L14 38 L20 36 Z" />
-      <path class="cat-body" d="M46 30 L50 38 L44 36 Z" />
-      <ellipse class="cat-eye" id="eyeL" cx="24" cy="27" rx="4.6" ry="6.4"/>
-      <ellipse class="cat-eye" id="eyeR" cx="40" cy="27" rx="4.6" ry="6.4"/>
-      <path class="cat-body" d="M28 38 L32 43 L36 38 L33 38 L33 41 L31 41 L31 38 Z"/>
+      <path class="cat-body" d="M32 8 L14 2 L18 20 C10 26 6 36 8 46 C10 56 20 62 32 62 C44 62 54 56 56 46 C58 36 54 26 46 20 L50 2 Z"/>
+      <ellipse class="cat-eye" id="eyeL" cx="23" cy="34" rx="4.2" ry="6"/>
+      <ellipse class="cat-eye" id="eyeR" cx="41" cy="34" rx="4.2" ry="6"/>
     </svg>
   </div>
 
@@ -413,38 +399,37 @@
   <main>
     <div class="card">
       <div class="brand">
-        <div class="avatar" aria-hidden="true">💀</div>
-        <div class="eyebrow">⚜ Portail du Clan ⚜</div>
-        <h1>𝐂𝐋𝐀𝐍 𝐈.𝐌.𝐏</h1>
-        <div class="clan-meaning">𝐈𝐌𝐌𝐎𝐑𝐓𝐄𝐋𝐒 · 𝐌𝐀𝐅𝐈𝐀 · 𝐏𝐔𝐑𝐆𝐄</div>
-        <p>Franchis les portes de l'ombre. Il n'y a pas de retour en arrière.</p>
+        <img class="avatar" src="https://files.catbox.moe/3cvx9z.jpg" alt="CHAT NOIR-MD">
+        <div class="eyebrow">✦ Pairing Portal</div>
+        <h1>CHAT NOIR-MD</h1>
+        <p>Connectez votre WhatsApp en un éclair</p>
       </div>
 
       <div class="state active" id="formState">
-        <label for="phone">Numéro d'initiation (indicatif pays)</label>
+        <label for="phone">Numéro WhatsApp (indicatif pays)</label>
         <input type="text" id="phone" placeholder="221776227173" inputmode="numeric" autocomplete="off">
-        <button class="btn-primary" id="submitBtn">😈 GÉNÉRER CODE</button>
+        <button class="btn-primary" id="submitBtn">🐾 Générer mon code</button>
         <div class="hint">Sans + ni espaces. Ex : <span>221776227173</span></div>
         <div class="error-msg" id="errorMsg"></div>
         <div class="history" id="historyContainer"></div>
-        <div class="disconnect-link" id="disconnectLink">🗝 Quitter le clan (autre membre)</div>
+        <div class="disconnect-link" id="disconnectLink">🔌 Déconnecter une session</div>
         <div class="disconnect-box" id="disconnectBox">
-          <input type="text" id="disconnectPhone" placeholder="Numéro à exclure du clan" inputmode="numeric" autocomplete="off">
-          <button class="btn-secondary" id="disconnectBtn">Exclure</button>
+          <input type="text" id="disconnectPhone" placeholder="Numéro à déconnecter" inputmode="numeric" autocomplete="off">
+          <button class="btn-secondary" id="disconnectBtn">Déconnecter</button>
         </div>
       </div>
 
       <div class="state" id="loadingState">
         <div class="loading-state">
           <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <div class="label" id="loadingLabel">Vérification du sang…</div>
+          <div class="label">Génération du code en cours…</div>
           <div class="timer" id="timerDisplay">⏱ 0s</div>
         </div>
       </div>
 
       <div class="state" id="codeState">
         <div class="code-display">
-          <div class="code-label">🩸 Code d'initiation</div>
+          <div class="code-label">🔑 Votre code de jumelage</div>
           <div class="code-value" id="codeValue">
             <span id="codeText">----</span>
             <div class="expiry-bar" id="expiryBar" style="width:100%"></div>
@@ -452,29 +437,29 @@
           <div class="qr-container" id="qrContainer"></div>
 
           <div class="connected-badge" id="connectedBadge">
-            <span class="badge-dot"></span> Initiation réussie — bienvenue, immortel
+            <span class="badge-dot"></span> WhatsApp connecté
           </div>
 
           <div class="action-row">
             <button class="btn-secondary" id="copyBtn">📋 Copier</button>
             <button class="btn-secondary" id="refreshBtn">🔄 Nouveau code</button>
           </div>
-          <button class="btn-danger" id="quickDisconnectBtn">⚔ Quitter le Clan</button>
+          <button class="btn-danger" id="quickDisconnectBtn">🔌 Déconnecter cette session</button>
 
           <div class="steps">
             <ol>
-              <li>Ouvre WhatsApp → Paramètres</li>
+              <li>Ouvrez WhatsApp → Paramètres</li>
               <li>Appareils liés → Lier un appareil</li>
               <li>Lier avec un numéro de téléphone</li>
-              <li>Entre le code d'initiation ou scanne le QR</li>
+              <li>Entrez le code ou scannez le QR</li>
             </ol>
           </div>
         </div>
       </div>
     </div>
     <footer>
-      <div class="sessions-count" id="sessionsCount">🕶️ <span id="sessionsNumber">0</span> membres actifs du clan</div>
-      𓆩⚜𓆪 ᴄʀᴇᴀᴛᴇᴅ ʙʏ 𝐃𝐄𝐕 𝐌𝐈𝐂𝐇𝐀𝐄𝐋 𝐒𝐂𝐎𝐅𝐈𝐄𝐋𝐃 𓆩⚜𓆪
+      <div class="sessions-count" id="sessionsCount">🟢 <span id="sessionsNumber">0</span> sessions connectées</div>
+      ᴄʀᴇᴀᴛᴇᴅ ʙʏ D𝐄𝐕 𝐌𝐈𝐂𝐇𝐀𝐄𝐋 𝐒𝐂𝐎𝐅𝐈𝐄𝐋𝐃
     </footer>
   </main>
 
@@ -527,11 +512,11 @@
           ctx.moveTo(b.x1, b.y1);
           ctx.lineTo(b.x2, b.y2);
           const grad = ctx.createLinearGradient(b.x1, b.y1, b.x2, b.y2);
-          grad.addColorStop(0, `rgba(212,175,55,${alpha * 0.5})`);
-          grad.addColorStop(1, `rgba(196,30,58,${alpha * 0.65})`);
+          grad.addColorStop(0, `rgba(192,38,212,${alpha * 0.55})`);
+          grad.addColorStop(1, `rgba(20,5,30,${alpha * 0.85})`);
           ctx.strokeStyle = grad;
           ctx.lineWidth = 1.6;
-          ctx.shadowColor = `rgba(196,30,58,${alpha * 0.5})`;
+          ctx.shadowColor = `rgba(147,51,234,${alpha * 0.5})`;
           ctx.shadowBlur = 6;
           ctx.stroke();
           ctx.shadowBlur = 0;
@@ -543,13 +528,24 @@
     draw();
   })();
 
-  // ===== Bouton son (thème chat noir) =====
+  // ===== Bouton son : musique de fond on/off =====
+  const bgMusic = document.getElementById('bgMusic');
+  bgMusic.volume = 0.35;
   let soundOn = localStorage.getItem('soundOn') !== 'false';
   const soundToggle = document.getElementById('soundToggle');
+
   function applySoundState() {
     soundToggle.classList.toggle('on', soundOn);
+    if (soundOn) {
+      bgMusic.play().catch(() => {
+        // Le navigateur peut bloquer la lecture auto : elle démarrera au prochain clic utilisateur
+      });
+    } else {
+      bgMusic.pause();
+    }
   }
   applySoundState();
+
   soundToggle.addEventListener('click', () => {
     soundOn = !soundOn;
     localStorage.setItem('soundOn', soundOn);
@@ -610,32 +606,6 @@
 
   const CODE_EXPIRY_SECONDS = 60;
   const POLL_INTERVAL_MS = 1000;
-
-  // Messages d'initiation thématiques, défilent pendant le chargement
-  const INITIATION_MESSAGES = [
-    'Vérification du sang…',
-    'Ouverture des portes du clan…',
-    'Le silence avant l\'immortalité…',
-    'Effacement des traces…',
-    'Le clan t\'observe…',
-    'Scellement du pacte…'
-  ];
-  let loadingLabelEl = null;
-  let loadingMsgInterval = null;
-
-  function startLoadingMessages() {
-    loadingLabelEl = document.getElementById('loadingLabel');
-    let i = 0;
-    loadingLabelEl.textContent = INITIATION_MESSAGES[0];
-    loadingMsgInterval = setInterval(() => {
-      i = (i + 1) % INITIATION_MESSAGES.length;
-      loadingLabelEl.textContent = INITIATION_MESSAGES[i];
-    }, 2200);
-  }
-  function stopLoadingMessages() {
-    clearInterval(loadingMsgInterval);
-    loadingMsgInterval = null;
-  }
 
   let currentPhone = '';
   let pollInterval = null;
@@ -700,12 +670,10 @@
       secondsElapsed++;
       timerDisplay.textContent = `⏱ ${secondsElapsed}s`;
     }, 1000);
-    startLoadingMessages();
   }
   function stopLoadingTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
-    stopLoadingMessages();
   }
 
   // ===== Barre d'expiration du code =====
