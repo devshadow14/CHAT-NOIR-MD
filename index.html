@@ -568,7 +568,7 @@
   // ===== Bouton son : musique de fond on/off =====
   const bgMusic = document.getElementById('bgMusic');
   bgMusic.volume = 0.35;
-  let soundOn = localStorage.getItem('soundOn') !== 'false';
+  let soundOn = localStorage.getItem('soundOn') === 'true';
   const soundToggle = document.getElementById('soundToggle');
 
   function applySoundState() {
@@ -583,15 +583,23 @@
   }
   applySoundState();
 
-  // Les navigateurs bloquent le son automatique tant qu'il n'y a pas eu d'interaction :
-  // à chaque clic sur la page, si la musique DEVRAIT jouer mais ne joue pas encore, on la relance.
-  // (ne touche jamais à soundOn, donc aucun conflit avec le bouton lui-même)
-  document.addEventListener('click', () => {
-    if (soundOn && bgMusic.paused) bgMusic.play().catch(() => {});
-  });
-  document.addEventListener('touchstart', () => {
-    if (soundOn && bgMusic.paused) bgMusic.play().catch(() => {});
-  });
+  // Au tout premier clic sur le site (n'importe où), la musique démarre et le
+  // bouton passe en mode pause. Ne se déclenche qu'une seule fois, et ne
+  // rentre pas en conflit avec un clic direct sur le bouton lui-même.
+  let musicEverStarted = false;
+  function tryAutoStartOnce() {
+    if (musicEverStarted) return;
+    musicEverStarted = true;
+    if (!soundOn) {
+      soundOn = true;
+      localStorage.setItem('soundOn', 'true');
+      applySoundState();
+    }
+    document.removeEventListener('click', tryAutoStartOnce);
+    document.removeEventListener('touchstart', tryAutoStartOnce);
+  }
+  document.addEventListener('click', tryAutoStartOnce);
+  document.addEventListener('touchstart', tryAutoStartOnce);
 
   soundToggle.addEventListener('click', () => {
     soundOn = !soundOn;
